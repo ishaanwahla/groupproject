@@ -80,3 +80,65 @@ main {
 .book p {
     color: #64748b; 
 }
+
+/*centers the login card*/
+.container-center {
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/*basic styling*/
+.login-card {
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9; 
+    border-radius: 20px; 
+    padding: 30px;
+    max-width: 360px;
+    width: 100%;
+}
+
+/*layout for form fields*/
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+/*submit button*/
+.btn-primary {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff; 
+    color: #24527a; 
+    padding: 10px; 
+    border-radius: 20px; 
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/*when hovered*/
+.btn-primary:hover {
+    background-color: #24527a;
+    color: #ffffff;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.login-footer a {
+    color: #24527a;
+    text-decoration: none;
+}
