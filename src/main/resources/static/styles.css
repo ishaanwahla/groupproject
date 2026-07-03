@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com');
+
+/*font, background, header*/
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+  background-color: #f8fafc; 
+}
+
+body {
+    max-width: 800px;
+    padding: 20px;
+    color: #1e293b; 
+}
+
+header {
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+/*sidebar and main content side by side*/
+.container {
+    display: flex;
+    gap: 40px;
+}
+
+/*side button design*/
+aside a {
+    display: block;
+    margin-bottom: 10px;
+    text-decoration: none;
+    background-color: #ffffff; 
+    color: #24527a; 
+    padding: 10px 20px; 
+    text-align: center; 
+    border-radius: 20px; 
+    border: 1px solid #e2e8f0; 
+}
+
+/*side buttons hover, inverts colors*/
+aside a:hover {
+    background-color: #24527a;
+    color: #ffffff;
+}
+
+/*placeholder interface takes up the full width*/
+main {
+    flex: 1;
+}
+
+.typing-interface {
+    border: 1px dashed #94a3b8;
+    padding: 20px;
+}
+
+/*puts the books next to eachother */
+.example-books {
+    display: flex;
+    gap: 20px;
+}
+
+/*book buttons*/
+.book {
+    margin: 15px;
+    padding: 15px;
+    border: 1px solid #f1f5f9; 
+    flex: 1;
+    background-color: #ffffff; 
+    border-radius: 20px; 
+    padding-left: 24px; 
+    padding-right: 24px; 
+}
+
+/*book buttons when hovered over get a slight shadow and border outline*/
+.book:hover {
+    box-shadow: 0 10px 15px -3px rgba(36, 82, 122, 0.08), 0 4px 6px -2px rgba(36, 82, 122, 0.03);
+    border-color: #cbd5e1;
+}
+
+/*author name*/
+.book p {
+    color: #64748b; 
+}
+
+/*centers the login card*/
+.container-center {
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/*basic styling*/
+.login-card {
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9; 
+    border-radius: 20px; 
+    padding: 30px;
+    max-width: 360px;
+    width: 100%;
+}
+
+/*layout for form fields*/
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+/*submit button*/
+.btn-primary {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff; 
+    color: #24527a; 
+    padding: 10px; 
+    border-radius: 20px; 
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/*when hovered*/
+.btn-primary:hover {
+    background-color: #24527a;
+    color: #ffffff;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.login-footer a {
+    color: #24527a;
+    text-decoration: none;
+}
