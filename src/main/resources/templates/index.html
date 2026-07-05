@@ -8,18 +8,25 @@
 
     <link rel="stylesheet" href="styles.css">
     <script src="/js/typing.js"></script>
+    <script src="/js/menu.js"></script>
 </head>
 
 <body>
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <h2>Booksprint</h2>
-        <a href="login.html">Logout</a>
+        <div class="account-dropdown-container">
+            <button id="accountBtn" class="btn-account">Account</button>
+            <div id="dropdownMenu" class="dropdown-menu">
+                <a href="#">Settings</a>
+                <a href="login.html">Log Out</a>
+            </div>
+        <div>
     </header>
 
     <div class="container">
-        <aside>
-            <a href="discover.html" class="active-nav">Discover</a>
-            <a href="saved.html" class="active-nav">Saved</a>
+        <aside class="left-sidebar">
+            <a href="#" class="active-nav">+ New Book</a>
+            <a href="#" class="active-nav">Your Collection</a>
         </aside>
 
         <main>
@@ -49,6 +56,13 @@
                 </div>
             </div>
         </main>
+        <aside class="right-sidebar">
+            <p class="book-name">Book Name Placeholder</p>
+            <p class="author-name">Author: Placeholder</p>
+            <div class="progress-circle">
+                <span class="progress-text">0%</span>
+            </div>
+        </aside>
     </div>
 
 
