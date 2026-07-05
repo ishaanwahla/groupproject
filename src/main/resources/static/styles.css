@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 /*font, background, header*/
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-  background-color: #f8fafc; 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
 }
 
 body {
     max-width: 800px;
     padding: 20px;
-    color: #1e293b; 
+    color: #1e293b;
 }
 
 header {
@@ -28,12 +28,12 @@ aside a {
     display: block;
     margin-bottom: 10px;
     text-decoration: none;
-    background-color: #ffffff; 
-    color: #24527a; 
-    padding: 10px 20px; 
-    text-align: center; 
-    border-radius: 20px; 
-    border: 1px solid #e2e8f0; 
+    background-color: #ffffff;
+    color: #24527a;
+    padding: 10px 20px;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
 }
 
 /*side buttons hover, inverts colors*/
@@ -62,12 +62,12 @@ main {
 .book {
     margin: 15px;
     padding: 15px;
-    border: 1px solid #f1f5f9; 
+    border: 1px solid #f1f5f9;
     flex: 1;
-    background-color: #ffffff; 
-    border-radius: 20px; 
-    padding-left: 24px; 
-    padding-right: 24px; 
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
 /*book buttons when hovered over get a slight shadow and border outline*/
@@ -78,7 +78,7 @@ main {
 
 /*author name*/
 .book p {
-    color: #64748b; 
+    color: #64748b;
 }
 
 /*centers the login card*/
@@ -90,8 +90,8 @@ main {
 /*basic styling*/
 .login-card {
     background-color: #ffffff;
-    border: 1px solid #f1f5f9; 
-    border-radius: 20px; 
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
     padding: 30px;
     max-width: 360px;
     width: 100%;
@@ -117,10 +117,10 @@ main {
 .btn-primary {
     width: 100%;
     border: 1px solid #e2e8f0;
-    background-color: #ffffff; 
-    color: #24527a; 
-    padding: 10px; 
-    border-radius: 20px; 
+    background-color: #ffffff;
+    color: #24527a;
+    padding: 10px;
+    border-radius: 20px;
     font-weight: 600;
     cursor: pointer;
 }
