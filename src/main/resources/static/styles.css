@@ -47,14 +47,6 @@ main {
     flex: 1;
 }
 
-#typing-interface {
-    border: 1px dashed #94a3b8;
-    padding: 20px;
-    height: 120px;
-    line-height: 40px;
-    overflow: hidden;
-    position: relative;
-}
 
 /*puts the books next to eachother */
 .example-books {
@@ -145,4 +137,22 @@ main {
 .login-footer a {
     color: #24527a;
     text-decoration: none;
+}
+
+/* Typing Interface and associated styles */
+#typing-interface {
+    border: 1px dashed #94a3b8;
+    padding: 20px;
+    height: 120px;
+    line-height: 40px;
+    overflow: hidden;
+    position: relative;
+}
+
+.correct {
+    color: #333fff;
+}
+
+.incorrect {
+    color: red;
 }

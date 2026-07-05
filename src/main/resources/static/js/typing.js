@@ -1,3 +1,8 @@
+
+/* ==================
+/  Constants & Global Variables
+/  ==================
+*/
 const PLACEHOLDER_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 const CHUNK_SIZE = 20; // the number of words per chunk
@@ -11,6 +16,11 @@ let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
 // holds span HTML elements for individual characters and tracks the position
 let spanElements = new Array();
 let currentSpanPosition = 0;
+
+/* ==================
+/  Functions
+/  ==================
+*/
 
 // Temporary function to simulate fetching text from an API and returning it in chunks
 //	
@@ -46,6 +56,10 @@ async function populateBuffer() {
 	}
 }
 
+// Shifts the array and handles scrolling the text
+function cycleChunk() {
+	console.log("its morbin' time");
+}
 
 // Renders chunks to the screen
 // by preparing a DOM fragment ahead of time
@@ -88,6 +102,39 @@ async function setup() {
 	renderChunks();
 	populateBuffer();
 }
+
+/* ==================
+/  Event Listeners
+/  ==================
+*/
+
+window.addEventListener("keydown", (e) => {
+	// should ignore non-standard keys (shift, alt)
+	// and stop the page from scrolling with space
+	if (e.key.length !== 1) return;
+	e.preventDefault();
+
+	if (visibleChunks.length === 0) return;
+
+	// grab the next character and it's corresponding DOM element for styling purposes
+	const targetCharacter = visibleChunks[0].text.shift();
+	const currentSpan = spanElements[currentSpanPosition];
+
+	// style the current character based on whether it was typed correctly (1 means correct)
+	const isCorrect = (e.key === targetCharacter) & 1;
+	if (isCorrect) {
+		currentSpan.classList.add("correct");
+	} else {
+		currentSpan.classList.add("incorrect");
+	}
+
+	currentSpanPosition++;
+
+	if (visibleChunks[0].text.length === 0) {
+		cycleChunk();
+	}
+});
+
 
 /* Wait until the page loads before attempting to access DOM elements */
 document.addEventListener('DOMContentLoaded', setup);
