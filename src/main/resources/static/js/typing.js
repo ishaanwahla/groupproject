@@ -5,12 +5,16 @@
 */
 const PLACEHOLDER_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
+// Data Structures
+// ---------------
 const textBuffer = new Array(); // an array of objects representing the fetched text
 
 const CHUNK_SIZE = 20; // the number of words per chunk
 const BUFFER_THRESHOLD = 3; // signals refilling when buffer drops below this size
 const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 
+// DOM & Visual Elements
+// ---------------------
 const LINE_HEIGHT = 40; // line height in pixels
 let currentChunkId = 0;
 let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
@@ -18,6 +22,15 @@ let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
 // holds span HTML elements for individual characters and tracks the position
 let spanElements = new Array();
 let currentSpanPosition = 0;
+
+// Stats & Time Tracking
+// ---------------------
+let trackingStats = false;
+let startTime = null;
+let intervalId = null;
+let totalCorrectKeystrokes = 0;
+
+let isPaused = false;
 
 /* ==================
 /  Functions
@@ -119,6 +132,21 @@ function renderChunks() {
 	typingInterface.appendChild(fragment);
 }
 
+function togglePause() {
+	const pauseIndicator = document.getElementById("pause-indicator");
+	const typingInterface = document.getElementById("typing-interface");
+
+	if (!isPaused) { // Pause
+		isPaused = true;
+		typingInterface.style.opacity = "0.3";
+		if (pauseIndicator) pauseIndicator.style.display = "block";
+	} else { // Resume
+		isPaused = false;
+		typingInterface.style.opacity = "1.0";
+		if (pauseIndicator) pauseIndicator.style.display = "none";
+	}
+}
+
 async function setup() {
 	await populateBuffer();
 
@@ -137,9 +165,14 @@ async function setup() {
 */
 
 window.addEventListener("keydown", (e) => {
+	// pauses the typing test
+	if (e.key === "Escape") {
+		togglePause();
+		return;
+	}
 	// should ignore non-standard keys (shift, alt)
 	// and stop the page from scrolling with space
-	if (e.key.length !== 1) return;
+	if (e.key.length !== 1 || isPaused) return;
 	e.preventDefault();
 
 	if (visibleChunks.length === 0) return;
