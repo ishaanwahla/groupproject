@@ -102,8 +102,7 @@ function cycleChunk() {
 	}
 }
 
-// Renders chunks to the screen
-// by preparing a DOM fragment ahead of time
+// Renders chunks to the screen by preparing a DOM fragment ahead of time
 function renderChunks() {
 	const typingInterface = document.getElementById("typing-interface");
 	typingInterface.textContent = "";
@@ -130,6 +129,11 @@ function renderChunks() {
 	spanElements = Array.from(fragment.querySelectorAll("span"));
 
 	typingInterface.appendChild(fragment);
+
+	// populate the cursor on the first screen draw
+	if (spanElements.length > 0) {
+		spanElements[0].classList.add("cursor");
+	}
 }
 
 function togglePause() {
@@ -139,10 +143,14 @@ function togglePause() {
 	if (!isPaused) { // Pause
 		isPaused = true;
 		typingInterface.style.opacity = "0.3";
+		// this class will pause the cursor blinking animation
+		typingInterface.classList.add("interface-paused");
 		if (pauseIndicator) pauseIndicator.style.display = "block";
 	} else { // Resume
 		isPaused = false;
 		typingInterface.style.opacity = "1.0";
+		// start the cursor flashing again
+		typingInterface.classList.remove("interface-paused");
 		if (pauseIndicator) pauseIndicator.style.display = "none";
 	}
 }
@@ -210,6 +218,9 @@ window.addEventListener("keydown", (e) => {
 	// if we run past the spans somehow, return to avoid a crash
 	if (!currentSpan) return;
 
+	// remove the cursor temporarily to avoid styling it
+	currentSpan.classList.remove("cursor");
+
 	// style the current character based on whether it was typed correctly (1 means correct)
 	const isCorrect = (e.key === targetCharacter) & 1;
 	if (isCorrect) {
@@ -225,6 +236,7 @@ window.addEventListener("keydown", (e) => {
 		const typingInterface = document.getElementById("typing-interface");
 		typingInterface.scrollTop = nextSpan.offsetTop - LINE_HEIGHT;
 	}
+	nextSpan.classList.add("cursor");
 
 	currentSpanPosition++;
 

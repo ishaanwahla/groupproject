@@ -161,10 +161,45 @@ main {
     display: flex;
     gap: 20px;
     margin-bottom: 10px;
-    font-family: monospace;
     font-size: 1.2rem;
 }
 
+span.cursor {
+    position: relative;
+}
+
+/* offset the cursor positioning - otherwise it pushes the text around as you type */
+span.cursor::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10%;
+    height: 80%;
+    width: 2px;
+    background-color: #000;
+    opacity: 1;
+    animation: blink .75s infinite;
+}
+
+/* pauses the animation when typing-interface has this class added */
+#typing-interface.interface-paused span.cursor::before {
+    animation-play-state: paused;
+}
+
+/* flashing cursor animation to track typing position */
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* styles for typed characters */
 .correct {
     color: #333fff;
 }
