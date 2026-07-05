@@ -5,11 +5,13 @@
 */
 const PLACEHOLDER_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
+const textBuffer = new Array(); // an array of objects representing the fetched text
+
 const CHUNK_SIZE = 20; // the number of words per chunk
 const BUFFER_THRESHOLD = 3; // signals refilling when buffer drops below this size
 const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 
-const textBuffer = new Array();
+const LINE_HEIGHT = 40; // line height in pixels
 let currentChunkId = 0;
 let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
 
@@ -58,7 +60,33 @@ async function populateBuffer() {
 
 // Shifts the array and handles scrolling the text
 function cycleChunk() {
-	console.log("its morbin' time");
+	visibleChunks.shift();
+
+	// prepare a reserve chunk so we don't run out while typing
+	if (textBuffer.length > 0) {
+		const freshChunk = textBuffer.shift();
+		visibleChunks.push(freshChunk);
+
+		populateBuffer();
+
+		// add new chunk to the very bottom of the dom
+		const typingInterface = document.getElementById("typing-interface");
+		const chunkDiv = document.createElement("div");
+		chunkDiv.classList.add("chunk-block");
+		chunkDiv.style.display = "inline";
+
+		freshChunk.text.forEach(char => {
+			const span = document.createElement("span");
+			span.textContent = char;
+			chunkDiv.appendChild(span);
+		});
+
+		typingInterface.appendChild(chunkDiv);
+
+		// populate the new letters into the array for the event handler to use
+		spanElements = Array.from(typingInterface.querySelectorAll("span"));
+
+	}
 }
 
 // Renders chunks to the screen
@@ -120,12 +148,19 @@ window.addEventListener("keydown", (e) => {
 	const targetCharacter = visibleChunks[0].text.shift();
 	const currentSpan = spanElements[currentSpanPosition];
 
+	// if we run past the spans somehow, return to avoid a crash
+	if (!currentSpan) return;
+
 	// style the current character based on whether it was typed correctly (1 means correct)
 	const isCorrect = (e.key === targetCharacter) & 1;
-	if (isCorrect) {
-		currentSpan.classList.add("correct");
-	} else {
+	isCorrect ? currentSpan.classList.add("correct") :
 		currentSpan.classList.add("incorrect");
+
+	const nextSpan = spanElements[currentSpanPosition + 1];
+	if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {
+		// scrolls the screen down slightly
+		const typingInterface = document.getElementById("typing-interface");
+		typingInterface.scrollTop = nextSpan.offsetTop - LINE_HEIGHT;
 	}
 
 	currentSpanPosition++;
@@ -134,7 +169,6 @@ window.addEventListener("keydown", (e) => {
 		cycleChunk();
 	}
 });
-
 
 /* Wait until the page loads before attempting to access DOM elements */
 document.addEventListener('DOMContentLoaded', setup);
