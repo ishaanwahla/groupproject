@@ -157,6 +157,12 @@ main {
     margin-bottom: 10px;
 }
 
+#pause-instructions {
+    font-weight: bold;
+    color: gray;
+    margin-top: 10px;
+}
+
 #user-stats {
     display: flex;
     gap: 20px;

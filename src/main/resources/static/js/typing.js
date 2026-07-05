@@ -25,6 +25,7 @@ let currentSpanPosition = 0;
 
 // Stats & Time Tracking
 // ---------------------
+const STAT_UPDATE_INTERVAL = 1000; // 1 second
 let trackingStats = false;
 let startTime = null;
 let intervalId = null;
@@ -138,6 +139,7 @@ function renderChunks() {
 
 function togglePause() {
 	const pauseIndicator = document.getElementById("pause-indicator");
+	const pauseInstructions = document.getElementById("pause-instructions");
 	const typingInterface = document.getElementById("typing-interface");
 
 	if (!isPaused) { // Pause
@@ -145,16 +147,19 @@ function togglePause() {
 		typingInterface.style.opacity = "0.3";
 		// this class will pause the cursor blinking animation
 		typingInterface.classList.add("interface-paused");
+		pauseInstructions.style.display = "none";
 		if (pauseIndicator) pauseIndicator.style.display = "block";
 	} else { // Resume
 		isPaused = false;
 		typingInterface.style.opacity = "1.0";
 		// start the cursor flashing again
 		typingInterface.classList.remove("interface-paused");
+		pauseInstructions.style.display = "block";
 		if (pauseIndicator) pauseIndicator.style.display = "none";
 	}
 }
 
+// called from the event handler periodically to calculate accuracy and set the wpm indicator
 function updateStats() {
 	if (isPaused || !startTime) return;
 
@@ -178,7 +183,7 @@ function updateStats() {
 async function setup() {
 	await populateBuffer();
 
-	// grab 3 chunks to populate the screen with text
+	// grab chunks to populate the screen with text
 	while (visibleChunks.length < 3 && textBuffer.length > 0) {
 		visibleChunks.push(textBuffer.shift());
 	}
@@ -208,14 +213,14 @@ window.addEventListener("keydown", (e) => {
 	if (!trackingStats) {
 		trackingStats = true;
 		startTime = Date.now();
-		intervalId = setInterval(updateStats, 1000);
+		intervalId = setInterval(updateStats, STAT_UPDATE_INTERVAL);
 	}
 
-	// grab the next character and it's corresponding DOM element for styling purposes
+	// grab the next character and its corresponding DOM element for styling purposes
 	const targetCharacter = visibleChunks[0].text.shift();
 	const currentSpan = spanElements[currentSpanPosition];
 
-	// if we run past the spans somehow, return to avoid a crash
+	// if we run past the available spans somehow, return to avoid a crash
 	if (!currentSpan) return;
 
 	// remove the cursor temporarily to avoid styling it
