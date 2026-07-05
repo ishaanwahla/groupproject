@@ -6,7 +6,11 @@ const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 
 const textBuffer = new Array();
 let currentChunkId = 0;
-let activeChunk = null; // represents the object currently being typed
+let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
+
+// holds span HTML elements for individual characters and tracks the position
+let spanElements = new Array();
+let currentSpanPosition = 0;
 
 // Temporary function to simulate fetching text from an API and returning it in chunks
 //	
@@ -42,14 +46,47 @@ async function populateBuffer() {
 	}
 }
 
+
+// Renders chunks to the screen
+// by preparing a DOM fragment ahead of time
+function renderChunks() {
+	const typingInterface = document.getElementById("typing-interface");
+	typingInterface.textContent = "";
+
+	// creates a DOM tree in memory, don't worry about rendering until we're ready
+	const fragment = document.createDocumentFragment();
+
+	// iterate through the 3 next chunks to be rendered
+	visibleChunks.forEach(chunk => {
+		const chunkDiv = document.createElement("div");
+		chunkDiv.classList.add("chunk-block");
+		chunkDiv.style.display = "inline";
+
+		chunk.text.forEach(char => {
+			const span = document.createElement("span");
+			span.textContent = char;
+			chunkDiv.appendChild(span);
+		});
+
+		fragment.appendChild(chunkDiv);
+	});
+
+	// create a NodeList. This should be easier for the event listener to index into
+	spanElements = Array.from(fragment.querySelectorAll("span"));
+
+	typingInterface.appendChild(fragment);
+}
+
 async function setup() {
 	await populateBuffer();
 
-	// pull the first chunk from the front of the array
-	activeChunk = textBuffer.shift();
+	// grab 3 chunks to populate the screen with text
+	while (visibleChunks.length < 3 && textBuffer.length > 0) {
+		visibleChunks.push(textBuffer.shift());
+	}
 
-	let typingInterface = document.getElementById("typing-interface");
-	typingInterface.textContent = PLACEHOLDER_TEXT;
+	renderChunks();
+	populateBuffer();
 }
 
 /* Wait until the page loads before attempting to access DOM elements */
