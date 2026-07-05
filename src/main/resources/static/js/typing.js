@@ -33,6 +33,36 @@ let totalCorrectKeystrokes = 0;
 
 let isPaused = false;
 
+
+/* ==========================
+/  Stubs for Future Functions
+/  ==========================
+*/
+
+// will replace the "fetchFakeText" function once the backend is up and running
+async function fetchText(chunkId) {
+	try {
+		// const response = await fetch(`/api/text/${chunkId}`);
+		// if (!response.ok) throw new Error("Network response returned error");
+		// return await response.json();
+	} catch (error) {
+		console.error("Failed to fetch text:", error);
+	}
+}
+
+// function for event handlers to call to save user data 
+async function saveUserStats(wpm, accuracy) {
+	// try {
+	//     await fetch('/api/save', {
+	//         method: 'POST',
+	//         headers: { 'Content-Type': 'application/json' },
+	//         body: JSON.stringify({ wpm, accuracy, timestamp: Date.now() })
+	//     });
+	// } catch (error) {
+	//     console.error("Failed to save user stats:", error);
+	// }
+}
+
 /* ==================
 /  Functions
 /  ==================
@@ -72,7 +102,7 @@ async function populateBuffer() {
 	}
 }
 
-// Shifts the array and handles scrolling the text
+// Discards old chunks and repopulates buffer, adds new spans to NodeList for rendering
 function cycleChunk() {
 	visibleChunks.shift();
 
@@ -83,7 +113,7 @@ function cycleChunk() {
 
 		populateBuffer();
 
-		// add new chunk to the very bottom of the dom
+		// add new chunk to the very bottom of the DOM
 		const typingInterface = document.getElementById("typing-interface");
 		const chunkDiv = document.createElement("div");
 		chunkDiv.classList.add("chunk-block");
