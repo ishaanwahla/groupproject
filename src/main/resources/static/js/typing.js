@@ -115,29 +115,33 @@ function cycleChunk() {
 
 	// prepare a reserve chunk so we don't run out while typing
 	if (textBuffer.length > 0) {
-		const freshChunk = textBuffer.shift();
-		visibleChunks.push(freshChunk);
+		const newChunk = textBuffer.shift();
+		visibleChunks.push(newChunk);
 
 		populateBuffer();
 
 		// add new chunk to the very bottom of the DOM
 		const typingInterface = document.getElementById("typing-interface");
-		const chunkDiv = document.createElement("div");
-		chunkDiv.classList.add("chunk-block");
-		chunkDiv.style.display = "inline";
-
-		freshChunk.text.forEach(char => {
-			const span = document.createElement("span");
-			span.textContent = char;
-			chunkDiv.appendChild(span);
-		});
-
-		typingInterface.appendChild(chunkDiv);
+		typingInterface.appendChild(createChunkPageElement(newChunk));
 
 		// populate the new letters into the array for the event handler to use
 		spanElements = Array.from(typingInterface.querySelectorAll("span"));
-
 	}
+}
+
+// Creates a DOM element (div) and appends individual character spans to it
+function createChunkPageElement(chunk) {
+	const chunkDiv = document.createElement("div");
+	chunkDiv.classList.add("chunk-block");
+	chunkDiv.style.display = "inline";
+
+	chunk.text.forEach(char => {
+		const span = document.createElement("span");
+		span.textContent = char;
+		chunkDiv.appendChild(span);
+	});
+
+	return chunkDiv;
 }
 
 // Renders chunks to the screen by preparing a DOM fragment ahead of time
@@ -150,22 +154,11 @@ function renderChunks() {
 
 	// iterate through the 3 next chunks to be rendered
 	visibleChunks.forEach(chunk => {
-		const chunkDiv = document.createElement("div");
-		chunkDiv.classList.add("chunk-block");
-		chunkDiv.style.display = "inline";
-
-		chunk.text.forEach(char => {
-			const span = document.createElement("span");
-			span.textContent = char;
-			chunkDiv.appendChild(span);
-		});
-
-		fragment.appendChild(chunkDiv);
+		fragment.appendChild(createChunkPageElement(chunk));
 	});
 
 	// create a NodeList. This should be easier for the event listener to index into
 	spanElements = Array.from(fragment.querySelectorAll("span"));
-
 	typingInterface.appendChild(fragment);
 
 	// populate the cursor on the first screen draw
