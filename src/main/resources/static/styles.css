@@ -142,3 +142,31 @@ main {
     color: #24527a;
     text-decoration: none;
 }
+
+/*admin page search box*/
+#searchBox {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+/*admin user table*/
+#userTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+
+#userTable th,
+#userTable td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#userTable th {
+    color: #64748b;
+}
