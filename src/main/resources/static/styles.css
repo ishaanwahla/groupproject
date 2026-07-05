@@ -1,13 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-/*font, background, header*/
+/*---------------------FRONT PAGE, LOGIN, REGISTER------------------------*/
+
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: #f8fafc;
 }
 
 body {
-    max-width: 800px;
+    max-width: 100%;
     padding: 20px;
     color: #1e293b;
 }
@@ -122,7 +123,7 @@ main {
 }
 
 /*when hovered*/
-.btn-primary:hover {
+.btn-primary:hover, .btn-account:hover {
     background-color: #24527a;
     color: #ffffff;
 }
@@ -138,6 +139,98 @@ main {
     color: #24527a;
     text-decoration: none;
 }
+
+.account-dropdown-container {
+    position: relative;
+}
+
+/*acount button*/
+.btn-account{
+    background-color: #ffffff;
+    color: #24527a;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/*dropdown menu*/
+.dropdown-menu{
+    position: absolute;
+    display: none;
+    right: 0;
+    top: 110%;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    width: 120px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+.dropdown-menu.show {
+    display: block;
+    transform: translateY(0);
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #1e293b;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f5f9;
+    color: #24527a;
+    border-radius: 12px;
+}
+
+/*left sidebar width*/
+.left-sidebar {
+    width: 200px;
+}
+
+/*right sidebar*/
+.right-sidebar {
+    width: 200px;
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 15px;
+    height: fit-content;
+}
+
+/*book name*/
+.book-name {
+    font-weight: bold;
+    color: #1e293b;
+    text-align: center;
+}
+
+/*author name*/
+.author-name {
+    color: #1e293b;
+    text-align: center;
+}
+
+/*progress circle*/
+.progress-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    background: conic-gradient(#e2e8f0 0% 100%);
+    justify-content: center;
+}
+
+/*---------------------ADMIN PAGE------------------------*/
 
 
 /*admin page search box*/
@@ -167,6 +260,9 @@ main {
 #userTable th {
     color: #64748b;
 }
+
+/*---------------------TYPING INTERFACE------------------------*/
+
 
 /* Typing Interface and associated styles */
 #typing-interface {
