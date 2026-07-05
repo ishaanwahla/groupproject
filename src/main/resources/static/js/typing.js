@@ -10,12 +10,13 @@ const PLACEHOLDER_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing eli
 const textBuffer = new Array(); // an array of objects representing the fetched text
 
 const CHUNK_SIZE = 20; // the number of words per chunk
-const BUFFER_THRESHOLD = 3; // signals refilling when buffer drops below this size
+const BUFFER_THRESHOLD = 3; // signals refilling when buffer drops below this size (not used until backend is implemented)
 const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 
 // DOM & Visual Elements
 // ---------------------
 const LINE_HEIGHT = 40; // line height in pixels
+const MAX_VISIBILE_CHUNKS = 3; // desired number of chunks visible on screen at one time
 let currentChunkId = 0;
 let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
 
@@ -25,7 +26,13 @@ let currentSpanPosition = 0;
 
 // Stats & Time Tracking
 // ---------------------
+const MAX_ACCURACY = 100;
 const STAT_UPDATE_INTERVAL = 1000; // 1 second
+const MS_PER_MINUTE = 60000; // used to convert millisecond measures to minutes for wpm
+const CHARS_PER_WORD = 5; // amount of characters to count as 1 word for wpm
+
+const PAUSED_OPACITY = 0.3;
+
 let trackingStats = false;
 let startTime = null;
 let intervalId = null;
@@ -174,7 +181,7 @@ function togglePause() {
 
 	if (!isPaused) { // Pause
 		isPaused = true;
-		typingInterface.style.opacity = "0.3";
+		typingInterface.style.opacity = `${PAUSED_OPACITY}`;
 		// this class will pause the cursor blinking animation
 		typingInterface.classList.add("interface-paused");
 		pauseInstructions.style.display = "none";
@@ -193,15 +200,15 @@ function togglePause() {
 function updateStats() {
 	if (isPaused || !startTime) return;
 
-	const timeElapsedMinutes = (Date.now() - startTime) / 60000;
+	const timeElapsedMinutes = (Date.now() - startTime) / MS_PER_MINUTE;
 	if (timeElapsedMinutes <= 0) return;
 
 	// just count 5 characters as a word for now... some other typing tests seem to use this
-	const wpm = Math.round((currentSpanPosition / 5) / timeElapsedMinutes);
+	const wpm = Math.round((currentSpanPosition / CHARS_PER_WORD) / timeElapsedMinutes);
 
 	const accuracy = currentSpanPosition > 0
-		? Math.round((totalCorrectKeystrokes / currentSpanPosition) * 100)
-		: 100;
+		? Math.round((totalCorrectKeystrokes / currentSpanPosition) * MAX_ACCURACY)
+		: MAX_ACCURACY;
 
 	const wpmIndicator = document.getElementById("wpm-display");
 	const accuracyIndicator = document.getElementById("accuracy-display");
@@ -214,7 +221,7 @@ async function setup() {
 	await populateBuffer();
 
 	// grab chunks to populate the screen with text
-	while (visibleChunks.length < 3 && textBuffer.length > 0) {
+	while (visibleChunks.length < MAX_VISIBILE_CHUNKS && textBuffer.length > 0) {
 		visibleChunks.push(textBuffer.shift());
 	}
 
