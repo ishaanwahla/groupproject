@@ -147,6 +147,26 @@ function togglePause() {
 	}
 }
 
+function updateStats() {
+	if (isPaused || !startTime) return;
+
+	const timeElapsedMinutes = (Date.now() - startTime) / 60000;
+	if (timeElapsedMinutes <= 0) return;
+
+	// just count 5 characters as a word for now... some other typing tests seem to use this
+	const wpm = Math.round((currentSpanPosition / 5) / timeElapsedMinutes);
+
+	const accuracy = currentSpanPosition > 0
+		? Math.round((totalCorrectKeystrokes / currentSpanPosition) * 100)
+		: 100;
+
+	const wpmIndicator = document.getElementById("wpm-display");
+	const accuracyIndicator = document.getElementById("accuracy-display");
+
+	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
+	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
+}
+
 async function setup() {
 	await populateBuffer();
 
@@ -177,6 +197,12 @@ window.addEventListener("keydown", (e) => {
 
 	if (visibleChunks.length === 0) return;
 
+	if (!trackingStats) {
+		trackingStats = true;
+		startTime = Date.now();
+		intervalId = setInterval(updateStats, 1000);
+	}
+
 	// grab the next character and it's corresponding DOM element for styling purposes
 	const targetCharacter = visibleChunks[0].text.shift();
 	const currentSpan = spanElements[currentSpanPosition];
@@ -186,8 +212,12 @@ window.addEventListener("keydown", (e) => {
 
 	// style the current character based on whether it was typed correctly (1 means correct)
 	const isCorrect = (e.key === targetCharacter) & 1;
-	isCorrect ? currentSpan.classList.add("correct") :
+	if (isCorrect) {
+		currentSpan.classList.add("correct")
+		totalCorrectKeystrokes++;
+	} else {
 		currentSpan.classList.add("incorrect");
+	};
 
 	const nextSpan = spanElements[currentSpanPosition + 1];
 	if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {

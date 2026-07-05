@@ -157,6 +157,14 @@ main {
     margin-bottom: 10px;
 }
 
+#user-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+
 .correct {
     color: #333fff;
 }
