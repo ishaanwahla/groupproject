@@ -4,45 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Booksprint</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <h2>Booksprint Admin</h2>
-        <a href="/">Back to app</a>
+        <a href="/" class="btn-account">Back to app</a>
     </header>
 
-    <p id="statusMessage"></p>
+    <p id="statusMessage" class="admin-status"></p>
 
-    <input type="text" id="searchBox" placeholder="Search by name or email">
-
-    <table id="userTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Joined</th>
-            </tr>
-        </thead>
-        <tbody id="userTableBody">
-        </tbody>
-    </table>
-
-    <link rel="stylesheet" href="styles.css">
+    <div class="container">
+        <aside class="left-sidebar admin-user-panel">
+            <input type="text" id="searchBox" placeholder="Search by name or email">
+            <h4 class="user-list-heading">Users</h4>
+            <ul id="userList" class="user-list"></ul>
+        </aside>
+    </div>
 
     <script>
         let users = [];
 
-        function renderRows(rows) {
-            const body = document.getElementById('userTableBody');
-            body.innerHTML = '';
+        function renderList(rows) {
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
             for (const user of rows) {
-                const row = document.createElement('tr');
-                row.innerHTML = '<td>' + user.name + '</td>' +
-                    '<td>' + user.email + '</td>' +
-                    '<td>' + user.role + '</td>' +
-                    '<td>' + user.createdAt + '</td>';
-                body.appendChild(row);
+                const item = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = user.name;
+                link.className = 'user-list-item';
+                item.appendChild(link);
+                list.appendChild(item);
             }
         }
 
@@ -55,7 +48,7 @@
             })
             .then(data => {
                 users = data;
-                renderRows(users);
+                renderList(users);
             })
             .catch(error => {
                 document.getElementById('statusMessage').textContent = error.message;
@@ -66,7 +59,7 @@
             const filtered = users.filter(user =>
                 user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
             );
-            renderRows(filtered);
+            renderList(filtered);
         });
     </script>
 </body>
