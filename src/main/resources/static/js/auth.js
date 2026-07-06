@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mode === 'login') {
                     message.textContent = 'Incorrect email or password.';
                 } else {
-                    message.textContent = 'Unable to create account at the moment.';
+                    const error = await response.json().catch(() => ({}));
+                    message.textContent = error.detail || error.message || 'Unable to create account.';
                 }
             }
         });

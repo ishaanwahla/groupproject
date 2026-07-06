@@ -2,6 +2,7 @@ package cmpt276.groupproject.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +34,9 @@ public class AuthController {
 	public UserResponse register(@Valid @RequestBody RegisterRequest request, BindingResult bindingResult,
 		HttpSession session) {
 		if (bindingResult.hasErrors()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Registration data is invalid.");
+			FieldError error = bindingResult.getFieldError();
+			String message = error == null ? "Registration data is invalid." : error.getDefaultMessage();
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
 		}
 
 		UserAccount user = authService.register(request, session);
