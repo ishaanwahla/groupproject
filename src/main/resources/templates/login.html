@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Booksprint</title>
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" th:href="@{/styles.css}">
     <script src="/js/auth.js"></script>
 </head>
 
@@ -29,8 +29,7 @@
                     <input type="password" id="password" name="password" placeholder="••••••••" required>
                 </div>
 
-                <p class="form-message" style="color: red;" th:if="${#fields.hasErrors('global')}"
-                    th:errors="*{global}"></p>
+                <p class="form-message form-error" th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></p>
 
                 <button type="submit" class="btn-primary">Sign In</button>
             </form>

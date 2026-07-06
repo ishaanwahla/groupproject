@@ -84,6 +84,10 @@ main {
     margin-top: 40px;
 }
 
+.form-error {
+    color: red;
+}
+
 /*basic styling*/
 .login-card {
     background-color: #ffffff;
@@ -123,7 +127,8 @@ main {
 }
 
 /*when hovered*/
-.btn-primary:hover, .btn-account:hover {
+.btn-primary:hover,
+.btn-account:hover {
     background-color: #24527a;
     color: #ffffff;
 }
@@ -145,7 +150,7 @@ main {
 }
 
 /*acount button*/
-.btn-account{
+.btn-account {
     display: inline-block;
     background-color: #ffffff;
     color: #24527a;
@@ -159,7 +164,7 @@ main {
 }
 
 /*dropdown menu*/
-.dropdown-menu{
+.dropdown-menu {
     position: absolute;
     display: none;
     right: 0;
@@ -362,4 +367,3 @@ span.cursor::before {
 .incorrect {
     color: red;
 }
-

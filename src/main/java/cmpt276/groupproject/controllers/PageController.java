@@ -1,6 +1,9 @@
 package cmpt276.groupproject.controllers;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import cmpt276.groupproject.models.LoginRequest;
+import cmpt276.groupproject.models.RegisterRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import cmpt276.groupproject.services.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -20,19 +23,28 @@ public class PageController {
 
 	@GetMapping("/app")
 	public String index(HttpSession session) {
-		if (authService.currentUser(session).isEmpty()) {
+		var currentUser = authService.currentUser(session);
+
+		if (currentUser.isEmpty()) {
 			return "redirect:/login";
 		}
+
+		if (currentUser.get().isAdmin()) {
+			return "redirect:/admin";
+		}
+
 		return "index";
 	}
 
 	@GetMapping("/login")
-	public String login() {
+	public String login(Model model) {
+		model.addAttribute("loginRequest", new LoginRequest());
 		return "login";
 	}
 
 	@GetMapping("/register")
-	public String register() {
+	public String register(Model model) {
+		model.addAttribute("registerRequest", new RegisterRequest());
 		return "register";
 	}
 

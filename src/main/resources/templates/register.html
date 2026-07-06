@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" th:href="@{/styles.css}">
     <script src="/js/auth.js"></script>
 </head>
 
@@ -18,28 +18,26 @@
     <div class="container container-center">
         <main class="login-card">
             <h3>Create Account</h3>
-
-            <form class="login-form" action="/api/auth/register" method="POST">
+            <form class="login-form" action="/api/auth/register" th:object="${registerRequest}" method="POST">
                 <div>
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
+                    <input type="text" id="name" th:field="*{name}" required>
+                    <p class="form-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
                 </div>
 
                 <div>
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" th:field="*{email}" required>
+                    <p class="form-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
                 </div>
 
                 <div>
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" th:field="*{password}" required>
+                    <p class="form-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
                 </div>
 
-                <p class="form-message" style="color: red;" th:if="${#fields.hasErrors('${registerRequest.email}')}"
-                    th:errors="${registerRequest.email}"></p>
-
-                <p class="form-message" style="color: red;" th:if="${#fields.hasErrors('global')}"
-                    th:errors="*{global}"></p>
+                <p class="form-message form-error" th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></p>
 
                 <button type="submit" class="btn-primary">Sign Up</button>
             </form>
