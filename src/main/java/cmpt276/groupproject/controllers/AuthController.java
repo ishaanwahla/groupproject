@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +33,7 @@ public class AuthController {
 	@PostMapping("/register")
 	@ResponseStatus(HttpStatus.CREATED)
 	public UserResponse register(@Valid @RequestBody RegisterRequest request, BindingResult bindingResult,
-		HttpSession session) {
+			HttpSession session) {
 		if (bindingResult.hasErrors()) {
 			FieldError error = bindingResult.getFieldError();
 			String message = error == null ? "Registration data is invalid." : error.getDefaultMessage();
@@ -44,13 +45,24 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public UserResponse login(@Valid @RequestBody LoginRequest request, BindingResult bindingResult,
-		HttpSession session) {
+	public void login(@Valid @ModelAttribute LoginRequest request, BindingResult bindingResult,
+			HttpSession session, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+
 		if (bindingResult.hasErrors()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login data is invalid.");
+			response.sendRedirect("/login");
+			return;
 		}
 
-		return UserResponse.from(authService.login(request, session));
+		try {
+			UserAccount user = authService.login(request, session);
+			if (user.isAdmin()) {
+				response.sendRedirect("/admin");
+			} else {
+				response.sendRedirect("/app");
+			}
+		} catch (Exception e) {
+			response.sendRedirect("/login");
+		}
 	}
 
 	@PostMapping("/logout")
@@ -62,7 +74,7 @@ public class AuthController {
 	@GetMapping("/me")
 	public UserResponse me(HttpSession session) {
 		return authService.currentUser(session)
-			.map(UserResponse::from)
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));
+				.map(UserResponse::from)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));
 	}
 }
