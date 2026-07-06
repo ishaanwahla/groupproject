@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 
 import cmpt276.groupproject.models.LoginRequest;
 import cmpt276.groupproject.models.RegisterRequest;
@@ -30,38 +31,37 @@ public class AuthController {
 		this.authService = authService;
 	}
 
-	@PostMapping("/register")
-	@ResponseStatus(HttpStatus.CREATED)
-	public UserResponse register(@Valid @RequestBody RegisterRequest request, BindingResult bindingResult,
-			HttpSession session) {
-		if (bindingResult.hasErrors()) {
-			FieldError error = bindingResult.getFieldError();
-			String message = error == null ? "Registration data is invalid." : error.getDefaultMessage();
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
-		}
-
-		UserAccount user = authService.register(request, session);
-		return UserResponse.from(user);
-	}
-
 	@PostMapping("/login")
-	public void login(@Valid @ModelAttribute LoginRequest request, BindingResult bindingResult,
-			HttpSession session, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
-
+	public Object login(@Valid @ModelAttribute LoginRequest request, BindingResult bindingResult, HttpSession session) {
 		if (bindingResult.hasErrors()) {
-			response.sendRedirect("/login");
-			return;
+			return new ModelAndView("login");
 		}
 
 		try {
 			UserAccount user = authService.login(request, session);
-			if (user.isAdmin()) {
-				response.sendRedirect("/admin");
-			} else {
-				response.sendRedirect("/app");
-			}
+			return user.isAdmin() ? "redirect:/admin" : "redirect:/app";
 		} catch (Exception e) {
-			response.sendRedirect("/login");
+			bindingResult.reject("loginError", "Incorrect email or password.");
+			return new ModelAndView("login");
+		}
+	}
+
+	@PostMapping("/register")
+	public Object register(@Valid @ModelAttribute RegisterRequest request, BindingResult bindingResult,
+			HttpSession session) {
+		if (bindingResult.hasErrors()) {
+			return new ModelAndView("register");
+		}
+
+		try {
+			authService.register(request, session);
+			return "redirect:/app";
+		} catch (ResponseStatusException e) {
+			bindingResult.rejectValue("email", "registrationError", e.getReason());
+			return new ModelAndView("register");
+		} catch (Exception e) {
+			bindingResult.reject("registrationError", "Unable to create account. Please try again.");
+			return new ModelAndView("register");
 		}
 	}
 
