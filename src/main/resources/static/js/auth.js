@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                window.location.href = '/';
+                window.location.href = '/app';
             } else {
                 if (mode === 'login') {
                     message.textContent = 'Incorrect email or password.';

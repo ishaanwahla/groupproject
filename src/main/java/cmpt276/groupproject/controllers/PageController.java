@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class PageController {
 
 	@GetMapping("/")
+	public String home() {
+		return "redirect:/login";
+	}
+
+	@GetMapping("/app")
 	public String index() {
 		return "index";
 	}
