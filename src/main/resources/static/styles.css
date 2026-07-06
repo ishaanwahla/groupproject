@@ -285,6 +285,38 @@ main {
     background-color: #f1f5f9;
 }
 
+/*selected user's name, shown above their metadata*/
+.user-name-display {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/*selected user's account details*/
+.user-metadata-card {
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.user-metadata-card p {
+    margin: 0 0 12px;
+    color: #1e293b;
+}
+
+.user-metadata-card p:last-child {
+    margin-bottom: 0;
+}
+
+.user-metadata-card strong {
+    color: #64748b;
+}
+
 /*---------------------TYPING INTERFACE------------------------*/
 
 

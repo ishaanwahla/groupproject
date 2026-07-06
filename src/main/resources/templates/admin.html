@@ -20,10 +20,24 @@
             <h4 class="user-list-heading">Users</h4>
             <ul id="userList" class="user-list"></ul>
         </aside>
+
+        <main>
+            <div class="user-name-display" id="userNameDisplay">Select a user to view their details</div>
+
+            <div class="user-metadata-card" id="userMetadata" style="display: none;">
+                <p><strong>Email:</strong> <span id="metaEmail"></span></p>
+                <p><strong>Account Created:</strong> <span id="metaCreatedAt"></span></p>
+                <p><strong>Last Active:</strong> <span>N/A</span></p>
+                <p><strong>Total API Requests:</strong> <span>N/A</span></p>
+                <p><strong>Global WPM:</strong> <span>N/A</span></p>
+                <p><strong>Global Accuracy:</strong> <span>N/A</span></p>
+            </div>
+        </main>
     </div>
 
     <script>
         let users = [];
+        let selectedId = null;
 
         function renderList(rows) {
             const list = document.getElementById('userList');
@@ -33,10 +47,23 @@
                 const link = document.createElement('a');
                 link.href = '#';
                 link.textContent = user.name;
-                link.className = 'user-list-item';
+                link.className = 'user-list-item' + (user.id === selectedId ? ' active' : '');
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    selectedId = user.id;
+                    renderList(rows);
+                    showDetails(user);
+                });
                 item.appendChild(link);
                 list.appendChild(item);
             }
+        }
+
+        function showDetails(user) {
+            document.getElementById('userNameDisplay').textContent = user.name;
+            document.getElementById('metaEmail').textContent = user.email;
+            document.getElementById('metaCreatedAt').textContent = user.createdAt;
+            document.getElementById('userMetadata').style.display = 'block';
         }
 
         fetch('/api/admin/users')
