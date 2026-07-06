@@ -18,7 +18,7 @@
         <main class="login-card">
             <h3>Welcome back</h3>
 
-            <form class="login-form">
+            <form class="login-form" data-auth-form="login">
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" placeholder="you@example.com" required>
@@ -29,15 +29,17 @@
                     <input type="password" id="password" name="password" placeholder="••••••••" required>
                 </div>
 
+                <p class="form-message" data-auth-message></p>
                 <button type="submit" class="btn-primary">Sign In</button>
             </form>
 
             <div class="login-footer">
-                <p>Don't have an account? <a href="#">Sign up</a></p>
+                <p>Don't have an account? <a href="/register">Sign up</a></p>
             </div>
         </main>
     </div>
 
+    <script src="/js/auth.js"></script>
 </body>
 
 </html>
