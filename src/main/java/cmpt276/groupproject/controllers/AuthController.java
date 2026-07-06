@@ -39,7 +39,8 @@ public class AuthController {
 
 		try {
 			UserAccount user = authService.login(request, session);
-			return user.isAdmin() ? "redirect:/admin" : "redirect:/app";
+			String destination = user.isAdmin() ? "redirect:/admin" : "redirect:/app";
+			return new ModelAndView(destination);
 		} catch (Exception e) {
 			bindingResult.reject("loginError", "Incorrect email or password.");
 			return new ModelAndView("login");
@@ -55,7 +56,7 @@ public class AuthController {
 
 		try {
 			authService.register(request, session);
-			return "redirect:/app";
+			return new ModelAndView("redirect:/app");
 		} catch (ResponseStatusException e) {
 			bindingResult.rejectValue("email", "registrationError", e.getReason());
 			return new ModelAndView("register");
