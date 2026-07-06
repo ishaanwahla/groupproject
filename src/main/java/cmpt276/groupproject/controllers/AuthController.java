@@ -4,12 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 
 import cmpt276.groupproject.models.LoginRequest;
 import cmpt276.groupproject.models.RegisterRequest;
@@ -29,28 +31,39 @@ public class AuthController {
 		this.authService = authService;
 	}
 
-	@PostMapping("/register")
-	@ResponseStatus(HttpStatus.CREATED)
-	public UserResponse register(@Valid @RequestBody RegisterRequest request, BindingResult bindingResult,
-		HttpSession session) {
+	@PostMapping("/login")
+	public Object login(@Valid @ModelAttribute LoginRequest request, BindingResult bindingResult, HttpSession session) {
 		if (bindingResult.hasErrors()) {
-			FieldError error = bindingResult.getFieldError();
-			String message = error == null ? "Registration data is invalid." : error.getDefaultMessage();
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+			return new ModelAndView("login");
 		}
 
-		UserAccount user = authService.register(request, session);
-		return UserResponse.from(user);
+		try {
+			UserAccount user = authService.login(request, session);
+			String destination = user.isAdmin() ? "redirect:/admin" : "redirect:/app";
+			return new ModelAndView(destination);
+		} catch (Exception e) {
+			bindingResult.reject("loginError", "Incorrect email or password.");
+			return new ModelAndView("login");
+		}
 	}
 
-	@PostMapping("/login")
-	public UserResponse login(@Valid @RequestBody LoginRequest request, BindingResult bindingResult,
-		HttpSession session) {
+	@PostMapping("/register")
+	public Object register(@Valid @ModelAttribute RegisterRequest request, BindingResult bindingResult,
+			HttpSession session) {
 		if (bindingResult.hasErrors()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login data is invalid.");
+			return new ModelAndView("register");
 		}
 
-		return UserResponse.from(authService.login(request, session));
+		try {
+			authService.register(request, session);
+			return new ModelAndView("redirect:/app");
+		} catch (ResponseStatusException e) {
+			bindingResult.rejectValue("email", "registrationError", e.getReason());
+			return new ModelAndView("register");
+		} catch (Exception e) {
+			bindingResult.reject("registrationError", "Unable to create account. Please try again.");
+			return new ModelAndView("register");
+		}
 	}
 
 	@PostMapping("/logout")
@@ -62,7 +75,7 @@ public class AuthController {
 	@GetMapping("/me")
 	public UserResponse me(HttpSession session) {
 		return authService.currentUser(session)
-			.map(UserResponse::from)
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));
+				.map(UserResponse::from)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));
 	}
 }

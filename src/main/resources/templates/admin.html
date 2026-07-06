@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Booksprint</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="/js/admin.js"></script>
+    <script src="/js/auth.js"></script>
 </head>
+
 <body>
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <h2>Booksprint Admin</h2>
-        <a href="/" class="btn-account">Back to app</a>
+        <a class="btn-account" href="/login" data-logout-link>Log Out</a>
     </header>
 
     <p id="statusMessage" class="admin-status"></p>
@@ -21,46 +25,6 @@
             <ul id="userList" class="user-list"></ul>
         </aside>
     </div>
-
-    <script>
-        let users = [];
-
-        function renderList(rows) {
-            const list = document.getElementById('userList');
-            list.innerHTML = '';
-            for (const user of rows) {
-                const item = document.createElement('li');
-                const link = document.createElement('a');
-                link.href = '#';
-                link.textContent = user.name;
-                link.className = 'user-list-item';
-                item.appendChild(link);
-                list.appendChild(item);
-            }
-        }
-
-        fetch('/api/admin/users')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('You must be logged in as an admin to view this page.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                users = data;
-                renderList(users);
-            })
-            .catch(error => {
-                document.getElementById('statusMessage').textContent = error.message;
-            });
-
-        document.getElementById('searchBox').addEventListener('input', function () {
-            const query = this.value.toLowerCase();
-            const filtered = users.filter(user =>
-                user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
-            );
-            renderList(filtered);
-        });
-    </script>
 </body>
+
 </html>
