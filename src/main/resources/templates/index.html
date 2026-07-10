@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booksprint</title>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="/js/typing.js"></script>
     <script src="/js/menu.js"></script>
@@ -14,26 +15,27 @@
 
 <body>
     <header style="display: flex; justify-content: space-between; align-items: center;">
-        <h2>Booksprint</h2>
+        <h2><i class="fa-solid fa-book"></i> Booksprint</h2>
         <div class="account-dropdown-container">
-            <button id="accountBtn" class="btn-account">Account</button>
+            <button id="accountBtn" class="btn-account"><i class="fa-solid fa-user"></i> Account</button>
             <div id="dropdownMenu" class="dropdown-menu">
                 <a href="#">Settings</a>
                 <a href="/login" data-logout-link>Log Out</a>
             </div>
-        <div>
+        </div>
     </header>
 
     <div class="container">
         <aside class="left-sidebar">
-            <a href="#" class="active-nav">+ New Book</a>
-            <a href="#" class="active-nav">Your Collection</a>
+            <a href="#" class="active-nav new-book"><i class="fa-solid fa-plus"></i> New Book</a>
+            <a href="#" class="active-nav"><i class="fa-solid fa-layer-group"></i> Your Collection</a>
+            <a href="#" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
         </aside>
 
         <main>
             <div id="user-stats">
-                <div id="wpm-display">WPM: 0</div>
-                <div id="accuracy-display">Accuracy: 100%</div>
+                <div id="wpm-display"><i class="fa-solid fa-stopwatch"></i> WPM: 0</div>
+                <div id="accuracy-display"><i class="fa-solid fa-bullseye"></i> Accuracy: 100%</div>
             </div>
             <div id="pause-indicator">Press ESC to Resume</div>
             <div id="typing-interface">
@@ -41,28 +43,51 @@
             </div>
             <div id="pause-instructions">Press ESC to Pause</div>
 
-            <h3>Discover new books:</h3>
+            <div class="section-heading">
+                <h3>More from this Genre</h3>
+                <span>See more</span>
+            </div>
             <div class="example-books">
                 <div class="book">
-                    <h4>Alice in Wonderland</h4>
-                    <p>Lewis Carroll</p>
+                    <div class="book-info">
+                        <h4>Alice in Wonderland</h4>
+                        <p>Lewis Carroll</p>
+                        <button class="book-play" type="button">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="book-placeholder-image"></div>
                 </div>
                 <div class="book">
-                    <h4>The Time Machine</h4>
-                    <p>H.G. Wells</p>
+                    <div class="book-info">
+                        <h4>The Time Machine</h4>
+                        <p>H.G. Wells</p>
+                        <button class="book-play" type="button">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="book-placeholder-image"></div>
                 </div>
                 <div class="book">
-                    <h4>Frankenstein</h4>
-                    <p>Mary Shelley</p>
+                    <div class="book-info">
+                        <h4>Frankenstein</h4>
+                        <p>Mary Shelley</p>
+                        <button class="book-play" type="button">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="book-placeholder-image"></div>
                 </div>
             </div>
         </main>
         <aside class="right-sidebar">
             <p class="book-name">Book Name Placeholder</p>
             <p class="author-name">Author: Placeholder</p>
+            <div class="sidebar-placeholder-image"></div>
             <div class="progress-circle">
                 <span class="progress-text">0%</span>
             </div>
+            <button class="favorite-button" type="button"><i class="fa-solid fa-star"></i> Favorite</button>
         </aside>
     </div>
 
