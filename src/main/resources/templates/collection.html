@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/new-book.js"></script>
 </head>
 
 <body>
@@ -25,10 +26,10 @@
 
     <div class="container">
         <aside class="left-sidebar collection-sidebar">
-            <a href="#" class="active-nav new-book"><i class="fa-solid fa-plus"></i> New Book</a>
+            <a href="#" class="active-nav new-book-trigger"><i class="fa-solid fa-plus"></i> New Book</a>
             <a href="/collection" class="active-nav"><i class="fa-solid fa-layer-group"></i> My Collection</a>
             <a href="/discover" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
-            <a href="/app" class="active-nav new-book continue-link"><i class="fa-solid fa-play"></i> Continue</a>
+            <a href="/app" class="active-nav continue-link"><i class="fa-solid fa-play"></i> Continue</a>
         </aside>
 
         <main>
@@ -63,6 +64,12 @@
             </div>
         </main>
     </div>
+    <dialog id="newBookDialog" class="new-book-dialog">
+        <form method="dialog"><button class="dialog-close"><i class="fa-solid fa-xmark"></i></button></form>
+        <h2>New Book</h2>
+        <label class="new-book-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="Search for a book"></label>
+        <div class="new-book-more"><p>Looking for more?</p><a href="/discover">Discover</a></div>
+    </dialog>
 </body>
 
 </html>
