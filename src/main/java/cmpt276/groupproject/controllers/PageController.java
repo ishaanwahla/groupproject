@@ -52,6 +52,16 @@ public class PageController {
 		return "discover";
 	}
 
+	@GetMapping("/profile")
+	public String profile(HttpSession session, Model model) {
+		var currentUser = authService.currentUser(session);
+		if (currentUser.isEmpty()) {
+			return "redirect:/login";
+		}
+		model.addAttribute("user", currentUser.get());
+		return "profile";
+	}
+
 	@GetMapping("/login")
 	public String login(Model model) {
 		model.addAttribute("loginRequest", new LoginRequest());
