@@ -36,6 +36,14 @@ public class PageController {
 		return "index";
 	}
 
+	@GetMapping("/collection")
+	public String collection(HttpSession session) {
+		if (authService.currentUser(session).isEmpty()) {
+			return "redirect:/login";
+		}
+		return "collection";
+	}
+
 	@GetMapping("/login")
 	public String login(Model model) {
 		model.addAttribute("loginRequest", new LoginRequest());

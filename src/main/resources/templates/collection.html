@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Collection - Booksprint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="/js/menu.js"></script>
+    <script src="/js/auth.js"></script>
+</head>
+
+<body>
+    <header style="display: flex; justify-content: space-between; align-items: center;">
+        <h2><i class="fa-solid fa-book"></i> Booksprint</h2>
+        <div class="account-dropdown-container">
+            <button id="accountBtn" class="btn-account"><i class="fa-solid fa-user"></i> Account</button>
+            <div id="dropdownMenu" class="dropdown-menu">
+                <a href="#">Settings</a>
+                <a href="/login" data-logout-link>Log Out</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="left-sidebar collection-sidebar">
+            <a href="#" class="active-nav new-book"><i class="fa-solid fa-plus"></i> New Book</a>
+            <a href="/collection" class="active-nav"><i class="fa-solid fa-layer-group"></i> My Collection</a>
+            <a href="#" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
+            <a href="/app" class="active-nav new-book continue-link"><i class="fa-solid fa-play"></i> Continue</a>
+        </aside>
+
+        <main>
+            <h3>My Collection</h3>
+            <div class="example-books collection-books">
+                <div class="book">
+                    <div class="book-info">
+                        <h4>Book</h4>
+                        <p>Author</p>
+                        <div class="book-progress">
+                            <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
+                            <span>90%</span>
+                        </div>
+                    </div>
+                    <div class="book-placeholder-image"></div>
+                </div>
+                <div class="book">
+                    <div class="book-info">
+                        <h4>Book</h4>
+                        <p>Author</p>
+                        <div class="book-progress">
+                            <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
+                            <span>10%</span>
+                        </div>
+                    </div>
+                    <div class="book-placeholder-image"></div>
+                </div>
+            </div>
+            <div class="collection-discover">
+                <p>Looking for more?</p>
+                <a href="#">Discover</a>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

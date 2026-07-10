@@ -154,6 +154,45 @@ main {
     margin-right: 0;
 }
 
+.collection-books .book {
+    max-width: 320px;
+}
+
+.collection-discover {
+    margin-top: 70px;
+    text-align: center;
+    color: #64748b;
+}
+
+.collection-discover a {
+    display: inline-block;
+    background-color: #24527a;
+    color: #ffffff;
+    border: 0;
+    border-radius: 20px;
+    padding: 10px 35px;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.book-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.collection-sidebar {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 115px);
+}
+
+.collection-sidebar .continue-link {
+    margin-top: auto;
+}
+
 /*centers the login card*/
 .container-center {
     justify-content: center;
