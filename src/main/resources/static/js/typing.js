@@ -40,6 +40,9 @@ let totalCorrectKeystrokes = 0;
 
 let isPaused = false;
 
+let sessionActive = false;
+let isEndlessMode = false;
+let remainingSeconds = 0;
 
 /* ==========================
 /  Stubs for Future Functions
@@ -92,7 +95,7 @@ async function fetchFakeText(chunkId) {
 
 	// temporarily "reattach" the words
 	// then break them up into individual characters
-	const characterArray = currentChunk.join(" ").split("");
+	const characterArray = (currentChunk.join(" ") + " ").split("");
 
 	return {
 		chunkId: chunkId,
@@ -121,11 +124,11 @@ function cycleChunk() {
 		populateBuffer();
 
 		// add new chunk to the very bottom of the DOM
-		const typingInterface = document.getElementById("typing-interface");
-		typingInterface.appendChild(createChunkPageElement(newChunk));
+		const chunkContainer = document.getElementById("chunk-container");
+		chunkContainer.appendChild(createChunkPageElement(newChunk));
 
 		// populate the new letters into the array for the event handler to use
-		spanElements = Array.from(typingInterface.querySelectorAll("span"));
+		spanElements = Array.from(chunkContainer.querySelectorAll("span"));
 	}
 }
 
@@ -146,8 +149,8 @@ function createChunkPageElement(chunk) {
 
 // Renders chunks to the screen by preparing a DOM fragment ahead of time
 function renderChunks() {
-	const typingInterface = document.getElementById("typing-interface");
-	typingInterface.textContent = "";
+	const chunkContainer = document.getElementById("chunk-container");
+	chunkContainer.textContent = "";
 
 	// creates a DOM tree in memory, don't worry about rendering until we're ready
 	const fragment = document.createDocumentFragment();
@@ -159,7 +162,7 @@ function renderChunks() {
 
 	// create a NodeList. This should be easier for the event listener to index into
 	spanElements = Array.from(fragment.querySelectorAll("span"));
-	typingInterface.appendChild(fragment);
+	chunkContainer.appendChild(fragment);
 
 	// populate the cursor on the first screen draw
 	if (spanElements.length > 0) {
@@ -168,6 +171,8 @@ function renderChunks() {
 }
 
 function togglePause() {
+	if (!sessionActive) return; // wait until the user chooses a session
+
 	const pauseIndicator = document.getElementById("pause-indicator");
 	const pauseInstructions = document.getElementById("pause-instructions");
 	const typingInterface = document.getElementById("typing-interface");
@@ -210,6 +215,46 @@ function updateStats() {
 	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
 }
 
+// Sets up event listeners for the session start UI elements
+function beginSessionSelect() {
+	const presetButtons = document.querySelectorAll(".session-preset-btn");
+	const customInput = document.getElementById("custom-duration-input");
+	const customButton = document.getElementById("custom-duration-btn");
+	const endlessButton = document.getElementById("endless-mode-btn");
+
+	presetButtons.forEach(button => {
+		button.addEventListener("click", () => {
+			const seconds = parseInt(button.dataset.duration, 10);
+			startSession(seconds, false);
+		});
+	});
+
+	customButton.addEventListener("click", () => {
+		const minutes = parseInt(customInput.value, 10);
+
+		if (isNaN(minutes) || minutes < 1 || minutes > 300) {
+			// TODO: show a validation message to the user instead of just bailing
+			return;
+		}
+
+		startSession(minutes * 60, false);
+	});
+
+	endlessButton.addEventListener("click", () => {
+		startSession(0, true);
+	});
+}
+
+// starts the actual timer
+function startSession(durationSeconds, endless) {
+	isEndlessMode = endless;
+	remainingSeconds = endless ? 0 : durationSeconds;
+	sessionActive = true;
+
+	const overlay = document.getElementById("session-select-overlay");
+	if (overlay) overlay.style.display = "none";
+}
+
 async function setup() {
 	await populateBuffer();
 
@@ -220,6 +265,8 @@ async function setup() {
 
 	renderChunks();
 	populateBuffer();
+
+	beginSessionSelect();
 }
 
 /* ==================
@@ -233,6 +280,8 @@ window.addEventListener("keydown", (e) => {
 		togglePause();
 		return;
 	}
+	if (!sessionActive) return; // wait until the user chooses a session
+
 	// should ignore non-standard keys (shift, alt)
 	// and stop the page from scrolling with space
 	if (e.key.length !== 1 || isPaused) return;

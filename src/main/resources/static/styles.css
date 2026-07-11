@@ -461,6 +461,18 @@ main {
     font-size: 1.2rem;
 }
 
+/* Session Select styles*/
+
+#session-select-overlay .btn-primary,
+#session-select-overlay .btn-secondary {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+.session-preset-btn {
+    white-space: nowrap;
+}
+
 /* Session select overlay (timer) */
 #session-select-overlay {
     position: absolute;
@@ -469,7 +481,7 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 6px;
     background-color: rgba(248, 250, 252, 0.7);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -478,7 +490,7 @@ main {
 
 #session-select-message {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     color: #1e293b;
     margin: 0;
 }
@@ -486,17 +498,28 @@ main {
 .session-select-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }
 
 #custom-duration-input {
     width: 140px;
-    padding: 10px;
+    padding: 6px 12px;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
     box-sizing: border-box;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+}
+
+/* disable the ugly scroll bar looking buttons */
+#custom-duration-input::-webkit-outer-spin-button,
+#custom-duration-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#custom-duration-input {
+    -moz-appearance: textfield;
 }
 
 span.cursor {
