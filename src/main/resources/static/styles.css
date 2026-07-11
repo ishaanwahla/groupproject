@@ -565,3 +565,21 @@ span.cursor::before {
 .incorrect {
     color: red;
 }
+
+#wpm-value {
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
+}
+
+#accuracy-value {
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
+}
+
+#time-value {
+    display: inline-block;
+    min-width: 6ch;
+    text-align: right;
+}
