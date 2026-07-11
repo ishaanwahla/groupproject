@@ -194,6 +194,15 @@ function togglePause() {
 	}
 }
 
+// formats a whole number of seconds as M:SS (or returns the infinity symbol for endless mode)
+function formatTime(totalSeconds) {
+	if (isEndlessMode) return "∞";
+
+	const minutes = Math.floor(totalSeconds / 60);
+	const seconds = totalSeconds % 60;
+	return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 // called from the event handler periodically to calculate accuracy and set the wpm indicator
 function updateStats() {
 	if (isPaused || !startTime) return;
@@ -208,11 +217,17 @@ function updateStats() {
 		? Math.round((totalCorrectKeystrokes / currentSpanPosition) * MAX_ACCURACY)
 		: MAX_ACCURACY;
 
-	const wpmIndicator = document.getElementById("wpm-display");
-	const accuracyIndicator = document.getElementById("accuracy-display");
+	const wpmValue = document.getElementById("wpm-value");
+	const accuracyValue = document.getElementById("accuracy-value");
+	const timeValue = document.getElementById("time-value");
 
-	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
-	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
+	if (wpmValue) wpmValue.textContent = wpm;
+	if (accuracyValue) accuracyValue.textContent = accuracy;
+
+	if (!isEndlessMode) {
+		remainingSeconds = Math.max(0, remainingSeconds - 1);
+	}
+	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
 }
 
 // Sets up event listeners for the session start UI elements
