@@ -583,3 +583,7 @@ span.cursor::before {
     min-width: 6ch;
     text-align: right;
 }
+
+#typing-wrapper {
+    position: relative;
+}

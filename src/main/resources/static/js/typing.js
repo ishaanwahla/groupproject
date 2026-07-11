@@ -36,7 +36,10 @@ const PAUSED_OPACITY = 0.3;
 let trackingStats = false;
 let startTime = null;
 let intervalId = null;
-let totalCorrectKeystrokes = 0;
+
+// session scoped accuracy variables
+let sessionKeystrokes = 0;
+let sessionCorrectKeystrokes = 0;
 
 let isPaused = false;
 
@@ -211,10 +214,10 @@ function updateStats() {
 	if (timeElapsedMinutes <= 0) return;
 
 	// just count 5 characters as a word for now... some other typing tests seem to use this
-	const wpm = Math.round((currentSpanPosition / CHARS_PER_WORD) / timeElapsedMinutes);
+	const wpm = Math.round((sessionKeystrokes / CHARS_PER_WORD) / timeElapsedMinutes);
 
-	const accuracy = currentSpanPosition > 0
-		? Math.round((totalCorrectKeystrokes / currentSpanPosition) * MAX_ACCURACY)
+	const accuracy = sessionKeystrokes > 0
+		? Math.round((sessionCorrectKeystrokes / sessionKeystrokes) * MAX_ACCURACY)
 		: MAX_ACCURACY;
 
 	const wpmValue = document.getElementById("wpm-value");
@@ -228,6 +231,10 @@ function updateStats() {
 		remainingSeconds = Math.max(0, remainingSeconds - 1);
 	}
 	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
+
+	if (!isEndlessMode && remainingSeconds === 0) {
+		endSession();
+	}
 }
 
 // Sets up event listeners for the session start UI elements
@@ -259,21 +266,62 @@ function beginSessionSelect() {
 		startSession(0, true);
 	});
 }
+function scrollToCursor() {
+	const typingInterface = document.getElementById("typing-interface");
+	const currentSpan = spanElements[currentSpanPosition];
+
+	if (typingInterface && currentSpan) {
+		typingInterface.scrollTop = currentSpan.offsetTop - LINE_HEIGHT;
+	} else if (typingInterface) {
+		// fallback in case its a fresh session
+		typingInterface.scrollTop = 0;
+	}
+}
+
+// Reset the scroll position and show the session start overlay with a custom message
+function showSessionOverlay(message) {
+	scrollToCursor();
+
+	const messageEl = document.getElementById("session-select-message");
+	if (messageEl && message) messageEl.textContent = message;
+
+	const overlay = document.getElementById("session-select-overlay");
+	if (overlay) overlay.style.display = "flex";
+}
+
+// for now: send the user back to the same selection as starting a new session
+// TODO: discuss a more satisfying session end with the team
+function endSession() {
+	sessionActive = false;
+	trackingStats = false;
+	clearInterval(intervalId);
+
+	showSessionOverlay("Continue typing?");
+}
 
 // starts the actual timer
 function startSession(durationSeconds, endless) {
+	sessionKeystrokes = 0;
+	sessionCorrectKeystrokes = 0;
+
 	isEndlessMode = endless;
 	remainingSeconds = endless ? 0 : durationSeconds;
 	sessionActive = true;
+
+	const wpmValue = document.getElementById("wpm-value");
+	const accuracyValue = document.getElementById("accuracy-value");
+	const timeValue = document.getElementById("time-value");
+
+	if (wpmValue) wpmValue.textContent = "0";
+	if (accuracyValue) accuracyValue.textContent = "100";
+	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
 
 	const overlay = document.getElementById("session-select-overlay");
 	if (overlay) overlay.style.display = "none";
 }
 
 async function setup() {
-	// reset scroll position so overlay doesn't miss the typing interface
-	const typingInterface = document.getElementById("typing-interface");
-	if (typingInterface) typingInterface.scrollTop = 0;
+	showSessionOverlay();
 
 	await populateBuffer();
 
@@ -328,10 +376,11 @@ window.addEventListener("keydown", (e) => {
 	const isCorrect = (e.key === targetCharacter) & 1;
 	if (isCorrect) {
 		currentSpan.classList.add("correct")
-		totalCorrectKeystrokes++;
+		sessionCorrectKeystrokes++;
 	} else {
 		currentSpan.classList.add("incorrect");
 	};
+	sessionKeystrokes++;
 
 	const nextSpan = spanElements[currentSpanPosition + 1];
 	if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {
