@@ -253,19 +253,25 @@ function beginSessionSelect() {
 
 	customButton.addEventListener("click", () => {
 		const minutes = parseInt(customInput.value, 10);
-
 		if (isNaN(minutes) || minutes < 1 || minutes > 300) {
-			// TODO: show a validation message to the user instead of just bailing
+			const message = document.getElementById("session-select-message");
+			if (message) message.textContent = "Enter a value between 1 and 300 minutes";
 			return;
 		}
-
 		startSession(minutes * 60, false);
+	});
+
+	customInput.addEventListener("input", () => {
+		const message = document.getElementById("session-select-message");
+		if (message) message.textContent = "Ready to start?";
 	});
 
 	endlessButton.addEventListener("click", () => {
 		startSession(0, true);
 	});
 }
+
+
 function scrollToCursor() {
 	const typingInterface = document.getElementById("typing-interface");
 	const currentSpan = spanElements[currentSpanPosition];
