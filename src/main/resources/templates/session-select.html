@@ -1,0 +1,18 @@
+<div id="session-select-overlay" th:fragment="session-select">
+    <p id="session-select-message">Ready to start?</p>
+
+    <div class="session-select-row">
+        <button type="button" class="session-preset-btn" data-duration="300">5 minutes</button>
+        <button type="button" class="session-preset-btn" data-duration="600">10 minutes</button>
+        <button type="button" class="session-preset-btn" data-duration="1200">20 minutes</button>
+    </div>
+
+    <div class="session-select-row">
+        <input type="number" id="custom-duration-input" min="1" max="300" placeholder="Minutes (1-300)">
+        <button type="button" id="custom-duration-btn">Start</button>
+    </div>
+
+    <div class="session-select-row">
+        <button type="button" id="endless-mode-btn">Endless Mode</button>
+    </div>
+</div>

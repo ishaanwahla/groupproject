@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -39,6 +39,7 @@
             </div>
             <div id="pause-indicator">Press ESC to Resume</div>
             <div id="typing-interface">
+                <div th:insert="~{session-select :: session-select}"></div>
                 [Placeholder for the typing interface]
             </div>
             <div id="pause-instructions">Press ESC to Pause</div>
