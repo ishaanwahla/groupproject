@@ -271,6 +271,10 @@ function startSession(durationSeconds, endless) {
 }
 
 async function setup() {
+	// reset scroll position so overlay doesn't miss the typing interface
+	const typingInterface = document.getElementById("typing-interface");
+	if (typingInterface) typingInterface.scrollTop = 0;
+
 	await populateBuffer();
 
 	// grab chunks to populate the screen with text
