@@ -57,17 +57,17 @@ async function fetchText(chunkId) {
 	}
 }
 
-// function for event handlers to call to save user data 
+// function for event handlers to call to save user data
 async function saveUserStats(wpm, accuracy) {
-	// try {
-	//     await fetch('/api/save', {
-	//         method: 'POST',
-	//         headers: { 'Content-Type': 'application/json' },
-	//         body: JSON.stringify({ wpm, accuracy, timestamp: Date.now() })
-	//     });
-	// } catch (error) {
-	//     console.error("Failed to save user stats:", error);
-	// }
+	try {
+		await fetch('/api/typing/stats', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ wpm, accuracy })
+		});
+	} catch (error) {
+		console.error("Failed to save user stats:", error);
+	}
 }
 
 /* ==================
@@ -208,6 +208,8 @@ function updateStats() {
 
 	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
 	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
+
+	saveUserStats(wpm, accuracy);
 }
 
 async function setup() {

@@ -51,6 +51,10 @@ public class UserAccount {
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
 
+	private Integer lastWpm;
+
+	private Integer lastAccuracy;
+
 	@PrePersist
 	void onCreate() {
 		LocalDateTime now = LocalDateTime.now();
@@ -113,6 +117,22 @@ public class UserAccount {
 
 	public boolean isAdmin() {
 		return role == UserRole.ADMIN;
+	}
+
+	public Integer getLastWpm() {
+		return lastWpm;
+	}
+
+	public void setLastWpm(Integer lastWpm) {
+		this.lastWpm = lastWpm;
+	}
+
+	public Integer getLastAccuracy() {
+		return lastAccuracy;
+	}
+
+	public void setLastAccuracy(Integer lastAccuracy) {
+		this.lastAccuracy = lastAccuracy;
 	}
 
 	private String trim(String value) {

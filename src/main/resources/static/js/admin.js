@@ -8,8 +8,12 @@ function setup() {
             const item = document.createElement('li');
             const link = document.createElement('a');
             link.href = '#';
-            link.textContent = user.name;
             link.className = 'user-list-item';
+
+            const wpm = user.lastWpm === null || user.lastWpm === undefined ? '—' : user.lastWpm;
+            const accuracy = user.lastAccuracy === null || user.lastAccuracy === undefined ? '—' : `${user.lastAccuracy}%`;
+            link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy})`;
+
             item.appendChild(link);
             list.appendChild(item);
         }

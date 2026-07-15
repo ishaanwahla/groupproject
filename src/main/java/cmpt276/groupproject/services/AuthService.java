@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import cmpt276.groupproject.models.LoginRequest;
 import cmpt276.groupproject.models.RegisterRequest;
+import cmpt276.groupproject.models.TypingStatsRequest;
 import cmpt276.groupproject.models.UserAccount;
 import cmpt276.groupproject.models.UserAccountRepository;
 import cmpt276.groupproject.models.UserRole;
@@ -63,5 +64,11 @@ public class AuthService {
 			return Optional.empty();
 		}
 		return userAccountRepository.findById(userId);
+	}
+
+	public UserAccount saveTypingStats(UserAccount user, TypingStatsRequest request) {
+		user.setLastWpm(request.getWpm());
+		user.setLastAccuracy(request.getAccuracy());
+		return userAccountRepository.save(user);
 	}
 }
