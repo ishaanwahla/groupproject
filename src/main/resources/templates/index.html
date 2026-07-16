@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -15,23 +15,10 @@
 </head>
 
 <body>
-    <header style="display: flex; justify-content: space-between; align-items: center;">
-        <h2><i class="fa-solid fa-book"></i> Booksprint</h2>
-        <div class="account-dropdown-container">
-            <button id="accountBtn" class="btn-account"><i class="fa-solid fa-user"></i> Account</button>
-            <div id="dropdownMenu" class="dropdown-menu">
-                <a href="/profile">Profile</a>
-                <a href="/login" data-logout-link>Log Out</a>
-            </div>
-        </div>
-    </header>
+    <header th:replace="~{fragments :: header}"></header>
 
     <div class="container">
-        <aside class="left-sidebar">
-            <a href="#" class="active-nav new-book-trigger"><i class="fa-solid fa-plus"></i> New Book</a>
-            <a href="/collection" class="active-nav"><i class="fa-solid fa-layer-group"></i> My Collection</a>
-            <a href="/discover" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
-        </aside>
+        <aside th:replace="~{fragments :: left-sidebar(false)}"></aside>
 
         <main>
             <div id="user-stats">
@@ -92,12 +79,7 @@
         </aside>
     </div>
 
-    <dialog id="newBookDialog" class="new-book-dialog">
-        <form method="dialog"><button class="dialog-close"><i class="fa-solid fa-xmark"></i></button></form>
-        <h2>New Book</h2>
-        <label class="new-book-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="Search for a book"></label>
-        <div class="new-book-more"><p>Looking for more?</p><a href="/discover">Discover</a></div>
-    </dialog>
+    <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
 
 
 </body>

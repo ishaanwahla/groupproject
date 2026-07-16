@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dialog = document.getElementById('newBookDialog');
+    const button = document.getElementById('newBookButton');
 
-    document.querySelectorAll('.new-book-trigger').forEach(button => {
-        button.addEventListener('click', event => {
-            event.preventDefault();
-            dialog.showModal();
-        });
+    button.addEventListener('click', event => {
+        event.preventDefault();
+        dialog.showModal();
     });
 });
