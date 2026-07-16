@@ -388,8 +388,20 @@ main {
     cursor: pointer;
 }
 
+.btn-secondary {
+    border: 1px solid #e2e8f0;
+    background-color: #dce8f2;
+    color: #24527a;
+    padding: 10px;
+    border-radius: 20px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 /*when hovered*/
 .btn-primary:hover,
+.btn-secondary:hover,
 .btn-account:hover {
     background-color: #24527a;
     color: #ffffff;
@@ -627,6 +639,67 @@ main {
     font-size: 1.2rem;
 }
 
+/* Session Select styles*/
+
+#session-select-overlay .btn-primary,
+#session-select-overlay .btn-secondary {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+.session-preset-btn {
+    white-space: nowrap;
+}
+
+/* Session select overlay (timer) */
+#session-select-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: rgba(248, 250, 252, 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 5;
+}
+
+#session-select-message {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+    margin: 0;
+}
+
+.session-select-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#custom-duration-input {
+    width: 140px;
+    padding: 6px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+/* disable the ugly scroll bar looking buttons */
+#custom-duration-input::-webkit-outer-spin-button,
+#custom-duration-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#custom-duration-input {
+    -moz-appearance: textfield;
+}
+
 span.cursor {
     position: relative;
 }
@@ -669,4 +742,26 @@ span.cursor::before {
 
 .incorrect {
     color: red;
+}
+
+#wpm-value {
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
+}
+
+#accuracy-value {
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
+}
+
+#time-value {
+    display: inline-block;
+    min-width: 6ch;
+    text-align: right;
+}
+
+#typing-wrapper {
+    position: relative;
 }

@@ -22,12 +22,18 @@
 
         <main>
             <div id="user-stats">
-                <div id="wpm-display"><i class="fa-solid fa-stopwatch"></i> WPM: 0</div>
-                <div id="accuracy-display"><i class="fa-solid fa-bullseye"></i> Accuracy: 100%</div>
+                <div id="wpm-display"><i class="fa-solid fa-stopwatch"></i> WPM: <span id="wpm-value">0</span></div>
+                <div id="accuracy-display"><i class="fa-solid fa-bullseye"></i> Accuracy: <span
+                        id="accuracy-value">100</span>%</div>
+                <div id="time-display"><i class="fa-solid fa-hourglass-half"></i> Time: <span
+                        id="time-value">--:--</span></div>
             </div>
             <div id="pause-indicator">Press ESC to Resume</div>
-            <div id="typing-interface">
-                [Placeholder for the typing interface]
+            <div id="typing-wrapper">
+                <div id="typing-interface">
+                    <div id="chunk-container"></div>
+                </div>
+                <div th:insert="~{session-select :: session-select}"></div>
             </div>
             <div id="pause-instructions">Press ESC to Pause</div>
 
