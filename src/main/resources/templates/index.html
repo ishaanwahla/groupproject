@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -11,26 +11,14 @@
     <script src="/js/typing.js"></script>
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/new-book.js"></script>
 </head>
 
 <body>
-    <header style="display: flex; justify-content: space-between; align-items: center;">
-        <h2><i class="fa-solid fa-book"></i> Booksprint</h2>
-        <div class="account-dropdown-container">
-            <button id="accountBtn" class="btn-account"><i class="fa-solid fa-user"></i> Account</button>
-            <div id="dropdownMenu" class="dropdown-menu">
-                <a href="#">Settings</a>
-                <a href="/login" data-logout-link>Log Out</a>
-            </div>
-        </div>
-    </header>
+    <header th:replace="~{fragments :: header}"></header>
 
     <div class="container">
-        <aside class="left-sidebar">
-            <a href="#" class="active-nav new-book"><i class="fa-solid fa-plus"></i> New Book</a>
-            <a href="#" class="active-nav"><i class="fa-solid fa-layer-group"></i> Your Collection</a>
-            <a href="#" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
-        </aside>
+        <aside th:replace="~{fragments :: left-sidebar(false)}"></aside>
 
         <main>
             <div id="user-stats">
@@ -90,6 +78,8 @@
             <button class="favorite-button" type="button"><i class="fa-solid fa-star"></i> Favorite</button>
         </aside>
     </div>
+
+    <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
 
 
 </body>

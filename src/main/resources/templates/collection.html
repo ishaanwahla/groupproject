@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Collection - Booksprint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="/js/menu.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/new-book.js"></script>
+</head>
+
+<body>
+    <header th:replace="~{fragments :: header}"></header>
+
+    <div class="container">
+        <aside th:replace="~{fragments :: left-sidebar(true)}"></aside>
+
+        <main>
+            <h2>My Collection</h2>
+            <div class="example-books collection-books">
+                <div class="book">
+                    <div class="book-info">
+                        <h4>Book</h4>
+                        <p>Author</p>
+                        <div class="book-progress">
+                            <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
+                            <span>90%</span>
+                        </div>
+                    </div>
+                    <div class="book-placeholder-image"></div>
+                </div>
+                <div class="book">
+                    <div class="book-info">
+                        <h4>Book</h4>
+                        <p>Author</p>
+                        <div class="book-progress">
+                            <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
+                            <span>10%</span>
+                        </div>
+                    </div>
+                    <div class="book-placeholder-image"></div>
+                </div>
+            </div>
+            <div class="collection-discover">
+                <p>Looking for more?</p>
+                <a href="/discover">Discover</a>
+            </div>
+        </main>
+    </div>
+    <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
+</body>
+
+</html>
