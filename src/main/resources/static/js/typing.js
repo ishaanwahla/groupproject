@@ -27,9 +27,11 @@ let currentSpanPosition = 0;
 // Stats & Time Tracking
 // ---------------------
 const MAX_ACCURACY = 100;
-const STAT_UPDATE_INTERVAL = 1000; // 1 second
 const MS_PER_MINUTE = 60000; // used to convert millisecond measures to minutes for wpm
 const CHARS_PER_WORD = 5; // amount of characters to count as 1 word for wpm
+
+const STAT_UPDATE_INTERVAL = 1000; // 1 second
+const STAT_SAVE_INTERVAL = 5000;
 
 const PAUSED_OPACITY = 0.3;
 
@@ -40,6 +42,8 @@ let totalCorrectKeystrokes = 0;
 
 let isPaused = false;
 
+// function for saving user stats in DB
+const throttledSaveUserStats = throttleFunctionCall(saveUserStats, STAT_SAVE_INTERVAL);
 
 /* ==========================
 /  Stubs for Future Functions
@@ -209,7 +213,23 @@ function updateStats() {
 	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
 	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
 
-	saveUserStats(wpm, accuracy);
+	throttledSaveUserStats(wpm, accuracy);
+}
+
+// Gatekeeps function calls to improve performance
+// params: takes a function, and an interger representing milliseconds between each function call
+function throttleFunctionCall(func, interval) {
+	let inCooldown = false;
+
+	// a "closure" - basically a private scope the function holds to track its own cooldown state
+	return function(...args) {
+		if (inCooldown) return;
+		inCooldown = true;
+
+		func.apply(this, args);
+
+		setTimeout(() => { inCooldown = false; }, interval);
+	};
 }
 
 async function setup() {
