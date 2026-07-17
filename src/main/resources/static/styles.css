@@ -542,7 +542,8 @@ main {
 }
 
 /*image*/
-.sidebar-placeholder-image {
+.sidebar-placeholder-image,
+.current-book-cover {
     width: 140px;
     height: 140px;
     background-color: #f1f5f9;
@@ -552,13 +553,29 @@ main {
 
 /*progress circle*/
 .progress-circle {
+    --progress: 0%;
     width: 100px;
     height: 100px;
     border-radius: 50%;
     display: flex;
     align-items: center;
-    background: conic-gradient(#e2e8f0 0% 100%);
+    background: conic-gradient(#24527a 0 var(--progress), #e2e8f0 var(--progress) 100%);
     justify-content: center;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: "";
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+.progress-text {
+    position: relative;
+    z-index: 1;
 }
 
 .favorite-button {
