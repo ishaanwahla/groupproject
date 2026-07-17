@@ -12,11 +12,10 @@
         </div>
     </header>
 
-    <aside th:fragment="left-sidebar(showContinue)" class="left-sidebar">
+    <aside th:fragment="left-sidebar" class="left-sidebar">
         <a id="newBookButton" href="#" class="active-nav"><i class="fa-solid fa-plus"></i> New Book</a>
         <a href="/collection" class="active-nav"><i class="fa-solid fa-layer-group"></i> My Collection</a>
         <a href="/discover" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
-        <a th:if="${showContinue}" href="/app" class="active-nav continue-link"><i class="fa-solid fa-play"></i> Continue</a>
     </aside>
 
     <dialog th:fragment="new-book-dialog" id="newBookDialog" class="new-book-dialog">

@@ -54,13 +54,6 @@ aside a:hover {
     color: #ffffff;
 }
 
-/*continue button, same even when hovered over*/
-aside a.continue-link,
-aside a.continue-link:hover {
-    background-color: #24527a;
-    color: #ffffff;
-}
-
 .new-book-dialog {
     width: min(700px, 80vw);
     border: 1px solid #e2e8f0;
