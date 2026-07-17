@@ -17,7 +17,7 @@ class CollectionServiceTest {
 	void returnsTwentyWordChunksForAnOwnedBook() {
 		UserBookRepository userBookRepository = mock(UserBookRepository.class);
 		CollectionService service = new CollectionService(mock(BookRepository.class), userBookRepository,
-			mock(GutendexService.class), mock(GutenbergTextService.class));
+			mock(GutenbergCatalogService.class), mock(GutenbergTextService.class));
 		UserAccount user = new UserAccount();
 		user.setId(7L);
 		Book book = new Book();
@@ -43,7 +43,7 @@ class CollectionServiceTest {
 	void doesNotMoveSavedProgressBackwards() {
 		UserBookRepository userBookRepository = mock(UserBookRepository.class);
 		CollectionService service = new CollectionService(mock(BookRepository.class), userBookRepository,
-			mock(GutendexService.class), mock(GutenbergTextService.class));
+			mock(GutenbergCatalogService.class), mock(GutenbergTextService.class));
 		UserAccount user = new UserAccount();
 		user.setId(7L);
 		Book book = new Book();
@@ -52,7 +52,7 @@ class CollectionServiceTest {
 		userBook.setUser(user);
 		userBook.setBook(book);
 		userBook.setCurrentWordIndex(40);
-		when(userBookRepository.findByIdAndUserId(12L, 7L)).thenReturn(Optional.of(userBook));
+		when(userBookRepository.findByIdAndUserIdForUpdate(12L, 7L)).thenReturn(Optional.of(userBook));
 		when(userBookRepository.save(userBook)).thenReturn(userBook);
 
 		CollectionBookResponse response = service.updateProgress(user, 12L, 25);

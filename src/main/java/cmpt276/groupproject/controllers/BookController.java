@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import cmpt276.groupproject.books.BookSearchResult;
-import cmpt276.groupproject.books.GutendexService;
+import cmpt276.groupproject.books.GutenbergCatalogService;
 import cmpt276.groupproject.services.AuthService;
 import jakarta.servlet.http.HttpSession;
 
@@ -18,11 +18,11 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/api/books")
 public class BookController {
 
-	private final GutendexService gutendexService;
+	private final GutenbergCatalogService catalogService;
 	private final AuthService authService;
 
-	public BookController(GutendexService gutendexService, AuthService authService) {
-		this.gutendexService = gutendexService;
+	public BookController(GutenbergCatalogService catalogService, AuthService authService) {
+		this.catalogService = catalogService;
 		this.authService = authService;
 	}
 
@@ -31,6 +31,6 @@ public class BookController {
 		if (authService.currentUser(session).isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required.");
 		}
-		return gutendexService.search(q).stream().map(BookSearchResult::from).toList();
+		return catalogService.search(q).stream().map(BookSearchResult::from).toList();
 	}
 }

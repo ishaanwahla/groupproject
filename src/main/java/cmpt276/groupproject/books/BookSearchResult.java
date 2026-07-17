@@ -6,18 +6,14 @@ public record BookSearchResult(
 	int gutenbergId,
 	String title,
 	List<String> authors,
-	List<String> subjects,
-	String coverUrl,
-	int downloadCount
+	String coverUrl
 ) {
-	public static BookSearchResult from(GutendexBook book) {
+	public static BookSearchResult from(GutenbergBook book) {
 		return new BookSearchResult(
 			book.gutenbergId(),
 			book.title(),
 			book.authors(),
-			book.subjects(),
-			book.coverUrl(),
-			book.downloadCount()
+			book.coverUrl()
 		);
 	}
 }

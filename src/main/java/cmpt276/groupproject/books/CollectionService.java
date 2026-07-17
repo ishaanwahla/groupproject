@@ -18,14 +18,14 @@ public class CollectionService {
 
 	private final BookRepository bookRepository;
 	private final UserBookRepository userBookRepository;
-	private final GutendexService gutendexService;
+	private final GutenbergCatalogService catalogService;
 	private final GutenbergTextService textService;
 
 	public CollectionService(BookRepository bookRepository, UserBookRepository userBookRepository,
-			GutendexService gutendexService, GutenbergTextService textService) {
+			GutenbergCatalogService catalogService, GutenbergTextService textService) {
 		this.bookRepository = bookRepository;
 		this.userBookRepository = userBookRepository;
-		this.gutendexService = gutendexService;
+		this.catalogService = catalogService;
 		this.textService = textService;
 	}
 
@@ -44,7 +44,8 @@ public class CollectionService {
 
 	@Transactional
 	public CollectionBookResponse updateProgress(UserAccount user, Long userBookId, int wordIndex) {
-		UserBook userBook = ownedBook(user, userBookId);
+		UserBook userBook = userBookRepository.findByIdAndUserIdForUpdate(userBookId, user.getId())
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Collection book not found."));
 		int newWordIndex = Math.min(Math.max(0, wordIndex), userBook.getBook().getTotalWords());
 		userBook.setCurrentWordIndex(Math.max(userBook.getCurrentWordIndex(), newWordIndex));
 		return CollectionBookResponse.from(userBookRepository.save(userBook));
@@ -77,7 +78,7 @@ public class CollectionService {
 	}
 
 	private Book importBook(int gutenbergId) {
-		GutendexBook source = gutendexService.getBook(gutenbergId);
+		GutenbergBook source = catalogService.getBook(gutenbergId);
 		if (source.textUrl() == null) {
 			throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT,
 				"This book does not provide plain text.");
