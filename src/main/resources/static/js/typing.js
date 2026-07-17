@@ -433,10 +433,10 @@ function handleTypo(span, currentTypingAttempt) {
 	span.animate(
 		[
 			{ transform: 'translateX(0px)' },
-			{ transform: 'translateX(-${WOBBLE_AMT}px)' },
-			{ transform: 'translateX(${WOBBLE_AMT}px)' },
-			{ transform: 'translateX(-${HALF_WOBBLE_AMT}px)' },
-			{ transform: 'translateX(${HALF_WOBBLE_AMT}px)' },
+			{ transform: `translateX(-${WOBBLE_AMT}px)` },
+			{ transform: `translateX(${WOBBLE_AMT}px)` },
+			{ transform: `translateX(-${HALF_WOBBLE_AMT}px)` },
+			{ transform: `translateX(${HALF_WOBBLE_AMT}px)` },
 			{ transform: 'translateX(0px)' }
 		],
 		{

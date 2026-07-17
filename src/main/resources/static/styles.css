@@ -676,6 +676,18 @@ main {
     position: relative;
 }
 
+#chunk-container .chunk-block {
+    display: inline;
+    line-height: 40px;
+}
+
+#chunk-container span {
+    display: inline-block;
+    white-space: pre;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
 #pause-indicator {
     display: none;
     color: #ff3333;
