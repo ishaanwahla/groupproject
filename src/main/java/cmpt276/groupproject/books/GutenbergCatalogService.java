@@ -33,23 +33,28 @@ import org.xml.sax.SAXException;
 public class GutenbergCatalogService {
 
 	private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(8);
+	private static final String USER_AGENT =
+			"Booksprint/1.0 (+https://github.com/ishaanwahla/groupproject)";
 	private static final Pattern BOOK_ID = Pattern.compile("/ebooks/(\\d+)\\.opds$");
 	private static final Pattern DOWNLOAD_COUNT = Pattern.compile("\\d[\\d,]* downloads?", Pattern.CASE_INSENSITIVE);
 
 	private final String baseUrl;
+	private final String textBaseUrl;
 	private final HttpClient httpClient;
 
 	@Autowired
 	public GutenbergCatalogService(
-			@Value("${gutenberg.catalog-base-url:https://www.gutenberg.org}") String baseUrl) {
-		this(baseUrl, HttpClient.newBuilder()
+			@Value("${gutenberg.catalog-base-url:https://www.gutenberg.org}") String baseUrl,
+			@Value("${gutenberg.text-base-url:https://gutenberg.pglaf.org}") String textBaseUrl) {
+		this(baseUrl, textBaseUrl, HttpClient.newBuilder()
 				.connectTimeout(Duration.ofSeconds(5))
 				.followRedirects(HttpClient.Redirect.NORMAL)
 				.build());
 	}
 
-	GutenbergCatalogService(String baseUrl, HttpClient httpClient) {
+	GutenbergCatalogService(String baseUrl, String textBaseUrl, HttpClient httpClient) {
 		this.baseUrl = baseUrl;
+		this.textBaseUrl = textBaseUrl;
 		this.httpClient = httpClient;
 	}
 
@@ -74,7 +79,7 @@ public class GutenbergCatalogService {
 		HttpRequest request = HttpRequest.newBuilder(uri)
 				.timeout(REQUEST_TIMEOUT)
 				.header("Accept", "application/atom+xml")
-				.header("User-Agent", "Booksprint school project")
+				.header("User-Agent", USER_AGENT)
 				.GET().build();
 		try {
 			HttpResponse<String> response = httpClient.send(request,
@@ -218,6 +223,6 @@ public class GutenbergCatalogService {
 	}
 
 	private String textUrl(int gutenbergId) {
-		return baseUrl + "/ebooks/" + gutenbergId + ".txt.utf-8";
+		return textBaseUrl + "/cache/epub/" + gutenbergId + "/pg" + gutenbergId + ".txt";
 	}
 }

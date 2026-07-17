@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 public class GutenbergTextService {
 
 	private static final int MAX_TEXT_BYTES = 10 * 1024 * 1024;
-	private static final Set<String> ALLOWED_HOSTS = Set.of("gutenberg.org", "www.gutenberg.org");
+	private static final String USER_AGENT =
+			"Booksprint/1.0 (+https://github.com/ishaanwahla/groupproject)";
+	private static final Set<String> ALLOWED_HOSTS =
+			Set.of("gutenberg.org", "www.gutenberg.org", "gutenberg.pglaf.org");
 
 	// These markers help omit/skip ToC and legal notes of a book
 	private static final Pattern START_MARKER = Pattern.compile(
@@ -49,7 +52,7 @@ public class GutenbergTextService {
 			HttpRequest request = HttpRequest.newBuilder(uri)
 					.timeout(Duration.ofSeconds(30))
 					.header("Accept", "text/plain")
-					.header("User-Agent", "Booksprint school project")
+					.header("User-Agent", USER_AGENT)
 					.GET().build();
 			HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 			if (response.statusCode() >= 300 && response.statusCode() < 400) {

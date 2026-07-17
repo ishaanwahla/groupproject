@@ -26,7 +26,8 @@ class GutenbergCatalogServiceTest {
 		server.createContext("/ebooks/999.opds", exchange -> respond(exchange, bookFeed("Sound")));
 		server.start();
 		service = new GutenbergCatalogService(
-				"http://localhost:" + server.getAddress().getPort(), HttpClient.newHttpClient());
+				"http://localhost:" + server.getAddress().getPort(),
+				"https://gutenberg.pglaf.org", HttpClient.newHttpClient());
 	}
 
 	@AfterEach
@@ -42,7 +43,7 @@ class GutenbergCatalogServiceTest {
 		assertThat(book.title()).isEqualTo("Frankenstein");
 		assertThat(book.authors()).containsExactly("Shelley, Mary Wollstonecraft");
 		assertThat(book.coverUrl()).endsWith("/cache/epub/84/pg84.cover.medium.jpg");
-		assertThat(book.textUrl()).endsWith("/ebooks/84.txt.utf-8");
+		assertThat(book.textUrl()).isEqualTo("https://gutenberg.pglaf.org/cache/epub/84/pg84.txt");
 	}
 
 	// Makes sure we get the book metadata and plain text link
@@ -54,7 +55,7 @@ class GutenbergCatalogServiceTest {
 		assertThat(book.authors()).containsExactly("Shelley, Mary Wollstonecraft");
 		assertThat(book.subjects()).containsExactly("Gothic fiction");
 		assertThat(book.coverUrl()).isEqualTo("https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg");
-		assertThat(book.textUrl()).endsWith("/ebooks/84.txt.utf-8");
+		assertThat(book.textUrl()).isEqualTo("https://gutenberg.pglaf.org/cache/epub/84/pg84.txt");
 	}
 
 	// Makes sure non-text entries do not get a plain text link
