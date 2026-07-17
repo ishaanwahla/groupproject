@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import cmpt276.groupproject.models.UserAccount;
 
 class CollectionServiceTest {
+	// Makes sure the correct 20 words are returned for a book the user owns
 	@Test
 	void returnsTwentyWordChunksForAnOwnedBook() {
 		UserBookRepository userBookRepository = mock(UserBookRepository.class);
@@ -39,6 +40,7 @@ class CollectionServiceTest {
 		assertThat(response.endOfBook()).isFalse();
 	}
 
+	// Makes sure an older update cannot move the user's progress backwards
 	@Test
 	void doesNotMoveSavedProgressBackwards() {
 		UserBookRepository userBookRepository = mock(UserBookRepository.class);

@@ -77,7 +77,7 @@ public class GutenbergTextService {
 		}
 	}
 
-	// Fetching the book from the Gutendex API starts the book and ends it with
+	// Fetching the book from the Gutenberg API starts the book and ends it with
 	// legal text and ToC which we cut off here
 	String clean(String rawText) throws IOException {
 		Matcher start = START_MARKER.matcher(rawText);

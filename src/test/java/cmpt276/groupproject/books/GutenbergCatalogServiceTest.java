@@ -26,11 +26,13 @@ class GutenbergCatalogServiceTest {
 		server.createContext("/ebooks/999.opds", exchange -> respond(exchange, bookFeed("Sound")));
 		server.start();
 		service = new GutenbergCatalogService(
-			"http://localhost:" + server.getAddress().getPort(), HttpClient.newHttpClient());
+				"http://localhost:" + server.getAddress().getPort(), HttpClient.newHttpClient());
 	}
 
 	@AfterEach
-	void tearDown() { server.stop(0); }
+	void tearDown() {
+		server.stop(0);
+	}
 
 	@Test
 	void searchMapsOnlyBookEntries() {
@@ -43,6 +45,7 @@ class GutenbergCatalogServiceTest {
 		assertThat(book.textUrl()).endsWith("/ebooks/84.txt.utf-8");
 	}
 
+	// Makes sure we get the book metadata and plain text link
 	@Test
 	void getBookMapsMetadataAndPlainTextUrl() {
 		GutenbergBook book = service.getBook(84);
@@ -54,6 +57,7 @@ class GutenbergCatalogServiceTest {
 		assertThat(book.textUrl()).endsWith("/ebooks/84.txt.utf-8");
 	}
 
+	// Makes sure non-text entries do not get a plain text link
 	@Test
 	void doesNotOfferPlainTextForNonTextEntries() {
 		assertThat(service.getBook(999).textUrl()).isNull();
@@ -61,37 +65,37 @@ class GutenbergCatalogServiceTest {
 
 	private String searchFeed() {
 		return """
-			<?xml version="1.0" encoding="utf-8"?>
-			<feed xmlns="http://www.w3.org/2005/Atom">
-			  <entry>
-			    <id>https://www.gutenberg.org/ebooks/subjects/search.opds/?query=frankenstein</id>
-			    <title>Subjects</title>
-			    <content type="text">One subject heading matches your search.</content>
-			  </entry>
-			  <entry>
-			    <id>https://www.gutenberg.org/ebooks/84.opds</id>
-			    <title>Frankenstein</title>
-			    <content type="text">Shelley, Mary Wollstonecraft</content>
-			  </entry>
-			</feed>
-			""";
+				<?xml version="1.0" encoding="utf-8"?>
+				<feed xmlns="http://www.w3.org/2005/Atom">
+				  <entry>
+				    <id>https://www.gutenberg.org/ebooks/subjects/search.opds/?query=frankenstein</id>
+				    <title>Subjects</title>
+				    <content type="text">One subject heading matches your search.</content>
+				  </entry>
+				  <entry>
+				    <id>https://www.gutenberg.org/ebooks/84.opds</id>
+				    <title>Frankenstein</title>
+				    <content type="text">Shelley, Mary Wollstonecraft</content>
+				  </entry>
+				</feed>
+				""";
 	}
 
 	private String bookFeed(String type) {
 		return """
-			<?xml version="1.0" encoding="utf-8"?>
-			<feed xmlns="http://www.w3.org/2005/Atom">
-			  <author><name>Project Gutenberg</name></author>
-			  <entry>
-			    <title>Frankenstein</title>
-			    <author><name>Shelley, Mary Wollstonecraft</name></author>
-			    <category scheme="http://purl.org/dc/terms/LCSH" term="Gothic fiction"/>
-			    <category scheme="http://purl.org/dc/terms/DCMIType" term="%s"/>
-			    <link type="image/jpeg" rel="http://opds-spec.org/image"
-			          href="https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg"/>
-			  </entry>
-			</feed>
-			""".formatted(type);
+				<?xml version="1.0" encoding="utf-8"?>
+				<feed xmlns="http://www.w3.org/2005/Atom">
+				  <author><name>Project Gutenberg</name></author>
+				  <entry>
+				    <title>Frankenstein</title>
+				    <author><name>Shelley, Mary Wollstonecraft</name></author>
+				    <category scheme="http://purl.org/dc/terms/LCSH" term="Gothic fiction"/>
+				    <category scheme="http://purl.org/dc/terms/DCMIType" term="%s"/>
+				    <link type="image/jpeg" rel="http://opds-spec.org/image"
+				          href="https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg"/>
+				  </entry>
+				</feed>
+				""".formatted(type);
 	}
 
 	private void respond(HttpExchange exchange, String bodyText) throws IOException {
