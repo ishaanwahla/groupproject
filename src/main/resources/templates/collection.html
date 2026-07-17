@@ -10,6 +10,7 @@
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/new-book.js"></script>
+    <script src="/js/collection.js"></script>
 </head>
 
 <body>
@@ -20,30 +21,8 @@
 
         <main>
             <h2>My Collection</h2>
-            <div class="example-books collection-books">
-                <div class="book">
-                    <div class="book-info">
-                        <h4>Book</h4>
-                        <p>Author</p>
-                        <div class="book-progress">
-                            <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
-                            <span>90%</span>
-                        </div>
-                    </div>
-                    <div class="book-placeholder-image"></div>
-                </div>
-                <div class="book">
-                    <div class="book-info">
-                        <h4>Book</h4>
-                        <p>Author</p>
-                        <div class="book-progress">
-                            <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
-                            <span>10%</span>
-                        </div>
-                    </div>
-                    <div class="book-placeholder-image"></div>
-                </div>
-            </div>
+            <p id="collectionStatus" aria-live="polite">Loading collection...</p>
+            <div id="collectionBooks" class="example-books collection-books"></div>
             <div class="collection-discover">
                 <p>Looking for more?</p>
                 <a href="/discover">Discover</a>

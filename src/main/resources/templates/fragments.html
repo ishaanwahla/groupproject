@@ -22,7 +22,12 @@
     <dialog th:fragment="new-book-dialog" id="newBookDialog" class="new-book-dialog">
         <form method="dialog"><button class="dialog-close"><i class="fa-solid fa-xmark"></i></button></form>
         <h2>New Book</h2>
-        <label class="new-book-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="Search for a book"></label>
+        <form id="newBookSearchForm" class="new-book-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="newBookSearchInput" type="search" placeholder="Search public-domain books" required>
+        </form>
+        <p id="newBookSearchStatus" class="book-search-status" aria-live="polite"></p>
+        <div id="newBookSearchResults" class="book-search-results"></div>
         <div class="new-book-more"><p>Looking for more?</p><a href="/discover">Discover</a></div>
     </dialog>
 </body>
