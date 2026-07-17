@@ -13,7 +13,21 @@ const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 // DOM & Visual Elements
 // ---------------------
 const LINE_HEIGHT = 40; // line height in pixels
+<<<<<<< HEAD
 const MAX_VISIBILE_CHUNKS = 4; // number of chunks rendered ahead
+=======
+const MAX_VISIBILE_CHUNKS = 3; // desired number of chunks visible on screen at one time
+
+// the amount in pixels to animate a character on an incorrect guess
+const WOBBLE_AMT = 4;
+const HALF_WOBBLE_AMT = WOBBLE_AMT / 2;
+const WOBBLE_DURATION = 150;
+
+// RGB green value to subtract from when generating mistake colour for typos
+const MAX_GREEN = 255;
+const MISTAKE_STEP = 64; // amount of green to remove on each attempt
+
+>>>>>>> cb5af29 (feat: add styling and animation for typos)
 let currentChunkId = 0;
 let visibleChunks = new Array(); // holds the chunks displayed on screen
 let selectedCollectionBook = null;
@@ -393,8 +407,43 @@ function startSession(durationSeconds, endless) {
 	if (overlay) overlay.style.display = "none";
 }
 
+// Dynamic colour generation for incorrect characters moving from yellow down to red
+// 
+// Params: strikes is an integer corresponding to the number of incorrect attempts made to type a character
+// Returns: a String representing a CSS RGB colour
+function getMistakeColour(strikes) {
+	// decrease green each time until it hits 0
+	const green = Math.max(0, MAX_GREEN - (strikes * MISTAKE_STEP));
+	return `rgb(255, ${green}, 0)`;
+}
 
+// Play an animation and add iterative styling to a character based on how many incorrect attempts have been made
+//
+// Params: span is the Span DOM element corresponding to the incorrectly typed character
+// currentTypingAttempt is an integer corresponding to how many incorrect attempts have been made
 function handleTypo(span, currentTypingAttempt) {
+	// space needs the entire background changed or the user won't see any visual indicator
+	const isSpace = span.textContent === " " || span.textContent === "\u00A0";
+
+	let mistakeColour = getMistakeColour(currentTypingAttempt);
+
+	isSpace ? span.style.backgroundColor = mistakeColour : span.style.color = mistakeColour;
+
+	// play the 'wobble' animation on the character
+	span.animate(
+		[
+			{ transform: 'translateX(0px)' },
+			{ transform: 'translateX(-${WOBBLE_AMT}px)' },
+			{ transform: 'translateX(${WOBBLE_AMT}px)' },
+			{ transform: 'translateX(-${HALF_WOBBLE_AMT}px)' },
+			{ transform: 'translateX(${HALF_WOBBLE_AMT}px)' },
+			{ transform: 'translateX(0px)' }
+		],
+		{
+			duration: WOBBLE_DURATION,
+			iterations: 1
+		}
+	);
 
 }
 
