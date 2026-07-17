@@ -363,7 +363,6 @@ function showSessionOverlay(message) {
 }
 
 // for now: send the user back to the same selection as starting a new session
-// TODO: discuss a more satisfying session end with the team
 function endSession() {
 	sessionActive = false;
 	trackingStats = false;
@@ -394,6 +393,11 @@ function startSession(durationSeconds, endless) {
 	if (overlay) overlay.style.display = "none";
 }
 
+
+function handleTypo(span, currentTypingAttempt) {
+
+}
+
 async function setup() {
 	showSessionOverlay();
 	if (!await loadSelectedBook()) {
@@ -418,64 +422,73 @@ async function setup() {
 /  Event Listeners
 /  ==================
 */
+{
+	// tracks if the user has typed this character incorrectly already
+	let currentTypingAttempt = 0;
 
-window.addEventListener("keydown", (e) => {
-	// pauses the typing test
-	if (e.key === "Escape") {
-		togglePause();
-		return;
-	}
-	if (!sessionActive) return; // wait until the user chooses a session
+	window.addEventListener("keydown", (e) => {
+		// pauses the typing test
+		if (e.key === "Escape") {
+			togglePause();
+			return;
+		}
+		if (!sessionActive) return; // wait until the user chooses a session
 
-	// should ignore non-standard keys (shift, alt)
-	// and stop the page from scrolling with space
-	if (e.key.length !== 1 || isPaused) return;
-	e.preventDefault();
+		// should ignore non-standard keys (shift, alt)
+		// and stop the page from scrolling with space
+		if (e.key.length !== 1 || isPaused) return;
+		e.preventDefault();
 
-	if (visibleChunks.length === 0) return;
+		if (visibleChunks.length === 0) return;
 
-	if (!trackingStats) {
-		trackingStats = true;
-		startTime = Date.now();
-		intervalId = setInterval(updateStats, STAT_UPDATE_INTERVAL);
-	}
+		if (!trackingStats) {
+			trackingStats = true;
+			startTime = Date.now();
+			intervalId = setInterval(updateStats, STAT_UPDATE_INTERVAL);
+		}
 
-	// grab the next character and its corresponding DOM element for styling purposes
-	const targetCharacter = visibleChunks[0].text.shift();
-	const currentSpan = spanElements[currentSpanPosition];
+		//grab  the next character and its corresponding DOM element to check for correctness
+		const targetCharacter = visibleChunks[0].text[0];
+		const currentSpan = spanElements[currentSpanPosition];
 
-	// if we run past the available spans somehow, return to avoid a crash
-	if (!currentSpan) return;
+		// if we run past the available spans somehow, return to avoid a crash
+		if (!currentSpan) return;
 
-	// remove the cursor temporarily to avoid styling it
-	currentSpan.classList.remove("cursor");
+		// style the current character based on whether it was typed correctly (1 means correct)
+		const isCorrect = (e.key === targetCharacter) & 1;
+		if (isCorrect) {
+			currentTypingAttempt = 0;
 
-	// style the current character based on whether it was typed correctly (1 means correct)
-	const isCorrect = (e.key === targetCharacter) & 1;
-	if (isCorrect) {
-		currentSpan.classList.add("correct")
-		sessionCorrectKeystrokes++;
-	} else {
-		currentSpan.classList.add("incorrect");
-	};
-	sessionKeystrokes++;
-	if (targetCharacter === " ") currentTypedWordIndex++;
+			// remove the character now that we're done with it
+			visibleChunks[0].text.shift();
 
-	const nextSpan = spanElements[currentSpanPosition + 1];
-	if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {
-		// scrolls the screen down slightly
-		const typingInterface = document.getElementById("typing-interface");
-		typingInterface.scrollTop = nextSpan.offsetTop - LINE_HEIGHT;
-	}
-	if (nextSpan) nextSpan.classList.add("cursor");
+			currentSpan.classList.remove("cursor");
+			currentSpan.classList.add("correct")
+			sessionCorrectKeystrokes++;
+			sessionKeystrokes++;
+			if (targetCharacter === " ") currentTypedWordIndex++;
 
-	currentSpanPosition++;
-	updateBookProgress(currentTypedWordIndex);
+			const nextSpan = spanElements[currentSpanPosition + 1];
+			if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {
+				// scrolls the screen down slightly
+				const typingInterface = document.getElementById("typing-interface");
+				typingInterface.scrollTop = nextSpan.offsetTop - LINE_HEIGHT;
+			}
+			if (nextSpan) nextSpan.classList.add("cursor");
 
-	if (visibleChunks[0].text.length === 0) {
-		cycleChunk();
-	}
-});
+			currentSpanPosition++;
+			updateBookProgress(currentTypedWordIndex);
+
+			if (visibleChunks[0].text.length === 0) {
+				cycleChunk();
+			}
+		} else {
+			sessionKeystrokes++;
+			currentTypingAttempt++;
+			handleTypo(currentSpan, currentTypingAttempt);
+		};
+	});
+}
 
 window.addEventListener("pagehide", () => {
 	saveReadingProgress(currentTypedWordIndex);
