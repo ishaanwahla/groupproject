@@ -3,22 +3,22 @@
 /  Constants & Global Variables
 /  ==================
 */
-const PLACEHOLDER_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-
 // Data Structures
 // ---------------
 const textBuffer = new Array(); // an array of objects representing the fetched text
 
 const CHUNK_SIZE = 20; // the number of words per chunk
-const BUFFER_THRESHOLD = 3; // signals refilling when buffer drops below this size (not used until backend is implemented)
 const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 
 // DOM & Visual Elements
 // ---------------------
 const LINE_HEIGHT = 40; // line height in pixels
-const MAX_VISIBILE_CHUNKS = 3; // desired number of chunks visible on screen at one time
+const MAX_VISIBILE_CHUNKS = 4; // number of chunks rendered ahead
 let currentChunkId = 0;
-let visibleChunks = new Array(); // holds the 3 chunks displayed on screen
+let visibleChunks = new Array(); // holds the chunks displayed on screen
+let selectedCollectionBook = null;
+let reachedEndOfBook = false;
+let currentTypedWordIndex = 0;
 
 // holds span HTML elements for individual characters and tracks the position
 let spanElements = new Array();
@@ -38,26 +38,30 @@ const PAUSED_OPACITY = 0.3;
 let trackingStats = false;
 let startTime = null;
 let intervalId = null;
-let totalCorrectKeystrokes = 0;
+
+// session scoped accuracy variables
+let sessionKeystrokes = 0;
+let sessionCorrectKeystrokes = 0;
 
 let isPaused = false;
 
 // function for saving user stats in DB
 const throttledSaveUserStats = throttleFunctionCall(saveUserStats, STAT_SAVE_INTERVAL);
+let sessionActive = false;
+let isEndlessMode = false;
+let remainingSeconds = 0;
 
-/* ==========================
-/  Stubs for Future Functions
-/  ==========================
-*/
-
-// will replace the "fetchFakeText" function once the backend is up and running
 async function fetchText(chunkId) {
 	try {
-		// const response = await fetch(`/api/text/${chunkId}`);
-		// if (!response.ok) throw new Error("Network response returned error");
-		// return await response.json();
+		const response = await fetch(`/api/collection/${selectedCollectionBook.id}/chunks?chunk=${chunkId}`);
+		if (!response.ok) throw new Error("Network response returned error");
+		const chunk = await response.json();
+		skipCompletedWords(chunk);
+		reachedEndOfBook = chunk.endOfBook;
+		return chunk;
 	} catch (error) {
 		console.error("Failed to fetch text:", error);
+		return null;
 	}
 }
 
@@ -72,6 +76,17 @@ async function saveUserStats(wpm, accuracy) {
 	} catch (error) {
 		console.error("Failed to save user stats:", error);
 	}
+function skipCompletedWords(chunk) {
+	const chunkStart = chunk.chunkId * CHUNK_SIZE;
+	const wordsToSkip = Math.max(0, currentTypedWordIndex - chunkStart);
+	let skippedWords = 0;
+	let charactersToSkip = 0;
+
+	while (charactersToSkip < chunk.text.length && skippedWords < wordsToSkip) {
+		if (chunk.text[charactersToSkip] === " ") skippedWords++;
+		charactersToSkip++;
+	}
+	if (charactersToSkip > 0) chunk.text = chunk.text.slice(charactersToSkip);
 }
 
 /* ==================
@@ -79,35 +94,11 @@ async function saveUserStats(wpm, accuracy) {
 /  ==================
 */
 
-// Temporary function to simulate fetching text from an API and returning it in chunks
-//	
-// Params: chunkId - an integer representing a place in the blob of text we are grabbing from
-// Returns: an object in the form { chunkId: chunkId, text: [...]} where "text" is an array of individual characters
-//
-// Note: this doesn't need to be async, but dealing with promises makes the logic more consistent for when the backend is ready.
-async function fetchFakeText(chunkId) {
-	let words = PLACEHOLDER_TEXT.split(" ");
-	let startPosition = (chunkId * CHUNK_SIZE) % words.length;
-
-	const currentChunk = Array.from({ length: CHUNK_SIZE }, (_, i) => {
-		const targetPosition = (startPosition + i) % words.length;
-		return words[targetPosition];
-	});
-
-	// temporarily "reattach" the words
-	// then break them up into individual characters
-	const characterArray = currentChunk.join(" ").split("");
-
-	return {
-		chunkId: chunkId,
-		text: characterArray
-	};
-}
-
 // Refills the buffer when it gets too low
 async function populateBuffer() {
-	while (textBuffer.length < TARGET_BUFFER_SIZE) {
-		const newChunk = await fetchFakeText(currentChunkId);
+	while (textBuffer.length < TARGET_BUFFER_SIZE && !reachedEndOfBook) {
+		const newChunk = await fetchText(currentChunkId);
+		if (!newChunk || newChunk.text.length === 0) break;
 		textBuffer.push(newChunk);
 		currentChunkId++;
 	}
@@ -115,7 +106,8 @@ async function populateBuffer() {
 
 // Discards old chunks and repopulates buffer, adds new spans to NodeList for rendering
 function cycleChunk() {
-	visibleChunks.shift();
+	const completedChunk = visibleChunks.shift();
+	if (completedChunk) saveReadingProgress(completedChunk.nextWordIndex);
 
 	// prepare a reserve chunk so we don't run out while typing
 	if (textBuffer.length > 0) {
@@ -125,11 +117,67 @@ function cycleChunk() {
 		populateBuffer();
 
 		// add new chunk to the very bottom of the DOM
-		const typingInterface = document.getElementById("typing-interface");
-		typingInterface.appendChild(createChunkPageElement(newChunk));
+		const chunkContainer = document.getElementById("chunk-container");
+		chunkContainer.appendChild(createChunkPageElement(newChunk));
 
 		// populate the new letters into the array for the event handler to use
-		spanElements = Array.from(typingInterface.querySelectorAll("span"));
+		spanElements = Array.from(chunkContainer.querySelectorAll("span"));
+	}
+	if (visibleChunks.length === 0 && textBuffer.length === 0 && reachedEndOfBook) endSession();
+}
+
+async function saveReadingProgress(currentWordIndex) {
+	if (!selectedCollectionBook || currentWordIndex <= selectedCollectionBook.currentWordIndex) return;
+	try {
+		const response = await fetch(`/api/collection/${selectedCollectionBook.id}/progress`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ currentWordIndex }),
+			keepalive: true
+		});
+		if (!response.ok) throw new Error("Progress update returned error");
+		selectedCollectionBook.currentWordIndex = Math.max(
+			selectedCollectionBook.currentWordIndex, currentWordIndex);
+	} catch (error) {
+		console.error("Failed to save reading progress:", error);
+	}
+}
+
+function updateBookProgress(currentWordIndex) {
+	const progressCircle = document.querySelector('.progress-circle');
+	const progressText = document.querySelector('.progress-text');
+	if (!progressCircle || !progressText || !selectedCollectionBook?.totalWords) return;
+
+	const percentage = Math.min(100, Math.max(0,
+		currentWordIndex * 100 / selectedCollectionBook.totalWords));
+	const wholePercentage = Math.round(percentage);
+	progressCircle.style.setProperty('--progress', `${wholePercentage}%`);
+	progressText.textContent = `${wholePercentage}%`;
+}
+
+async function loadSelectedBook() {
+	try {
+		const response = await fetch('/api/collection');
+		if (!response.ok) return false;
+		const collection = await response.json();
+		const requestedId = Number(new URLSearchParams(window.location.search).get('book'));
+		selectedCollectionBook = collection.find(book => book.id === requestedId) || collection[0];
+		if (!selectedCollectionBook) return false;
+		currentChunkId = Math.floor(selectedCollectionBook.currentWordIndex / CHUNK_SIZE);
+		currentTypedWordIndex = selectedCollectionBook.currentWordIndex;
+		document.querySelector('.book-name').textContent = selectedCollectionBook.title;
+		document.querySelector('.author-name').textContent = `Author: ${selectedCollectionBook.authors.join(', ') || 'Unknown'}`;
+		updateBookProgress(selectedCollectionBook.currentWordIndex);
+		const cover = document.querySelector('.current-book-cover');
+		if (selectedCollectionBook.coverUrl) {
+			cover.style.backgroundImage = `url("${selectedCollectionBook.coverUrl.replaceAll('"', '')}")`;
+			cover.style.backgroundSize = 'cover';
+			cover.style.backgroundPosition = 'center';
+		}
+		return true;
+	} catch (error) {
+		console.error("Failed to load collection:", error);
+		return false;
 	}
 }
 
@@ -150,8 +198,8 @@ function createChunkPageElement(chunk) {
 
 // Renders chunks to the screen by preparing a DOM fragment ahead of time
 function renderChunks() {
-	const typingInterface = document.getElementById("typing-interface");
-	typingInterface.textContent = "";
+	const chunkContainer = document.getElementById("chunk-container");
+	chunkContainer.textContent = "";
 
 	// creates a DOM tree in memory, don't worry about rendering until we're ready
 	const fragment = document.createDocumentFragment();
@@ -163,7 +211,7 @@ function renderChunks() {
 
 	// create a NodeList. This should be easier for the event listener to index into
 	spanElements = Array.from(fragment.querySelectorAll("span"));
-	typingInterface.appendChild(fragment);
+	chunkContainer.appendChild(fragment);
 
 	// populate the cursor on the first screen draw
 	if (spanElements.length > 0) {
@@ -172,6 +220,8 @@ function renderChunks() {
 }
 
 function togglePause() {
+	if (!sessionActive) return; // wait until the user chooses a session
+
 	const pauseIndicator = document.getElementById("pause-indicator");
 	const pauseInstructions = document.getElementById("pause-instructions");
 	const typingInterface = document.getElementById("typing-interface");
@@ -193,6 +243,15 @@ function togglePause() {
 	}
 }
 
+// formats a whole number of seconds as M:SS (or returns the infinity symbol for endless mode)
+function formatTime(totalSeconds) {
+	if (isEndlessMode) return "∞";
+
+	const minutes = Math.floor(totalSeconds / 60);
+	const seconds = totalSeconds % 60;
+	return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 // called from the event handler periodically to calculate accuracy and set the wpm indicator
 function updateStats() {
 	if (isPaused || !startTime) return;
@@ -201,18 +260,31 @@ function updateStats() {
 	if (timeElapsedMinutes <= 0) return;
 
 	// just count 5 characters as a word for now... some other typing tests seem to use this
-	const wpm = Math.round((currentSpanPosition / CHARS_PER_WORD) / timeElapsedMinutes);
+	const wpm = Math.round((sessionKeystrokes / CHARS_PER_WORD) / timeElapsedMinutes);
 
-	const accuracy = currentSpanPosition > 0
-		? Math.round((totalCorrectKeystrokes / currentSpanPosition) * MAX_ACCURACY)
+	const accuracy = sessionKeystrokes > 0
+		? Math.round((sessionCorrectKeystrokes / sessionKeystrokes) * MAX_ACCURACY)
 		: MAX_ACCURACY;
 
-	const wpmIndicator = document.getElementById("wpm-display");
-	const accuracyIndicator = document.getElementById("accuracy-display");
+	const wpmValue = document.getElementById("wpm-value");
+	const accuracyValue = document.getElementById("accuracy-value");
+	const timeValue = document.getElementById("time-value");
+
+	if (wpmValue) wpmValue.textContent = wpm;
+	if (accuracyValue) accuracyValue.textContent = accuracy;
 
 	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
 	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
 
+  	if (!isEndlessMode) {
+		remainingSeconds = Math.max(0, remainingSeconds - 1);
+	}
+	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
+
+	if (!isEndlessMode && remainingSeconds === 0) {
+		endSession();
+  }
+  
 	throttledSaveUserStats(wpm, accuracy);
 }
 
@@ -230,9 +302,106 @@ function throttleFunctionCall(func, interval) {
 
 		setTimeout(() => { inCooldown = false; }, interval);
 	};
+
+
+
+// Sets up event listeners for the session start UI elements
+function beginSessionSelect() {
+	const presetButtons = document.querySelectorAll(".session-preset-btn");
+	const customInput = document.getElementById("custom-duration-input");
+	const customButton = document.getElementById("custom-duration-btn");
+	const endlessButton = document.getElementById("endless-mode-btn");
+
+	presetButtons.forEach(button => {
+		button.addEventListener("click", () => {
+			const seconds = parseInt(button.dataset.duration, 10);
+			startSession(seconds, false);
+		});
+	});
+
+	customButton.addEventListener("click", () => {
+		const minutes = parseInt(customInput.value, 10);
+		if (isNaN(minutes) || minutes < 1 || minutes > 300) {
+			const message = document.getElementById("session-select-message");
+			if (message) message.textContent = "Enter a value between 1 and 300 minutes";
+			return;
+		}
+		startSession(minutes * 60, false);
+	});
+
+	customInput.addEventListener("input", () => {
+		const message = document.getElementById("session-select-message");
+		if (message) message.textContent = "Ready to start?";
+	});
+
+	endlessButton.addEventListener("click", () => {
+		startSession(0, true);
+	});
+}
+
+
+function scrollToCursor() {
+	const typingInterface = document.getElementById("typing-interface");
+	const currentSpan = spanElements[currentSpanPosition];
+
+	if (typingInterface && currentSpan) {
+		typingInterface.scrollTop = currentSpan.offsetTop - LINE_HEIGHT;
+	} else if (typingInterface) {
+		// fallback in case its a fresh session
+		typingInterface.scrollTop = 0;
+	}
+}
+
+// Reset the scroll position and show the session start overlay with a custom message
+function showSessionOverlay(message) {
+	scrollToCursor();
+
+	const messageEl = document.getElementById("session-select-message");
+	if (messageEl && message) messageEl.textContent = message;
+
+	const overlay = document.getElementById("session-select-overlay");
+	if (overlay) overlay.style.display = "flex";
+}
+
+// for now: send the user back to the same selection as starting a new session
+// TODO: discuss a more satisfying session end with the team
+function endSession() {
+	sessionActive = false;
+	trackingStats = false;
+	clearInterval(intervalId);
+	saveReadingProgress(currentTypedWordIndex);
+
+	showSessionOverlay("Continue typing?");
+}
+
+// starts the actual timer
+function startSession(durationSeconds, endless) {
+	sessionKeystrokes = 0;
+	sessionCorrectKeystrokes = 0;
+
+	isEndlessMode = endless;
+	remainingSeconds = endless ? 0 : durationSeconds;
+	sessionActive = true;
+
+	const wpmValue = document.getElementById("wpm-value");
+	const accuracyValue = document.getElementById("accuracy-value");
+	const timeValue = document.getElementById("time-value");
+
+	if (wpmValue) wpmValue.textContent = "0";
+	if (accuracyValue) accuracyValue.textContent = "100";
+	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
+
+	const overlay = document.getElementById("session-select-overlay");
+	if (overlay) overlay.style.display = "none";
 }
 
 async function setup() {
+	showSessionOverlay();
+	if (!await loadSelectedBook()) {
+		showSessionOverlay("Add a book to begin");
+		return;
+	}
+
 	await populateBuffer();
 
 	// grab chunks to populate the screen with text
@@ -242,6 +411,8 @@ async function setup() {
 
 	renderChunks();
 	populateBuffer();
+
+	beginSessionSelect();
 }
 
 /* ==================
@@ -255,6 +426,8 @@ window.addEventListener("keydown", (e) => {
 		togglePause();
 		return;
 	}
+	if (!sessionActive) return; // wait until the user chooses a session
+
 	// should ignore non-standard keys (shift, alt)
 	// and stop the page from scrolling with space
 	if (e.key.length !== 1 || isPaused) return;
@@ -282,10 +455,12 @@ window.addEventListener("keydown", (e) => {
 	const isCorrect = (e.key === targetCharacter) & 1;
 	if (isCorrect) {
 		currentSpan.classList.add("correct")
-		totalCorrectKeystrokes++;
+		sessionCorrectKeystrokes++;
 	} else {
 		currentSpan.classList.add("incorrect");
 	};
+	sessionKeystrokes++;
+	if (targetCharacter === " ") currentTypedWordIndex++;
 
 	const nextSpan = spanElements[currentSpanPosition + 1];
 	if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {
@@ -293,13 +468,18 @@ window.addEventListener("keydown", (e) => {
 		const typingInterface = document.getElementById("typing-interface");
 		typingInterface.scrollTop = nextSpan.offsetTop - LINE_HEIGHT;
 	}
-	nextSpan.classList.add("cursor");
+	if (nextSpan) nextSpan.classList.add("cursor");
 
 	currentSpanPosition++;
+	updateBookProgress(currentTypedWordIndex);
 
 	if (visibleChunks[0].text.length === 0) {
 		cycleChunk();
 	}
+});
+
+window.addEventListener("pagehide", () => {
+	saveReadingProgress(currentTypedWordIndex);
 });
 
 /* Wait until the page loads before attempting to access DOM elements */

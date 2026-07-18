@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -11,35 +11,29 @@
     <script src="/js/typing.js"></script>
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/new-book.js"></script>
 </head>
 
 <body>
-    <header style="display: flex; justify-content: space-between; align-items: center;">
-        <h2><i class="fa-solid fa-book"></i> Booksprint</h2>
-        <div class="account-dropdown-container">
-            <button id="accountBtn" class="btn-account"><i class="fa-solid fa-user"></i> Account</button>
-            <div id="dropdownMenu" class="dropdown-menu">
-                <a href="#">Settings</a>
-                <a href="/login" data-logout-link>Log Out</a>
-            </div>
-        </div>
-    </header>
+    <header th:replace="~{fragments :: header}"></header>
 
     <div class="container">
-        <aside class="left-sidebar">
-            <a href="#" class="active-nav new-book"><i class="fa-solid fa-plus"></i> New Book</a>
-            <a href="#" class="active-nav"><i class="fa-solid fa-layer-group"></i> Your Collection</a>
-            <a href="#" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
-        </aside>
+        <aside th:replace="~{fragments :: left-sidebar}"></aside>
 
         <main>
             <div id="user-stats">
-                <div id="wpm-display"><i class="fa-solid fa-stopwatch"></i> WPM: 0</div>
-                <div id="accuracy-display"><i class="fa-solid fa-bullseye"></i> Accuracy: 100%</div>
+                <div id="wpm-display"><i class="fa-solid fa-stopwatch"></i> WPM: <span id="wpm-value">0</span></div>
+                <div id="accuracy-display"><i class="fa-solid fa-bullseye"></i> Accuracy: <span
+                        id="accuracy-value">100</span>%</div>
+                <div id="time-display"><i class="fa-solid fa-hourglass-half"></i> Time: <span
+                        id="time-value">--:--</span></div>
             </div>
             <div id="pause-indicator">Press ESC to Resume</div>
-            <div id="typing-interface">
-                [Placeholder for the typing interface]
+            <div id="typing-wrapper">
+                <div id="typing-interface">
+                    <div id="chunk-container"></div>
+                </div>
+                <div th:insert="~{session-select :: session-select}"></div>
             </div>
             <div id="pause-instructions">Press ESC to Pause</div>
 
@@ -81,15 +75,17 @@
             </div>
         </main>
         <aside class="right-sidebar">
-            <p class="book-name">Book Name Placeholder</p>
-            <p class="author-name">Author: Placeholder</p>
-            <div class="sidebar-placeholder-image"></div>
+            <p class="book-name">No book selected</p>
+            <p class="author-name">Author: -</p>
+            <div class="current-book-cover" aria-hidden="true"></div>
             <div class="progress-circle">
                 <span class="progress-text">0%</span>
             </div>
             <button class="favorite-button" type="button"><i class="fa-solid fa-star"></i> Favorite</button>
         </aside>
     </div>
+
+    <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
 
 
 </body>

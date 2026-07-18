@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover - Booksprint</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="/js/menu.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/new-book.js"></script>
+</head>
+
+<body>
+    <header th:replace="~{fragments :: header}"></header>
+
+    <div class="container">
+        <aside th:replace="~{fragments :: left-sidebar}"></aside>
+
+        <main class="discover-content">
+            <h2>Discover</h2>
+            <section>
+                <h3>Booksprint Recommendations</h3>
+                <div class="example-books discover-books">
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                </div>
+            </section>
+            <section>
+                <h3>Most Popular</h3>
+                <div class="example-books discover-books">
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                </div>
+            </section>
+            <section>
+                <h3>Sci-fi</h3>
+                <div class="example-books discover-books">
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                </div>
+            </section>
+            <section>
+                <h3>Non Fiction</h3>
+                <div class="example-books discover-books">
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                    <div class="book"><div class="book-info"><h4>Book</h4><p>Author</p><button class="book-play" type="button"><i class="fa-solid fa-play"></i></button></div><div class="book-placeholder-image"></div></div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="book-week">
+            <h2>Book of the Week</h2>
+            <div class="book-week-card">
+                <h2>Book</h2>
+                <p>Author</p>
+                <div class="sidebar-placeholder-image"></div>
+                <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
+            </div>
+        </aside>
+    </div>
+    <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
+</body>
+
+</html>

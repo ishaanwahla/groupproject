@@ -36,6 +36,32 @@ public class PageController {
 		return "index";
 	}
 
+	@GetMapping("/collection")
+	public String collection(HttpSession session) {
+		if (authService.currentUser(session).isEmpty()) {
+			return "redirect:/login";
+		}
+		return "collection";
+	}
+
+	@GetMapping("/discover")
+	public String discover(HttpSession session) {
+		if (authService.currentUser(session).isEmpty()) {
+			return "redirect:/login";
+		}
+		return "discover";
+	}
+
+	@GetMapping("/profile")
+	public String profile(HttpSession session, Model model) {
+		var currentUser = authService.currentUser(session);
+		if (currentUser.isEmpty()) {
+			return "redirect:/login";
+		}
+		model.addAttribute("user", currentUser.get());
+		return "profile";
+	}
+
 	@GetMapping("/login")
 	public String login(Model model) {
 		model.addAttribute("loginRequest", new LoginRequest());
