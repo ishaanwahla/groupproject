@@ -13,10 +13,7 @@ const TARGET_BUFFER_SIZE = 5; // number of chunks to maintain in reserve
 // DOM & Visual Elements
 // ---------------------
 const LINE_HEIGHT = 40; // line height in pixels
-<<<<<<< HEAD
 const MAX_VISIBILE_CHUNKS = 4; // number of chunks rendered ahead
-=======
-const MAX_VISIBILE_CHUNKS = 3; // desired number of chunks visible on screen at one time
 
 // the amount in pixels to animate a character on an incorrect guess
 const WOBBLE_AMT = 4;
@@ -27,7 +24,6 @@ const WOBBLE_DURATION = 150;
 const MAX_GREEN = 255;
 const MISTAKE_STEP = 64; // amount of green to remove on each attempt
 
->>>>>>> cb5af29 (feat: add styling and animation for typos)
 let currentChunkId = 0;
 let visibleChunks = new Array(); // holds the chunks displayed on screen
 let selectedCollectionBook = null;
