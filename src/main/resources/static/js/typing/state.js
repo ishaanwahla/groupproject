@@ -38,5 +38,6 @@ Object.seal(bufferState);
 export const inputState = {
 	currentSpanPosition: 0,
 	currentUnitProgress: 0, //how many keys of the current unit have been matched
+	currentTypingAttempt: 0, //how many times the user has tried to type the current unit
 };
 Object.seal(inputState);
