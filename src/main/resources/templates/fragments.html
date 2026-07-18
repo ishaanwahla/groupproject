@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
     <header th:fragment="header" style="display: flex; justify-content: space-between; align-items: center;">
-        <h2><i class="fa-solid fa-book"></i> Booksprint</h2>
+        <h2><a class="brand-home-link" href="/app"><i class="fa-solid fa-book"></i> Booksprint</a></h2>
         <div class="account-dropdown-container">
             <button id="accountBtn" class="btn-account"><i class="fa-solid fa-user"></i> Account</button>
             <div id="dropdownMenu" class="dropdown-menu">
@@ -12,17 +12,21 @@
         </div>
     </header>
 
-    <aside th:fragment="left-sidebar(showContinue)" class="left-sidebar">
+    <aside th:fragment="left-sidebar" class="left-sidebar">
         <a id="newBookButton" href="#" class="active-nav"><i class="fa-solid fa-plus"></i> New Book</a>
         <a href="/collection" class="active-nav"><i class="fa-solid fa-layer-group"></i> My Collection</a>
         <a href="/discover" class="active-nav"><i class="fa-solid fa-compass"></i> Discover</a>
-        <a th:if="${showContinue}" href="/app" class="active-nav continue-link"><i class="fa-solid fa-play"></i> Continue</a>
     </aside>
 
     <dialog th:fragment="new-book-dialog" id="newBookDialog" class="new-book-dialog">
         <form method="dialog"><button class="dialog-close"><i class="fa-solid fa-xmark"></i></button></form>
         <h2>New Book</h2>
-        <label class="new-book-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="Search for a book"></label>
+        <form id="newBookSearchForm" class="new-book-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="newBookSearchInput" type="search" placeholder="Search public-domain books" required>
+        </form>
+        <p id="newBookSearchStatus" class="book-search-status" aria-live="polite"></p>
+        <div id="newBookSearchResults" class="book-search-results"></div>
         <div class="new-book-more"><p>Looking for more?</p><a href="/discover">Discover</a></div>
     </dialog>
 </body>

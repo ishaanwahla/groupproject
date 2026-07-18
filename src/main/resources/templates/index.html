@@ -18,7 +18,7 @@
     <header th:replace="~{fragments :: header}"></header>
 
     <div class="container">
-        <aside th:replace="~{fragments :: left-sidebar(false)}"></aside>
+        <aside th:replace="~{fragments :: left-sidebar}"></aside>
 
         <main>
             <div id="user-stats">
@@ -75,9 +75,9 @@
             </div>
         </main>
         <aside class="right-sidebar">
-            <p class="book-name">Book Name Placeholder</p>
-            <p class="author-name">Author: Placeholder</p>
-            <div class="sidebar-placeholder-image"></div>
+            <p class="book-name">No book selected</p>
+            <p class="author-name">Author: -</p>
+            <div class="current-book-cover" aria-hidden="true"></div>
             <div class="progress-circle">
                 <span class="progress-text">0%</span>
             </div>
