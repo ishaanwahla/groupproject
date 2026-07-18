@@ -131,25 +131,37 @@ async function setup() {
 		}
 
 		//grab  the next character and its corresponding DOM element to check for correctness
-		const targetCharacter = app.visibleChunks[0].text[0];
+		const targetUnit = app.visibleChunks[0].text[0];
 		const currentSpan = app.spanElements[input.currentSpanPosition];
 
 		// if we run past the available spans somehow, return to avoid a crash
 		if (!currentSpan) return;
 
 		// style the current character based on whether it was typed correctly (1 means correct)
-		const isCorrect = (e.key === targetCharacter) & 1;
+		const expectedKey = targetUnit.keys[input.currentUnitProgress];
+		const isCorrect = (e.key === expectedKey) & 1;
 		if (isCorrect) {
 			currentTypingAttempt = 0;
 
+			app.sessionCorrectKeystrokes++;
+			app.sessionKeystrokes++;
+
+			const isFinalKey = input.currentUnitProgress === targetUnit.keys.length - 1;
+
+			if (!isFinalKey) {
+				// more keys required before this unit is complete —
+				// don't advance the position, don't touch the span yet
+				input.currentUnitProgress++;
+				return;
+			}
+
 			// remove the character now that we're done with it
+			input.currentUnitProgress = 0;
 			app.visibleChunks[0].text.shift();
 
 			currentSpan.classList.remove("cursor");
 			currentSpan.classList.add("correct")
-			app.sessionCorrectKeystrokes++;
-			app.sessionKeystrokes++;
-			if (targetCharacter === " ") app.currentTypedWordIndex++;
+			if (targetUnit === " ") app.currentTypedWordIndex++;
 
 			const nextSpan = app.spanElements[input.currentSpanPosition + 1];
 			if (nextSpan && nextSpan.offsetTop > currentSpan.offsetTop) {

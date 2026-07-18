@@ -104,7 +104,7 @@ export function skipCompletedWords(chunk) {
 	let charactersToSkip = 0;
 
 	while (charactersToSkip < chunk.text.length && skippedWords < wordsToSkip) {
-		if (chunk.text[charactersToSkip] === " ") skippedWords++;
+		if (chunk.text[charactersToSkip].display === " ") skippedWords++;
 		charactersToSkip++;
 	}
 	if (charactersToSkip > 0) chunk.text = chunk.text.slice(charactersToSkip);

@@ -37,6 +37,6 @@ Object.seal(bufferState);
 // tracks the input position as the user types
 export const inputState = {
 	currentSpanPosition: 0,
-	//TODO: add currentUnitProgress once text.js is implemented
+	currentUnitProgress: 0, //how many keys of the current unit have been matched
 };
 Object.seal(inputState);

@@ -2,12 +2,14 @@ import { appState as app, bufferState as bufState } from './state.js';
 import { bufferConstants as buf } from './constants.js';
 import { skipCompletedWords, saveReadingProgress, updateBookProgress } from './progress.js';
 import { endSession } from './session.js';
+import { textToTypingUnits } from './text.js';
 
 async function fetchText(chunkId) {
 	try {
 		const response = await fetch(`/api/collection/${app.selectedCollectionBook.id}/chunks?chunk=${chunkId}`);
 		if (!response.ok) throw new Error("Network response returned error");
 		const chunk = await response.json();
+		chunk.text = textToTypingUnits(chunk.text);
 		skipCompletedWords(chunk);
 		bufState.reachedEndOfBook = chunk.endOfBook;
 		return chunk;
@@ -57,9 +59,9 @@ function createChunkPageElement(chunk) {
 	chunkDiv.classList.add("chunk-block");
 	chunkDiv.style.display = "inline";
 
-	chunk.text.forEach(char => {
+	chunk.text.forEach(unit => {
 		const span = document.createElement("span");
-		span.textContent = char;
+		span.textContent = unit.display;
 		chunkDiv.appendChild(span);
 	});
 
