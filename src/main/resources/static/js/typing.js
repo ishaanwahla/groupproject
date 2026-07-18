@@ -76,6 +76,8 @@ async function saveUserStats(wpm, accuracy) {
 	} catch (error) {
 		console.error("Failed to save user stats:", error);
 	}
+}
+
 function skipCompletedWords(chunk) {
 	const chunkStart = chunk.chunkId * CHUNK_SIZE;
 	const wordsToSkip = Math.max(0, currentTypedWordIndex - chunkStart);
@@ -273,18 +275,15 @@ function updateStats() {
 	if (wpmValue) wpmValue.textContent = wpm;
 	if (accuracyValue) accuracyValue.textContent = accuracy;
 
-	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
-	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
-
-  	if (!isEndlessMode) {
+	if (!isEndlessMode) {
 		remainingSeconds = Math.max(0, remainingSeconds - 1);
 	}
 	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
 
 	if (!isEndlessMode && remainingSeconds === 0) {
 		endSession();
-  }
-  
+	}
+
 	throttledSaveUserStats(wpm, accuracy);
 }
 
@@ -302,7 +301,7 @@ function throttleFunctionCall(func, interval) {
 
 		setTimeout(() => { inCooldown = false; }, interval);
 	};
-
+}
 
 
 // Sets up event listeners for the session start UI elements
