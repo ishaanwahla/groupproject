@@ -27,9 +27,11 @@ let currentSpanPosition = 0;
 // Stats & Time Tracking
 // ---------------------
 const MAX_ACCURACY = 100;
-const STAT_UPDATE_INTERVAL = 1000; // 1 second
 const MS_PER_MINUTE = 60000; // used to convert millisecond measures to minutes for wpm
 const CHARS_PER_WORD = 5; // amount of characters to count as 1 word for wpm
+
+const STAT_UPDATE_INTERVAL = 1000; // 1 second
+const STAT_SAVE_INTERVAL = 5000;
 
 const PAUSED_OPACITY = 0.3;
 
@@ -43,6 +45,8 @@ let sessionCorrectKeystrokes = 0;
 
 let isPaused = false;
 
+// function for saving user stats in DB
+const throttledSaveUserStats = throttleFunctionCall(saveUserStats, STAT_SAVE_INTERVAL);
 let sessionActive = false;
 let isEndlessMode = false;
 let remainingSeconds = 0;
@@ -61,6 +65,17 @@ async function fetchText(chunkId) {
 	}
 }
 
+// function for event handlers to call to save user data
+async function saveUserStats(wpm, accuracy) {
+	try {
+		await fetch('/api/typing/stats', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ wpm, accuracy })
+		});
+	} catch (error) {
+		console.error("Failed to save user stats:", error);
+	}
 function skipCompletedWords(chunk) {
 	const chunkStart = chunk.chunkId * CHUNK_SIZE;
 	const wordsToSkip = Math.max(0, currentTypedWordIndex - chunkStart);
@@ -258,15 +273,37 @@ function updateStats() {
 	if (wpmValue) wpmValue.textContent = wpm;
 	if (accuracyValue) accuracyValue.textContent = accuracy;
 
-	if (!isEndlessMode) {
+	if (wpmIndicator) wpmIndicator.textContent = `WPM: ${wpm}`;
+	if (accuracyIndicator) accuracyIndicator.textContent = `Accuracy: ${accuracy}%`;
+
+  	if (!isEndlessMode) {
 		remainingSeconds = Math.max(0, remainingSeconds - 1);
 	}
 	if (timeValue) timeValue.textContent = formatTime(remainingSeconds);
 
 	if (!isEndlessMode && remainingSeconds === 0) {
 		endSession();
-	}
+  }
+  
+	throttledSaveUserStats(wpm, accuracy);
 }
+
+// Gatekeeps function calls to improve performance
+// params: takes a function, and an interger representing milliseconds between each function call
+function throttleFunctionCall(func, interval) {
+	let inCooldown = false;
+
+	// a "closure" - basically a private scope the function holds to track its own cooldown state
+	return function(...args) {
+		if (inCooldown) return;
+		inCooldown = true;
+
+		func.apply(this, args);
+
+		setTimeout(() => { inCooldown = false; }, interval);
+	};
+
+
 
 // Sets up event listeners for the session start UI elements
 function beginSessionSelect() {
