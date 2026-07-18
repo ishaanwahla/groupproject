@@ -77,7 +77,7 @@ export function updateStats() {
 	if (timeValue) timeValue.textContent = formatTime(app.remainingSeconds);
 
 	if (!app.isEndlessMode && app.remainingSeconds === 0) {
-		endSession();
+		endSession(wpm, accuracy);
 	}
 
 	throttledSaveUserStats(wpm, accuracy);

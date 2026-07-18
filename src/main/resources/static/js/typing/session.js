@@ -1,7 +1,7 @@
 import { appState as app } from './state.js';
 import { sessionConstants as session, statsConstants as stat } from './constants.js';
 import { scrollToCursor } from './typing.js';
-import { saveReadingProgress } from './progress.js';
+import { saveReadingProgress, saveUserStats } from './progress.js';
 
 // Sets up event listeners for the session start UI elements
 export function beginSessionSelect() {
@@ -58,11 +58,13 @@ export function showSessionOverlay(messageText) {
 }
 
 // for now: send the user back to the same selection as starting a new session
-export function endSession() {
+export function endSession(wpm, accuracy) {
 	app.sessionActive = false;
 	app.trackingStats = false;
 	clearInterval(app.intervalId);
 	saveReadingProgress(app.currentTypedWordIndex);
+	saveUserStats(wpm, accuracy);
+
 
 	showSessionOverlay("Continue typing?");
 }
