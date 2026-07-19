@@ -89,7 +89,11 @@
     </div>
 
     <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
-
+    <dialog id="errorDialog" class="new-book-dialog">
+        <form method="dialog"><button class="dialog-close"><i class="fa-solid fa-xmark"></i></button></form>
+        <h2>Something went wrong</h2>
+        <p id="errorDialogMessage"></p>
+    </dialog>
 
 </body>
 

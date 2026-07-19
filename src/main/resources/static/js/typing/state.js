@@ -8,6 +8,7 @@
 // global application state
 // shared across multiple files
 export const appState = {
+	bufferError: false, // prevents the test from proceeding until the buffer fills again
 	visibleChunks: [], // raw text representation of what the user currently sees
 	selectedCollectionBook: null,
 	spanElements: [], // holds span elements for individual characters displayed in DOM 

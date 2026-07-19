@@ -1,5 +1,6 @@
 import { appState as app } from './state.js';
 import { sessionConstants as session, statsConstants as stat } from './constants.js';
+import { populateBuffer } from './buffer.js';
 import { scrollToCursor } from './typing.js';
 import { saveReadingProgress, saveUserStats } from './progress.js';
 
@@ -88,5 +89,17 @@ export function startSession(durationSeconds, endless) {
 
 	const overlay = document.getElementById("session-select-overlay");
 	if (overlay) overlay.style.display = "none";
+}
+
+export function showErrorDialog(message) {
+	const dialog = document.getElementById("errorDialog");
+	document.getElementById("errorDialogMessage").textContent = message;
+	dialog.showModal();
+	dialog.addEventListener("close", handleErrorDialogClosed, { once: true });
+}
+
+// attempt to populate the buffer one more time
+function handleErrorDialogClosed() {
+	populateBuffer();
 }
 

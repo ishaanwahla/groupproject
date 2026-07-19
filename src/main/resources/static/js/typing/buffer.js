@@ -1,7 +1,8 @@
 import { appState as app, bufferState as bufState } from './state.js';
 import { bufferConstants as buf } from './constants.js';
+import { togglePause } from './typing.js';
 import { skipCompletedWords, saveReadingProgress, updateBookProgress } from './progress.js';
-import { endSession } from './session.js';
+import { endSession, showErrorDialog } from './session.js';
 import { textToTypingUnits } from './text.js';
 
 async function fetchText(chunkId) {
@@ -22,11 +23,25 @@ async function fetchText(chunkId) {
 
 // Refills the buffer when it gets too low
 export async function populateBuffer() {
+	let chunksAdded = 0;
 	while (bufState.textBuffer.length < buf.TARGET_BUFFER_SIZE && !bufState.reachedEndOfBook) {
 		const newChunk = await fetchText(bufState.currentChunkId);
 		if (!newChunk || newChunk.text.length === 0) break;
 		bufState.textBuffer.push(newChunk);
 		bufState.currentChunkId++;
+		chunksAdded++;
+	}
+
+	// display an error if we can't add anything to the buffer at all (as in: empty)
+	if (chunksAdded === 0 && bufState.textBuffer.length === 0 && !bufState.reachedEndOfBook) {
+		if (!app.isPaused) togglePause();
+		showErrorDialog("We're having trouble loading more of the book. Please check your connection and try again.");
+		return;
+	}
+
+	// reset the error state
+	if (app.bufferError && bufState.textBuffer.length > 0) {
+		app.bufferError = false;
 	}
 }
 
@@ -128,6 +143,6 @@ export async function loadSelectedBook() {
 		return true;
 	} catch (error) {
 		console.error("Failed to load collection:", error);
-		return false;
+		return null;
 	}
 }

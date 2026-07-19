@@ -15,7 +15,7 @@ function ensureStatTracking() {
 }
 
 // Pause typing, bring up an overlay and stop WPM/Accuracy and the Timer from changing
-function togglePause() {
+export function togglePause() {
 	if (!app.sessionActive) return; // wait until the user chooses a session
 
 	const pauseIndicator = document.getElementById("pause-indicator");
@@ -30,6 +30,8 @@ function togglePause() {
 		pauseInstructions.style.display = "none";
 		if (pauseIndicator) pauseIndicator.style.display = "block";
 	} else { // Resume
+		if (app.bufferError) return; // refuse to unpause while in error state
+
 		app.isPaused = false;
 		typingInterface.style.opacity = "1.0";
 		// start the cursor flashing again
@@ -149,7 +151,12 @@ function handleCharacterInput(pressedKey, span) {
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
 	showSessionOverlay();
-	if (!await loadSelectedBook()) {
+	const loaded = await loadSelectedBook();
+	if (loaded === null) {
+		showSessionOverlay("Unable to load your book right now. Please check your connection and try again.");
+		return;
+	}
+	if (!loaded) {
 		showSessionOverlay("Add a book to begin");
 		return;
 	}
@@ -169,6 +176,7 @@ async function setup() {
 
 window.addEventListener("keydown", (e) => {
 	// pauses the typing test
+	if (document.getElementById("errorDialog").open) return;
 	if (e.key === "Escape") {
 		togglePause();
 		return;
