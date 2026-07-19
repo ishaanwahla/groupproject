@@ -12,7 +12,8 @@ function setup() {
 
             const wpm = user.lastWpm === null || user.lastWpm === undefined ? '—' : user.lastWpm;
             const accuracy = user.lastAccuracy === null || user.lastAccuracy === undefined ? '—' : `${user.lastAccuracy}%`;
-            link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy})`;
+            const books = user.bookTitles && user.bookTitles.length > 0 ? user.bookTitles.join(', ') : 'No books yet';
+            link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy}) — Books: ${books}`;
 
             item.appendChild(link);
             list.appendChild(item);
