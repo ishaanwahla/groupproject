@@ -681,11 +681,16 @@ main {
     line-height: 40px;
 }
 
-#chunk-container span {
+
+#chunk-container span.char-span {
     display: inline-block;
     white-space: pre;
     line-height: 1.2;
     vertical-align: middle;
+}
+
+.word-block {
+    white-space: nowrap;
 }
 
 #pause-indicator {

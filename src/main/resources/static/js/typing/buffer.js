@@ -48,7 +48,7 @@ export function cycleChunk() {
 		chunkContainer.appendChild(createChunkPageElement(newChunk));
 
 		// populate the new letters into the array for the event handler to use
-		app.spanElements = Array.from(chunkContainer.querySelectorAll("span"));
+		app.spanElements = Array.from(chunkContainer.querySelectorAll("span.char-span"));
 	}
 	if (app.visibleChunks.length === 0 && bufState.textBuffer.length === 0 && bufState.reachedEndOfBook) endSession();
 }
@@ -59,15 +59,29 @@ function createChunkPageElement(chunk) {
 	chunkDiv.classList.add("chunk-block");
 	chunkDiv.style.display = "inline";
 
+	let wordWrapper = document.createElement("span");
+	wordWrapper.classList.add("word-block");
+	chunkDiv.appendChild(wordWrapper);
+
 	chunk.text.forEach(unit => {
 		const span = document.createElement("span");
+		span.classList.add("char-span");
 		span.textContent = unit.display;
-		chunkDiv.appendChild(span);
+		wordWrapper.appendChild(span);
+
+		// the <wbr> element will manually add a linebreak
+		// needed since browsers seem to handle wrap behaviour slightly differently.
+		if (unit.display === " ") {
+			chunkDiv.appendChild(document.createElement("wbr"));
+
+			wordWrapper = document.createElement("span");
+			wordWrapper.classList.add("word-block");
+			chunkDiv.appendChild(wordWrapper);
+		}
 	});
 
 	return chunkDiv;
 }
-
 
 // Renders chunks to the screen by preparing a DOM fragment ahead of time
 export function renderChunks() {
@@ -83,7 +97,7 @@ export function renderChunks() {
 	});
 
 	// create a NodeList. This should be easier for the event listener to index into
-	app.spanElements = Array.from(fragment.querySelectorAll("span"));
+	app.spanElements = Array.from(fragment.querySelectorAll("span.char-span"));
 	chunkContainer.appendChild(fragment);
 
 	// populate the cursor on the first screen draw

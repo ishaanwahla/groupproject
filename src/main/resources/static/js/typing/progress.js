@@ -85,7 +85,7 @@ export function updateStats() {
 
 
 // function for event handlers to call to save user data
-async function saveUserStats(wpm, accuracy) {
+export async function saveUserStats(wpm, accuracy) {
 	try {
 		await fetch('/api/typing/stats', {
 			method: 'POST',
