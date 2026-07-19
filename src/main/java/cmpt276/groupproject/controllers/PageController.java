@@ -17,7 +17,13 @@ public class PageController {
 	}
 
 	@GetMapping("/")
-	public String home() {
+	public String home(HttpSession session) {
+		var currentUser = authService.currentUser(session);
+
+		if (currentUser.isPresent()) {
+			return currentUser.get().isAdmin() ? "redirect:/admin" : "redirect:/app";
+		}
+
 		return "redirect:/login";
 	}
 
@@ -63,7 +69,12 @@ public class PageController {
 	}
 
 	@GetMapping("/login")
-	public String login(Model model) {
+	public String login(Model model, HttpSession session) {
+		var currentUser = authService.currentUser(session);
+		if (currentUser.isPresent()) {
+			return currentUser.get().isAdmin() ? "redirect:/admin" : "redirect:/app";
+		}
+
 		model.addAttribute("loginRequest", new LoginRequest());
 		return "login";
 	}
