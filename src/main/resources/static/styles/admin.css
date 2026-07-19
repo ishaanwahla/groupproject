@@ -1,0 +1,61 @@
+/*---------------------ADMIN PAGE------------------------*/
+
+.admin-status {
+    color: #ef4444;
+}
+
+.admin-container {
+    justify-content: center;
+}
+
+/*wider sidebar for the admin user panel, in its own card*/
+.admin-user-panel {
+    width: 280px;
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/*admin page search box*/
+#searchBox {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.user-list-heading {
+    color: #1e293b;
+    margin: 0 0 10px;
+    font-weight: 600;
+}
+
+/*scrollable list of registered users*/
+.user-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/*user list entry, styled like the rest of the app's links*/
+.user-list-item {
+    display: block;
+    padding: 8px 10px;
+    color: #24527a;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.user-list-item:hover,
+.user-list-item.active {
+    background-color: #24527a;
+    color: #ffffff;
+}
