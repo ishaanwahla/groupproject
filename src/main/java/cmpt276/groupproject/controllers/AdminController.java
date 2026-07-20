@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import cmpt276.groupproject.books.UserBookRepository;
 import cmpt276.groupproject.models.UserAccount;
 import cmpt276.groupproject.models.UserAccountRepository;
 import cmpt276.groupproject.models.UserResponse;
@@ -21,10 +22,13 @@ public class AdminController {
 
 	private final AuthService authService;
 	private final UserAccountRepository userAccountRepository;
+	private final UserBookRepository userBookRepository;
 
-	public AdminController(AuthService authService, UserAccountRepository userAccountRepository) {
+	public AdminController(AuthService authService, UserAccountRepository userAccountRepository,
+			UserBookRepository userBookRepository) {
 		this.authService = authService;
 		this.userAccountRepository = userAccountRepository;
+		this.userBookRepository = userBookRepository;
 	}
 
 	@GetMapping("/users")
@@ -37,7 +41,7 @@ public class AdminController {
 
 		return userAccountRepository.findAllByOrderByCreatedAtDescIdDesc()
 			.stream()
-			.map(UserResponse::from)
+			.map(user -> UserResponse.from(user, userBookRepository.findBookTitlesByUserId(user.getId())))
 			.toList();
 	}
 }
