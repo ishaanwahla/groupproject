@@ -1,3 +1,8 @@
+function formatDate(value) {
+    if (!value) return '—';
+    return new Date(value).toLocaleDateString();
+}
+
 function setup() {
     let users = [];
 
@@ -12,7 +17,9 @@ function setup() {
 
             const wpm = user.lastWpm === null || user.lastWpm === undefined ? '—' : user.lastWpm;
             const accuracy = user.lastAccuracy === null || user.lastAccuracy === undefined ? '—' : `${user.lastAccuracy}%`;
-            link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy})`;
+            const memberSince = formatDate(user.createdAt);
+            const lastActive = formatDate(user.updatedAt);
+            link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy}) — Member since: ${memberSince}, Last active: ${lastActive}`;
 
             item.appendChild(link);
             list.appendChild(item);
