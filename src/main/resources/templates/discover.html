@@ -12,6 +12,7 @@
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/new-book.js"></script>
+    <script src="/js/discover.js"></script>
 </head>
 
 <body>
@@ -83,71 +84,24 @@
             <section>
                 <h3>Sci-fi</h3>
                 <div class="example-books discover-books">
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
+                    <article class="book api-book" data-gutenberg-id="1250"></article>
+                    <article class="book api-book" data-gutenberg-id="35"></article>
+                    <article class="book api-book" data-gutenberg-id="139"></article>
                 </div>
             </section>
             <section>
                 <h3>Non Fiction</h3>
                 <div class="example-books discover-books">
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
+                    <article class="book api-book" data-gutenberg-id="2680"></article>
+                    <article class="book api-book" data-gutenberg-id="1232"></article>
+                    <article class="book api-book" data-gutenberg-id="132"></article>
                 </div>
             </section>
         </main>
 
         <aside class="book-week">
             <h2>Book of the Week</h2>
-            <div class="book-week-card">
-                <h2>Book</h2>
-                <p>Author</p>
-                <div class="sidebar-placeholder-image"></div>
-                <button class="book-play" type="button"><i class="fa-solid fa-play"></i></button>
-            </div>
+            <article class="book-week-card api-book" data-gutenberg-id="55"></article>
         </aside>
     </div>
     <dialog th:replace="~{fragments :: new-book-dialog}"></dialog>
