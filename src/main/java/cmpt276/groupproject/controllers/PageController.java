@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import cmpt276.groupproject.models.LoginRequest;
 import cmpt276.groupproject.models.RegisterRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import cmpt276.groupproject.services.AuthService;
 import jakarta.servlet.http.HttpSession;
 
@@ -28,7 +29,7 @@ public class PageController {
 	}
 
 	@GetMapping("/app")
-	public String index(HttpSession session) {
+	public String index(@RequestParam(required = false) Long book, HttpSession session) {
 		var currentUser = authService.currentUser(session);
 
 		if (currentUser.isEmpty()) {
@@ -39,6 +40,11 @@ public class PageController {
 			return "redirect:/admin";
 		}
 
+		if (book == null) {
+			session.removeAttribute("currentBookId");
+		} else {
+			session.setAttribute("currentBookId", book);
+		}
 		return "index";
 	}
 

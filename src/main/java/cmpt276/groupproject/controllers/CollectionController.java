@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import cmpt276.groupproject.books.AddBookRequest;
+import cmpt276.groupproject.books.BookSearchResult;
 import cmpt276.groupproject.books.CollectionBookResponse;
 import cmpt276.groupproject.books.CollectionService;
 import cmpt276.groupproject.books.ProgressRequest;
@@ -38,6 +39,12 @@ public class CollectionController {
 	@GetMapping
 	public List<CollectionBookResponse> list(HttpSession session) {
 		return collectionService.list(currentUser(session));
+	}
+
+	@GetMapping("/recommendations")
+	public List<BookSearchResult> recommendations(HttpSession session) {
+		Long currentBookId = (Long) session.getAttribute("currentBookId");
+		return collectionService.recommendations(currentUser(session), currentBookId);
 	}
 
 	@PostMapping

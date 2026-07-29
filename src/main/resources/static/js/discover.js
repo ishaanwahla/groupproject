@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.api-book').forEach(loadBook);
+    document.querySelectorAll('.recommendation-books').forEach(loadRecommendations);
 
     async function loadBook(card) {
         const gutenbergId = Number(card.dataset.gutenbergId);
@@ -19,6 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
             card.textContent = 'Unable to load this book.';
         } finally {
             card.removeAttribute('aria-busy');
+        }
+    }
+
+    async function loadRecommendations(container) {
+        const status = container.previousElementSibling;
+        try {
+            const response = await fetch('/api/collection/recommendations');
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+            const books = await response.json();
+            status.textContent = books.length ? '' : 'Add a book to get recommendations.';
+            books.forEach(book => {
+                const card = document.createElement('article');
+                card.className = 'book';
+                container.appendChild(card);
+                renderBook(card, book);
+            });
+        } catch (error) {
+            status.textContent = 'Unable to load recommendations.';
         }
     }
 
