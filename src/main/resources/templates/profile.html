@@ -31,15 +31,27 @@
                             <h2 th:text="${user.name}">Name</h2>
                         </div>
                     </div>
-                    <div class="profile-stats">
-                        <div><strong th:text="${user.lastWpm != null ? user.lastWpm : '—'}">—</strong><span>Latest WPM</span></div>
-                        <div><strong th:text="${user.lastAccuracy != null ? user.lastAccuracy + '%' : '—'}">—</strong><span>Latest accuracy</span></div>
-                        <div><strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong><span>Personal best</span></div>
-                        <div><strong th:text="${user.sessionsCompleted != null ? user.sessionsCompleted : 0}">0</strong><span>Sessions</span></div>
-                    </div>
                 </div>
 
-                <h3>Typing Performance</h3>
+                <h3>Latest Session</h3>
+                <div class="profile-stats latest-stats">
+                    <div><strong th:text="${user.lastWpm != null ? user.lastWpm : '—'}">—</strong><span>WPM</span></div>
+                    <div><strong th:text="${user.lastAccuracy != null ? user.lastAccuracy + '%' : '—'}">—</strong><span>Accuracy</span></div>
+                    <div><strong th:text="${user.lastWordsTyped != null ? user.lastWordsTyped : '—'}">—</strong><span>Words typed</span></div>
+                    <div><strong th:text="${user.lastMistakes != null ? user.lastMistakes : '—'}">—</strong><span>Mistakes</span></div>
+                </div>
+
+                <h3>Overall Statistics</h3>
+                <div class="profile-stats overall-stats">
+                    <div><strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong><span>Personal best</span></div>
+                    <div><strong th:text="${user.averageWpm != null ? user.averageWpm : '—'}">—</strong><span>Average WPM</span></div>
+                    <div><strong th:text="${user.averageAccuracy != null ? user.averageAccuracy + '%' : '—'}">—</strong><span>Average accuracy</span></div>
+                    <div><strong th:text="${user.totalWordsTyped != null ? user.totalWordsTyped : 0}">0</strong><span>Total words</span></div>
+                    <div><strong th:text="${user.totalMistakes != null ? user.totalMistakes : 0}">0</strong><span>Total mistakes</span></div>
+                    <div><strong th:text="${user.sessionsCompleted != null ? user.sessionsCompleted : 0}">0</strong><span>Sessions</span></div>
+                </div>
+
+                <h3>Performance Overview</h3>
                 <div class="profile-charts">
                     <div class="profile-chart-card accuracy-card">
                         <h4>Latest Accuracy</h4>

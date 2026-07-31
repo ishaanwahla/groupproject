@@ -93,29 +93,40 @@ class TypingControllerTest {
 	}
 
 	@Test
-	void completedSessionsUpdatePersonalBest() throws Exception {
+	void completedSessionsUpdateOverallStats() throws Exception {
 		UserAccount ada = user("Ada", "ada@example.com");
 		MockCookie sessionCookie = login("ada@example.com");
 
-		saveCompletedStats(sessionCookie, 85, 97);
-		saveCompletedStats(sessionCookie, 70, 99);
+		saveCompletedStats(sessionCookie, 85, 97, 50, 6);
+		saveCompletedStats(sessionCookie, 70, 93, 30, 4);
 
 		UserAccount reloaded = userAccountRepository.findById(ada.getId()).orElseThrow();
 		assertThat(reloaded.getBestWpm()).isEqualTo(85);
 		assertThat(reloaded.getSessionsCompleted()).isEqualTo(2);
+		assertThat(reloaded.getLastWordsTyped()).isEqualTo(30);
+		assertThat(reloaded.getLastMistakes()).isEqualTo(4);
+		assertThat(reloaded.getAverageWpm()).isEqualTo(78);
+		assertThat(reloaded.getAverageAccuracy()).isEqualTo(95);
+		assertThat(reloaded.getTotalWordsTyped()).isEqualTo(80);
+		assertThat(reloaded.getTotalMistakes()).isEqualTo(10);
 	}
 
 	@Test
 	void profileDisplaysSavedTypingStats() throws Exception {
 		user("Ada", "ada@example.com");
 		MockCookie sessionCookie = login("ada@example.com");
-		saveCompletedStats(sessionCookie, 85, 97);
+		saveCompletedStats(sessionCookie, 85, 97, 45, 6);
 
 		mockMvc.perform(get("/profile").cookie(sessionCookie))
 			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("Latest Session")))
+			.andExpect(content().string(containsString("Overall Statistics")))
 			.andExpect(content().string(containsString("--accuracy: 97%")))
-			.andExpect(content().string(containsString(">85</strong><span>Latest WPM</span>")))
+			.andExpect(content().string(containsString(">45</strong><span>Words typed</span>")))
+			.andExpect(content().string(containsString(">6</strong><span>Mistakes</span>")))
 			.andExpect(content().string(containsString(">85</strong><span>Personal best</span>")))
+			.andExpect(content().string(containsString(">85</strong><span>Average WPM</span>")))
+			.andExpect(content().string(containsString(">45</strong><span>Total words</span>")))
 			.andExpect(content().string(containsString(">1</strong><span>Sessions</span>")));
 	}
 
@@ -136,13 +147,14 @@ class TypingControllerTest {
 		return (MockCookie) result.getResponse().getCookie("SESSION");
 	}
 
-	private void saveCompletedStats(MockCookie sessionCookie, int wpm, int accuracy) throws Exception {
+	private void saveCompletedStats(MockCookie sessionCookie, int wpm, int accuracy,
+			int wordsTyped, int mistakes) throws Exception {
 		mockMvc.perform(post("/api/typing/stats")
 				.cookie(sessionCookie)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
-					{"wpm":%d,"accuracy":%d,"completed":true}
-					""".formatted(wpm, accuracy)))
+					{"wpm":%d,"accuracy":%d,"completed":true,"wordsTyped":%d,"mistakes":%d}
+					""".formatted(wpm, accuracy, wordsTyped, mistakes)))
 			.andExpect(status().isNoContent());
 	}
 }

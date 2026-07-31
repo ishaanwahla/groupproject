@@ -15,6 +15,12 @@ public class TypingStatsRequest {
 
 	private boolean completed;
 
+	@Min(value = 0, message = "Words typed must be zero or greater.")
+	private Integer wordsTyped;
+
+	@Min(value = 0, message = "Mistakes must be zero or greater.")
+	private Integer mistakes;
+
 	public Integer getWpm() {
 		return wpm;
 	}
@@ -37,5 +43,21 @@ public class TypingStatsRequest {
 
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
+	}
+
+	public Integer getWordsTyped() {
+		return wordsTyped;
+	}
+
+	public void setWordsTyped(Integer wordsTyped) {
+		this.wordsTyped = wordsTyped;
+	}
+
+	public Integer getMistakes() {
+		return mistakes;
+	}
+
+	public void setMistakes(Integer mistakes) {
+		this.mistakes = mistakes;
 	}
 }

@@ -59,6 +59,18 @@ public class UserAccount {
 
 	private Integer sessionsCompleted;
 
+	private Integer lastWordsTyped;
+
+	private Integer lastMistakes;
+
+	private Integer totalWpm;
+
+	private Integer totalAccuracy;
+
+	private Integer totalWordsTyped;
+
+	private Integer totalMistakes;
+
 	@PrePersist
 	void onCreate() {
 		LocalDateTime now = LocalDateTime.now();
@@ -153,6 +165,64 @@ public class UserAccount {
 
 	public void setSessionsCompleted(Integer sessionsCompleted) {
 		this.sessionsCompleted = sessionsCompleted;
+	}
+
+	public Integer getLastWordsTyped() {
+		return lastWordsTyped;
+	}
+
+	public void setLastWordsTyped(Integer lastWordsTyped) {
+		this.lastWordsTyped = lastWordsTyped;
+	}
+
+	public Integer getLastMistakes() {
+		return lastMistakes;
+	}
+
+	public void setLastMistakes(Integer lastMistakes) {
+		this.lastMistakes = lastMistakes;
+	}
+
+	public Integer getTotalWpm() {
+		return totalWpm;
+	}
+
+	public void setTotalWpm(Integer totalWpm) {
+		this.totalWpm = totalWpm;
+	}
+
+	public Integer getTotalAccuracy() {
+		return totalAccuracy;
+	}
+
+	public void setTotalAccuracy(Integer totalAccuracy) {
+		this.totalAccuracy = totalAccuracy;
+	}
+
+	public Integer getTotalWordsTyped() {
+		return totalWordsTyped;
+	}
+
+	public void setTotalWordsTyped(Integer totalWordsTyped) {
+		this.totalWordsTyped = totalWordsTyped;
+	}
+
+	public Integer getTotalMistakes() {
+		return totalMistakes;
+	}
+
+	public void setTotalMistakes(Integer totalMistakes) {
+		this.totalMistakes = totalMistakes;
+	}
+
+	public Integer getAverageWpm() {
+		if (totalWpm == null || sessionsCompleted == null || sessionsCompleted == 0) return null;
+		return Math.round((float) totalWpm / sessionsCompleted);
+	}
+
+	public Integer getAverageAccuracy() {
+		if (totalAccuracy == null || sessionsCompleted == null || sessionsCompleted == 0) return null;
+		return Math.round((float) totalAccuracy / sessionsCompleted);
 	}
 
 	private String trim(String value) {

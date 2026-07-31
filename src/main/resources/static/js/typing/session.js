@@ -102,7 +102,8 @@ export function endSession(
 	app.trackingStats = false;
 	clearInterval(app.intervalId);
 	saveReadingProgress(app.currentTypedWordIndex);
-	saveUserStats(wpm, accuracy, true);
+	const mistakes = app.sessionKeystrokes - app.sessionCorrectKeystrokes;
+	saveUserStats(wpm, accuracy, true, app.sessionWordsTyped, mistakes);
 	showSessionSummary(wpm, accuracy);
 }
 

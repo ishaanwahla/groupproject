@@ -70,12 +70,24 @@ public class AuthService {
 		user.setLastWpm(request.getWpm());
 		user.setLastAccuracy(request.getAccuracy());
 		if (request.isCompleted()) {
+			int wordsTyped = request.getWordsTyped() == null ? 0 : request.getWordsTyped();
+			int mistakes = request.getMistakes() == null ? 0 : request.getMistakes();
+			user.setLastWordsTyped(wordsTyped);
+			user.setLastMistakes(mistakes);
 			if (user.getBestWpm() == null || request.getWpm() > user.getBestWpm()) {
 				user.setBestWpm(request.getWpm());
 			}
 			int sessionsCompleted = user.getSessionsCompleted() == null ? 0 : user.getSessionsCompleted();
 			user.setSessionsCompleted(sessionsCompleted + 1);
+			user.setTotalWpm(valueOrZero(user.getTotalWpm()) + request.getWpm());
+			user.setTotalAccuracy(valueOrZero(user.getTotalAccuracy()) + request.getAccuracy());
+			user.setTotalWordsTyped(valueOrZero(user.getTotalWordsTyped()) + wordsTyped);
+			user.setTotalMistakes(valueOrZero(user.getTotalMistakes()) + mistakes);
 		}
 		return userAccountRepository.save(user);
+	}
+
+	private int valueOrZero(Integer value) {
+		return value == null ? 0 : value;
 	}
 }
