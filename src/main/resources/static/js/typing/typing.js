@@ -1,4 +1,4 @@
-import { appState as app, inputState as input, bufferState } from './state.js';
+import { appState as app, inputState as input, bufferState, keyboardState } from './state.js';
 import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './buffer.js';
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
@@ -177,6 +177,10 @@ async function setup() {
 }
 
 window.addEventListener("keydown", (e) => {
+	// play the keypress animation on the virtual keyboard
+	const keyElement = keyboardState.keyRegistry.get(e.code);
+	if (keyElement) keyElement.classList.add("pressed");
+
 	// pauses the typing test
 	if (document.getElementById("errorDialog").open) return;
 	if (e.key === "Escape") {
@@ -204,6 +208,18 @@ window.addEventListener("keydown", (e) => {
 	if (app.visibleChunks[0].text.length === 0) {
 		cycleChunk();
 	}
+});
+
+// revert the virtual keyboard key back to its unpressed state
+window.addEventListener("keyup", (e) => {
+	const keyElement = keyboardState.keyRegistry.get(e.code);
+	if (keyElement) keyElement.classList.remove("pressed");
+});
+
+
+// if the window loses focus keyup will never fire, clear every pressed key manually
+window.addEventListener("blur", () => {
+	keyboardState.keyRegistry.forEach(key => key.classList.remove("pressed"));
 });
 
 /* Wait until the page loads before attempting to access DOM elements */

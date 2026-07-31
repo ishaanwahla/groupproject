@@ -42,7 +42,7 @@
         top: calc(var(--u) * 0.15);
         height: calc(var(--u) * 0.85);
         /* prevents the jarring darkness flicker when fading keys into each other*/
-        mix-blend-mode: plus-lighter;
+        mix-blend-mode: plus-darker;
         opacity: 0;
     }
 
