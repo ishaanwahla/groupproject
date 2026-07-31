@@ -4,13 +4,10 @@
     color: #ef4444;
 }
 
-.admin-container {
-    justify-content: center;
-}
-
 /*wider sidebar for the admin user panel, in its own card*/
 .admin-user-panel {
     width: 280px;
+    flex-shrink: 0;
     background-color: #ffffff;
     border: 1px solid #f1f5f9;
     border-radius: 20px;
@@ -60,20 +57,68 @@
     color: #ffffff;
 }
 
-/*row holding the user info link alongside its delete button*/
-.user-list-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.user-list-row .user-list-item {
+/*center panel showing the selected user's full details*/
+.admin-detail-panel {
     flex: 1;
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
 }
 
-.user-delete-btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    white-space: nowrap;
+.admin-empty-state {
+    color: #64748b;
+}
+
+.admin-detail-heading {
+    margin: 0 0 15px;
+    color: #1e293b;
+}
+
+.admin-detail-fields p {
+    margin: 8px 0;
+    color: #1e293b;
+}
+
+.admin-delete-btn {
+    margin-top: 20px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.admin-delete-btn:hover {
+    background-color: #b91c1c;
+    color: #ffffff;
+}
+
+/*right panel listing the selected user's book collection*/
+.admin-books-panel {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.admin-books-heading {
+    margin: 0 0 10px;
+    color: #1e293b;
+}
+
+.admin-books-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-books-list li {
+    padding: 8px 0;
+    color: #24527a;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-books-list li.admin-books-empty {
+    color: #64748b;
+    border-bottom: none;
 }

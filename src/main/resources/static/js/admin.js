@@ -5,35 +5,114 @@ function formatDate(value) {
 
 function setup() {
     let users = [];
+    let visibleUsers = [];
+    let selectedUserId = null;
 
-    function renderList(rows) {
+    function findSelectedUser() {
+        return users.find(user => user.id === selectedUserId) || null;
+    }
+
+    function renderUserList() {
         const list = document.getElementById('userList');
         list.innerHTML = '';
-        for (const user of rows) {
-            const row = document.createElement('li');
-            row.className = 'user-list-row';
-
+        for (const user of visibleUsers) {
+            const item = document.createElement('li');
             const link = document.createElement('a');
             link.href = '#';
             link.className = 'user-list-item';
-
-            const wpm = user.lastWpm === null || user.lastWpm === undefined ? '—' : user.lastWpm;
-            const accuracy = user.lastAccuracy === null || user.lastAccuracy === undefined ? '—' : `${user.lastAccuracy}%`;
-            const books = user.bookTitles && user.bookTitles.length > 0 ? user.bookTitles.join(', ') : 'No books yet';
-            const memberSince = formatDate(user.createdAt);
-            const lastActive = formatDate(user.updatedAt);
-            link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy}) — Books: ${books} — Member since: ${memberSince}, Last active: ${lastActive}`;
-
-            const deleteButton = document.createElement('button');
-            deleteButton.type = 'button';
-            deleteButton.className = 'btn-secondary user-delete-btn';
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', () => deleteUser(user));
-
-            row.appendChild(link);
-            row.appendChild(deleteButton);
-            list.appendChild(row);
+            if (user.id === selectedUserId) link.classList.add('active');
+            link.textContent = user.name;
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                selectedUserId = user.id;
+                renderAll();
+            });
+            item.appendChild(link);
+            list.appendChild(item);
         }
+    }
+
+    function renderDetailPanel() {
+        const panel = document.getElementById('userDetailPanel');
+        panel.innerHTML = '';
+        const user = findSelectedUser();
+
+        if (!user) {
+            const empty = document.createElement('p');
+            empty.className = 'admin-empty-state';
+            empty.textContent = 'Select a user to view details';
+            panel.appendChild(empty);
+            return;
+        }
+
+        const heading = document.createElement('h3');
+        heading.className = 'admin-detail-heading';
+        heading.textContent = user.name;
+        panel.appendChild(heading);
+
+        const wpm = user.lastWpm === null || user.lastWpm === undefined ? '—' : user.lastWpm;
+        const accuracy = user.lastAccuracy === null || user.lastAccuracy === undefined ? '—' : `${user.lastAccuracy}%`;
+
+        const fields = [
+            ['Email', user.email],
+            ['Account Created', formatDate(user.createdAt)],
+            ['Last Active', formatDate(user.updatedAt)],
+            ['Global WPM', wpm],
+            ['Global Accuracy', accuracy]
+        ];
+
+        const fieldList = document.createElement('div');
+        fieldList.className = 'admin-detail-fields';
+        for (const [label, value] of fields) {
+            const row = document.createElement('p');
+            const strong = document.createElement('strong');
+            strong.textContent = `${label}: `;
+            row.appendChild(strong);
+            row.append(String(value));
+            fieldList.appendChild(row);
+        }
+        panel.appendChild(fieldList);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'btn-secondary admin-delete-btn';
+        deleteButton.textContent = 'Delete User';
+        deleteButton.addEventListener('click', () => deleteUser(user));
+        panel.appendChild(deleteButton);
+    }
+
+    function renderBooksPanel() {
+        const panel = document.getElementById('userBooksPanel');
+        panel.innerHTML = '';
+        const user = findSelectedUser();
+        if (!user) return;
+
+        const heading = document.createElement('h4');
+        heading.className = 'admin-books-heading';
+        heading.textContent = `${user.name}'s Books`;
+        panel.appendChild(heading);
+
+        const list = document.createElement('ul');
+        list.className = 'admin-books-list';
+        if (user.bookTitles && user.bookTitles.length > 0) {
+            for (const title of user.bookTitles) {
+                const item = document.createElement('li');
+                item.textContent = title;
+                list.appendChild(item);
+            }
+        } else {
+            const item = document.createElement('li');
+            item.className = 'admin-books-empty';
+            item.textContent = 'No books yet';
+            list.appendChild(item);
+        }
+        panel.appendChild(list);
+    }
+
+    function renderAll() {
+        renderUserList();
+        renderDetailPanel();
+        renderBooksPanel();
     }
 
     function deleteUser(user) {
@@ -48,11 +127,22 @@ function setup() {
                     throw new Error(body && body.message ? body.message : 'Failed to delete user.');
                 }
                 users = users.filter(candidate => candidate.id !== user.id);
-                renderList(users);
+                if (selectedUserId === user.id) {
+                    selectedUserId = null;
+                }
+                applyFilter(document.getElementById('searchBox').value);
             })
             .catch(error => {
                 document.getElementById('statusMessage').textContent = error.message;
             });
+    }
+
+    function applyFilter(query) {
+        const normalized = query.toLowerCase();
+        visibleUsers = users.filter(user =>
+            user.name.toLowerCase().includes(normalized) || user.email.toLowerCase().includes(normalized)
+        );
+        renderAll();
     }
 
     fetch('/api/admin/users')
@@ -64,18 +154,14 @@ function setup() {
         })
         .then(data => {
             users = data;
-            renderList(users);
+            applyFilter(document.getElementById('searchBox').value);
         })
         .catch(error => {
             document.getElementById('statusMessage').textContent = error.message;
         });
 
     document.getElementById('searchBox').addEventListener('input', function() {
-        const query = this.value.toLowerCase();
-        const filtered = users.filter(user =>
-            user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
-        );
-        renderList(filtered);
+        applyFilter(this.value);
     });
 }
 
