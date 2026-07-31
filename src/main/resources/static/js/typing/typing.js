@@ -135,7 +135,10 @@ function handleCharacterInput(pressedKey, span) {
 
 		span.classList.remove("cursor");
 		span.classList.add("correct")
-		if (targetUnit.display === " ") app.currentTypedWordIndex++;
+		if (targetUnit.display === " ") {
+			app.currentTypedWordIndex++;
+			app.sessionWordsTyped++;
+		}
 
 		handleScroll(span);
 

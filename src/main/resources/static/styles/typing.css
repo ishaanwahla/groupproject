@@ -175,7 +175,7 @@
 }
 
 .session-summary-heading p,
-.summary-missed-key {
+.session-summary-details p {
     margin: 0;
 }
 
@@ -191,7 +191,7 @@
 
 .session-summary-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     width: 100%;
     gap: 8px;
 }
@@ -214,8 +214,13 @@
 }
 
 .session-summary-stats span,
-.summary-missed-key {
+.session-summary-details {
     font-size: 0.75rem;
+}
+
+.session-summary-details {
+    display: flex;
+    gap: 20px;
 }
 
 .session-summary-actions {
@@ -223,8 +228,7 @@
     gap: 8px;
 }
 
-.session-summary-actions .btn-primary,
-.session-summary-actions .btn-secondary {
+.session-summary-actions .btn-primary {
     width: auto;
     padding: 6px 12px;
     font-size: 0.8rem;

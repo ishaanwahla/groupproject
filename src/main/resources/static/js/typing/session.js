@@ -82,6 +82,8 @@ function showSessionSummary(wpm, accuracy) {
 	document.getElementById("summary-accuracy").textContent = `${accuracy}%`;
 	document.getElementById("summary-personal-best").textContent = app.personalBestWpm;
 	document.getElementById("summary-mistakes").textContent = mistakes;
+	document.getElementById("summary-words").textContent = app.sessionWordsTyped;
+	document.getElementById("summary-correct-keys").textContent = app.sessionCorrectKeystrokes;
 	document.getElementById("summary-missed-key").textContent = mostMissed
 		? `${formatMissedKey(mostMissed[0])} (${mostMissed[1]})`
 		: "None";
@@ -108,6 +110,7 @@ export function endSession(
 export function startSession(durationSeconds, endless) {
 	app.sessionKeystrokes = 0;
 	app.sessionCorrectKeystrokes = 0;
+	app.sessionWordsTyped = 0;
 	app.mistakeCounts = {};
 
 	app.isEndlessMode = endless;
