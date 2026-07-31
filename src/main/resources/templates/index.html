@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/styles/book-cards.css">
     <link rel="stylesheet" href="/styles/dialog.css">
     <link rel="stylesheet" href="/styles/typing.css">
+    <link rel="stylesheet" href="/styles/keyboard.css">
     <script type="module" src="/js/typing/typing.js"></script>
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
@@ -31,14 +32,15 @@
                 <div id="time-display"><i class="fa-solid fa-hourglass-half"></i> Time: <span
                         id="time-value">--:--</span></div>
             </div>
-            <div id="pause-indicator">Press ESC to Resume</div>
             <div id="typing-wrapper">
                 <div id="typing-interface">
                     <div id="chunk-container"></div>
                 </div>
                 <div th:insert="~{session-select :: session-select}"></div>
             </div>
+            <div id="pause-indicator">Press ESC to Resume</div>
             <div id="pause-instructions">Press ESC to Pause</div>
+            <div id="keyboard"></div>
 
             <div class="section-heading">
                 <h3>More from this Genre</h3>

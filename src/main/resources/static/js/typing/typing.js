@@ -3,6 +3,7 @@ import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './bu
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
 import { updateBookProgress, updateStats } from './progress.js';
+import { createVirtualKeyboard } from './keyboard.js';
 
 
 // Check if stat tracking needs to be enabled
@@ -28,7 +29,7 @@ export function togglePause() {
 		// this class will pause the cursor blinking animation
 		typingInterface.classList.add("interface-paused");
 		pauseInstructions.style.display = "none";
-		if (pauseIndicator) pauseIndicator.style.display = "block";
+		if (pauseIndicator) pauseIndicator.style.display = "flex";
 	} else { // Resume
 		if (app.bufferError) return; // refuse to unpause while in error state
 
@@ -36,7 +37,7 @@ export function togglePause() {
 		typingInterface.style.opacity = "1.0";
 		// start the cursor flashing again
 		typingInterface.classList.remove("interface-paused");
-		pauseInstructions.style.display = "block";
+		pauseInstructions.style.display = "flex";
 		if (pauseIndicator) pauseIndicator.style.display = "none";
 	}
 }
@@ -150,6 +151,7 @@ function handleCharacterInput(pressedKey, span) {
 
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
+	createVirtualKeyboard();
 	showSessionOverlay();
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {

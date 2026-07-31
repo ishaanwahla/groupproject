@@ -7,6 +7,8 @@
 //		code is the lookup code for fetching the key element from the keyRegistry
 //		label is just a shorter name meant for debugging purposes (not reflected anywhere visually)
 
+import { keyboardState } from "./state.js";
+
 const ROWS = [
 	[
 		["letters-numbers", "Escape", "esc"],
@@ -70,4 +72,40 @@ const KEY_WIDTH_U = {
 	"enter-leftshift": 2.3,
 	"rightshift": 2.8,
 	"space": 6.55,
+};
+
+// creates the virtual keyboard in the DOM
+// from SVG images stored in /resources/static/assets/keyboard
+export function createVirtualKeyboard() {
+	keyboardState.board = document.getElementById("keyboard");
+
+	ROWS.forEach(rowData => {
+		const row = document.createElement("div");
+		row.className = "row";
+
+		rowData.forEach(([type, code, label]) => {
+			const key = document.createElement("div");
+			key.className = "key";
+			key.style.width = `calc(${KEY_WIDTH_U[type]} * var(--u))`;
+			key.dataset.code = code;
+
+			// regular SVG
+			const up = document.createElement("img");
+			up.className = "key-img up";
+			up.src = `/assets/keyboard/${type}.svg`;
+			up.alt = label;
+
+			// keydown SVG
+			const down = document.createElement("img");
+			down.className = "key-img down";
+			down.src = `/assets/keyboard/${type}-pressed.svg`;
+			down.alt = "";
+
+			key.append(up, down);
+			row.appendChild(key);
+			keyboardState.keyRegistry.set(code, key);
+		});
+
+		keyboardState.board.appendChild(row);
+	});
 };

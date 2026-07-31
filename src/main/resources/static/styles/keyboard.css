@@ -1,0 +1,55 @@
+    :root {
+        /* represents a single width unit */
+        --u: 40px;
+        --gap: 2px;
+    }
+
+    #keyboard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--gap);
+    }
+
+    .row {
+        display: flex;
+        gap: var(--gap);
+    }
+
+    .key {
+        position: relative;
+        height: var(--u);
+    }
+
+    /* base key image container, contains both pressed and unpressed variants */
+    .key-img {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        object-fit: fill;
+        transition: opacity 0.06s ease-out;
+    }
+
+    /* unpressed key, full height*/
+    .key-img.up {
+        top: 0;
+        height: var(--u);
+        opacity: 1;
+    }
+
+    /* pressed key, slightly shorter and sits a bit lower*/
+    .key-img.down {
+        top: calc(var(--u) * 0.15);
+        height: calc(var(--u) * 0.85);
+        /* prevents the jarring darkness flicker when fading keys into each other*/
+        mix-blend-mode: plus-lighter;
+        opacity: 0;
+    }
+
+    .key.pressed .key-img.up {
+        opacity: 0;
+    }
+
+    .key.pressed .key-img.down {
+        opacity: .85;
+    }

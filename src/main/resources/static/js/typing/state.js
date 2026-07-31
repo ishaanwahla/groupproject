@@ -42,3 +42,11 @@ export const inputState = {
 	currentTypingAttempt: 0, //how many times the user has tried to type the current unit
 };
 Object.seal(inputState);
+
+// owned by `keyboard.js` but used by the keydown event handler in `typing.js`
+// holds the DOM element for the virtual keyboard as well as the registry for key DOM elements
+export const keyboardState = {
+	board: null,
+	keyRegistry: new Map(),
+};
+Object.seal(keyboardState);
