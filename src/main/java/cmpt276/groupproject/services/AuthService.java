@@ -69,6 +69,13 @@ public class AuthService {
 	public UserAccount saveTypingStats(UserAccount user, TypingStatsRequest request) {
 		user.setLastWpm(request.getWpm());
 		user.setLastAccuracy(request.getAccuracy());
+		if (request.isCompleted()) {
+			if (user.getBestWpm() == null || request.getWpm() > user.getBestWpm()) {
+				user.setBestWpm(request.getWpm());
+			}
+			int sessionsCompleted = user.getSessionsCompleted() == null ? 0 : user.getSessionsCompleted();
+			user.setSessionsCompleted(sessionsCompleted + 1);
+		}
 		return userAccountRepository.save(user);
 	}
 }

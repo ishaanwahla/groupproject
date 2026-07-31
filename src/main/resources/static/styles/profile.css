@@ -46,7 +46,32 @@
 }
 
 .profile-stats {
-    font-size: 1.3rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.profile-stats div {
+    padding: 14px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.profile-stats strong,
+.profile-stats span {
+    display: block;
+}
+
+.profile-stats strong {
+    color: #24527a;
+    font-size: 1.4rem;
+}
+
+.profile-stats span {
+    margin-top: 3px;
+    font-size: 0.8rem;
     font-weight: 600;
 }
 

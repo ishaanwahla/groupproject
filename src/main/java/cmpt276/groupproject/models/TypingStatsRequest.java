@@ -13,6 +13,8 @@ public class TypingStatsRequest {
 	@Min(value = 0, message = "Accuracy must be zero or greater.")
 	private Integer accuracy;
 
+	private boolean completed;
+
 	public Integer getWpm() {
 		return wpm;
 	}
@@ -27,5 +29,13 @@ public class TypingStatsRequest {
 
 	public void setAccuracy(Integer accuracy) {
 		this.accuracy = accuracy;
+	}
+
+	public boolean isCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
 	}
 }

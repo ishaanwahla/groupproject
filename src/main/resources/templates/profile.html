@@ -33,8 +33,10 @@
                         </div>
                     </div>
                     <div class="profile-stats">
-                        <p>WPM: 50</p>
-                        <p>Accuracy: 75%</p>
+                        <div><strong th:text="${user.lastWpm != null ? user.lastWpm : '—'}">—</strong><span>Latest WPM</span></div>
+                        <div><strong th:text="${user.lastAccuracy != null ? user.lastAccuracy + '%' : '—'}">—</strong><span>Latest accuracy</span></div>
+                        <div><strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong><span>Personal best</span></div>
+                        <div><strong th:text="${user.sessionsCompleted != null ? user.sessionsCompleted : 0}">0</strong><span>Sessions</span></div>
                     </div>
                 </div>
 

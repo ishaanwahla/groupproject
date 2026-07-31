@@ -2,7 +2,7 @@ import { appState as app, inputState as input, bufferState } from './state.js';
 import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './buffer.js';
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
-import { updateBookProgress, updateStats } from './progress.js';
+import { loadUserStats, updateBookProgress, updateStats } from './progress.js';
 
 
 // Check if stat tracking needs to be enabled
@@ -144,6 +144,7 @@ function handleCharacterInput(pressedKey, span) {
 	} else {
 		app.sessionKeystrokes++;
 		input.currentTypingAttempt++;
+		app.mistakeCounts[expectedKey] = (app.mistakeCounts[expectedKey] || 0) + 1;
 		handleTypo(span);
 	};
 }
@@ -151,6 +152,7 @@ function handleCharacterInput(pressedKey, span) {
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
 	showSessionOverlay();
+	loadUserStats();
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {
 		showSessionOverlay("Unable to load your book right now. Please check your connection and try again.");

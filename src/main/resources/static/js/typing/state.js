@@ -18,6 +18,8 @@ export const appState = {
 	intervalId: null,
 	sessionKeystrokes: 0,
 	sessionCorrectKeystrokes: 0,
+	mistakeCounts: {},
+	personalBestWpm: 0,
 	isPaused: false,
 	sessionActive: false,
 	isEndlessMode: false,

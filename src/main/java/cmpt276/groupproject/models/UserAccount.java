@@ -55,6 +55,10 @@ public class UserAccount {
 
 	private Integer lastAccuracy;
 
+	private Integer bestWpm;
+
+	private Integer sessionsCompleted;
+
 	@PrePersist
 	void onCreate() {
 		LocalDateTime now = LocalDateTime.now();
@@ -133,6 +137,22 @@ public class UserAccount {
 
 	public void setLastAccuracy(Integer lastAccuracy) {
 		this.lastAccuracy = lastAccuracy;
+	}
+
+	public Integer getBestWpm() {
+		return bestWpm;
+	}
+
+	public void setBestWpm(Integer bestWpm) {
+		this.bestWpm = bestWpm;
+	}
+
+	public Integer getSessionsCompleted() {
+		return sessionsCompleted;
+	}
+
+	public void setSessionsCompleted(Integer sessionsCompleted) {
+		this.sessionsCompleted = sessionsCompleted;
 	}
 
 	private String trim(String value) {

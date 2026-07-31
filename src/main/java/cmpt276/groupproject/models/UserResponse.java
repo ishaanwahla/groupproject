@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record UserResponse(Long id, String name, String email, UserRole role, LocalDateTime createdAt,
-		LocalDateTime updatedAt, Integer lastWpm, Integer lastAccuracy, List<String> bookTitles) {
+		LocalDateTime updatedAt, Integer lastWpm, Integer lastAccuracy, Integer bestWpm,
+		Integer sessionsCompleted, List<String> bookTitles) {
 
 	public static UserResponse from(UserAccount userAccount) {
 		return from(userAccount, List.of());
@@ -20,6 +21,8 @@ public record UserResponse(Long id, String name, String email, UserRole role, Lo
 			userAccount.getUpdatedAt(),
 			userAccount.getLastWpm(),
 			userAccount.getLastAccuracy(),
+			userAccount.getBestWpm(),
+			userAccount.getSessionsCompleted(),
 			bookTitles
 		);
 	}

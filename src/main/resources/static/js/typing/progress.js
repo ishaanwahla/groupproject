@@ -78,19 +78,31 @@ export function updateStats() {
 
 	if (!app.isEndlessMode && app.remainingSeconds === 0) {
 		endSession(wpm, accuracy);
+		return;
 	}
 
 	throttledSaveUserStats(wpm, accuracy);
 }
 
+export async function loadUserStats() {
+	try {
+		const response = await fetch('/api/auth/me');
+		if (!response.ok) return;
+		const user = await response.json();
+		app.personalBestWpm = user.bestWpm || 0;
+	} catch (error) {
+		console.error("Failed to load user stats:", error);
+	}
+}
+
 
 // function for event handlers to call to save user data
-export async function saveUserStats(wpm, accuracy) {
+export async function saveUserStats(wpm, accuracy, completed = false) {
 	try {
 		await fetch('/api/typing/stats', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ wpm, accuracy })
+			body: JSON.stringify({ wpm, accuracy, completed })
 		});
 	} catch (error) {
 		console.error("Failed to save user stats:", error);

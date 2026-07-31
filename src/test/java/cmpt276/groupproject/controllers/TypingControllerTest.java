@@ -89,6 +89,19 @@ class TypingControllerTest {
 		assertThat(reloaded.getLastAccuracy()).isEqualTo(97);
 	}
 
+	@Test
+	void completedSessionsUpdatePersonalBest() throws Exception {
+		UserAccount ada = user("Ada", "ada@example.com");
+		MockCookie sessionCookie = login("ada@example.com");
+
+		saveCompletedStats(sessionCookie, 85, 97);
+		saveCompletedStats(sessionCookie, 70, 99);
+
+		UserAccount reloaded = userAccountRepository.findById(ada.getId()).orElseThrow();
+		assertThat(reloaded.getBestWpm()).isEqualTo(85);
+		assertThat(reloaded.getSessionsCompleted()).isEqualTo(2);
+	}
+
 	private UserAccount user(String name, String email) {
 		UserAccount user = new UserAccount();
 		user.setName(name);
@@ -104,5 +117,15 @@ class TypingControllerTest {
 				.param("password", PASSWORD))
 			.andReturn();
 		return (MockCookie) result.getResponse().getCookie("SESSION");
+	}
+
+	private void saveCompletedStats(MockCookie sessionCookie, int wpm, int accuracy) throws Exception {
+		mockMvc.perform(post("/api/typing/stats")
+				.cookie(sessionCookie)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{"wpm":%d,"accuracy":%d,"completed":true}
+					""".formatted(wpm, accuracy)))
+			.andExpect(status().isNoContent());
 	}
 }
