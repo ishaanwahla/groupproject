@@ -1,7 +1,10 @@
 package cmpt276.groupproject.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -100,6 +103,20 @@ class TypingControllerTest {
 		UserAccount reloaded = userAccountRepository.findById(ada.getId()).orElseThrow();
 		assertThat(reloaded.getBestWpm()).isEqualTo(85);
 		assertThat(reloaded.getSessionsCompleted()).isEqualTo(2);
+	}
+
+	@Test
+	void profileDisplaysSavedTypingStats() throws Exception {
+		user("Ada", "ada@example.com");
+		MockCookie sessionCookie = login("ada@example.com");
+		saveCompletedStats(sessionCookie, 85, 97);
+
+		mockMvc.perform(get("/profile").cookie(sessionCookie))
+			.andExpect(status().isOk())
+			.andExpect(content().string(containsString("--accuracy: 97%")))
+			.andExpect(content().string(containsString(">85</strong><span>Latest WPM</span>")))
+			.andExpect(content().string(containsString(">85</strong><span>Personal best</span>")))
+			.andExpect(content().string(containsString(">1</strong><span>Sessions</span>")));
 	}
 
 	private UserAccount user(String name, String email) {

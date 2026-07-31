@@ -40,6 +40,44 @@
                     </div>
                 </div>
 
+                <h3>Typing Performance</h3>
+                <div class="profile-charts">
+                    <div class="profile-chart-card accuracy-card">
+                        <h4>Latest Accuracy</h4>
+                        <div class="accuracy-chart"
+                            th:style="'--accuracy: ' + ${user.lastAccuracy != null ? user.lastAccuracy : 0} + '%'">
+                            <div class="accuracy-chart-center">
+                                <strong th:text="${user.lastAccuracy != null ? user.lastAccuracy + '%' : '—'}">—</strong>
+                                <span>Accuracy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-chart-card wpm-chart-card">
+                        <h4>WPM Comparison</h4>
+                        <div class="wpm-chart">
+                            <div class="wpm-chart-row">
+                                <span>Latest</span>
+                                <div class="wpm-chart-track">
+                                    <div class="wpm-chart-bar"
+                                        th:style="'width: ' + ${user.lastWpm != null ? (user.bestWpm != null && user.bestWpm > user.lastWpm ? user.lastWpm * 100 / user.bestWpm : 100) : 0} + '%'">
+                                    </div>
+                                </div>
+                                <strong th:text="${user.lastWpm != null ? user.lastWpm : '—'}">—</strong>
+                            </div>
+                            <div class="wpm-chart-row">
+                                <span>Best</span>
+                                <div class="wpm-chart-track">
+                                    <div class="wpm-chart-bar personal-best-bar"
+                                        th:style="'width: ' + ${user.bestWpm != null ? 100 : 0} + '%'">
+                                    </div>
+                                </div>
+                                <strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <h3>Favorite Books:</h3>
                 <div class="example-books profile-favorites">
                     <div class="book">
