@@ -10,7 +10,9 @@ function setup() {
         const list = document.getElementById('userList');
         list.innerHTML = '';
         for (const user of rows) {
-            const item = document.createElement('li');
+            const row = document.createElement('li');
+            row.className = 'user-list-row';
+
             const link = document.createElement('a');
             link.href = '#';
             link.className = 'user-list-item';
@@ -22,9 +24,35 @@ function setup() {
             const lastActive = formatDate(user.updatedAt);
             link.textContent = `${user.name} (WPM: ${wpm}, Accuracy: ${accuracy}) — Books: ${books} — Member since: ${memberSince}, Last active: ${lastActive}`;
 
-            item.appendChild(link);
-            list.appendChild(item);
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'btn-secondary user-delete-btn';
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => deleteUser(user));
+
+            row.appendChild(link);
+            row.appendChild(deleteButton);
+            list.appendChild(row);
         }
+    }
+
+    function deleteUser(user) {
+        if (!confirm(`Delete ${user.name}'s account? This cannot be undone.`)) {
+            return;
+        }
+
+        fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' })
+            .then(async response => {
+                if (!response.ok) {
+                    const body = await response.json().catch(() => null);
+                    throw new Error(body && body.message ? body.message : 'Failed to delete user.');
+                }
+                users = users.filter(candidate => candidate.id !== user.id);
+                renderList(users);
+            })
+            .catch(error => {
+                document.getElementById('statusMessage').textContent = error.message;
+            });
     }
 
     fetch('/api/admin/users')

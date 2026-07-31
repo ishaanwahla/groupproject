@@ -59,3 +59,21 @@
     background-color: #24527a;
     color: #ffffff;
 }
+
+/*row holding the user info link alongside its delete button*/
+.user-list-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.user-list-row .user-list-item {
+    flex: 1;
+}
+
+.user-delete-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}

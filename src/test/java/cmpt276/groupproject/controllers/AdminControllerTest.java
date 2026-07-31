@@ -1,6 +1,7 @@
 package cmpt276.groupproject.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -125,6 +126,56 @@ class AdminControllerTest {
 
 		UserAccount reloaded = userAccountRepository.findById(ada.getId()).orElseThrow();
 		assertThat(reloaded.getUpdatedAt()).isAfterOrEqualTo(ada.getUpdatedAt());
+	}
+
+	@Test
+	void deleteUserRequiresLogin() throws Exception {
+		UserAccount ada = user("Ada", "ada@example.com", UserRole.USER);
+
+		mockMvc.perform(delete("/api/admin/users/" + ada.getId()))
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void deleteUserRejectsStandardUser() throws Exception {
+		UserAccount ada = user("Ada", "ada@example.com", UserRole.USER);
+		MockCookie sessionCookie = login("ada@example.com");
+
+		mockMvc.perform(delete("/api/admin/users/" + ada.getId()).cookie(sessionCookie))
+			.andExpect(status().isForbidden());
+	}
+
+	@Test
+	void deleteUserRejectsDeletingOwnAccount() throws Exception {
+		UserAccount admin = user("Admin", "admin@example.com", UserRole.ADMIN);
+		MockCookie sessionCookie = login("admin@example.com");
+
+		mockMvc.perform(delete("/api/admin/users/" + admin.getId()).cookie(sessionCookie))
+			.andExpect(status().isBadRequest());
+		assertThat(userAccountRepository.findById(admin.getId())).isPresent();
+	}
+
+	@Test
+	void deleteUserReturnsNotFoundForUnknownId() throws Exception {
+		user("Admin", "admin@example.com", UserRole.ADMIN);
+		MockCookie sessionCookie = login("admin@example.com");
+
+		mockMvc.perform(delete("/api/admin/users/999999").cookie(sessionCookie))
+			.andExpect(status().isNotFound());
+	}
+
+	@Test
+	void deleteUserRemovesAccountAndCollection() throws Exception {
+		user("Admin", "admin@example.com", UserRole.ADMIN);
+		UserAccount ada = user("Ada", "ada@example.com", UserRole.USER);
+		addBookToCollection(ada, "Alice in Wonderland");
+		MockCookie sessionCookie = login("admin@example.com");
+
+		mockMvc.perform(delete("/api/admin/users/" + ada.getId()).cookie(sessionCookie))
+			.andExpect(status().isNoContent());
+
+		assertThat(userAccountRepository.findById(ada.getId())).isEmpty();
+		assertThat(userBookRepository.findAllByUserIdOrderByUpdatedAtDesc(ada.getId())).isEmpty();
 	}
 
 	private void addBookToCollection(UserAccount user, String title) {
