@@ -56,11 +56,45 @@ const ROWS = [
 		["space", "Space", "space"],
 		["ctrl-alt-super", "AltRight", "alt"],
 		["ctrl-alt-super", "MetaRight", "super"],
-		["ctrl-alt-super", "ContextMenu", "menu"],
+		["ctrl-alt-super", "ContextMenu", "fn"],
 		["ctrl-alt-super", "ControlRight", "ctrl"],
 	],
 ];
 
+// Used to add symbols on top of the key
+// text is a string literal
+// icon is a font-awesome icon
+const LABELS = {
+	Digit1: [{ text: "!", pos: "top" }, { text: "1", pos: "bottom" }],
+	Digit2: [{ text: "@", pos: "top" }, { text: "2", pos: "bottom" }],
+	Digit3: [{ text: "#", pos: "top" }, { text: "3", pos: "bottom" }],
+	Digit4: [{ text: "$", pos: "top" }, { text: "4", pos: "bottom" }],
+	Digit5: [{ text: "%", pos: "top" }, { text: "5", pos: "bottom" }],
+	Digit6: [{ text: "^", pos: "top" }, { text: "6", pos: "bottom" }],
+	Digit7: [{ text: "&", pos: "top" }, { text: "7", pos: "bottom" }],
+	Digit8: [{ text: "*", pos: "top" }, { text: "8", pos: "bottom" }],
+	Digit9: [{ text: "(", pos: "top" }, { text: "9", pos: "bottom" }],
+	Digit0: [{ text: ")", pos: "top" }, { text: "0", pos: "bottom" }],
+	Minus: [{ text: "_", pos: "top" }, { text: "-", pos: "bottom" }],
+	Equal: [{ text: "+", pos: "top" }, { text: "=", pos: "bottom" }],
+	BracketLeft: [{ text: "{", pos: "top" }, { text: "[", pos: "bottom" }],
+	BracketRight: [{ text: "}", pos: "top" }, { text: "]", pos: "bottom" }],
+	Backslash: [{ text: "|", pos: "top" }, { text: "\\", pos: "bottom" }],
+	Semicolon: [{ text: ":", pos: "top" }, { text: ";", pos: "bottom" }],
+	Quote: [{ text: "\"", pos: "top" }, { text: "'", pos: "bottom" }],
+	Comma: [{ text: "<", pos: "top" }, { text: ",", pos: "bottom" }],
+	Period: [{ text: ">", pos: "top" }, { text: ".", pos: "bottom" }],
+	Slash: [{ text: "?", pos: "top" }, { text: "/", pos: "bottom" }],
+	Space: [{ text: "", pos: "bottom" }],
+
+	Tab: [{ icon: "fa-arrow-right-arrow-left", pos: "center" }],
+	Enter: [{ text: "enter", pos: "center" }],
+	Backspace: [{ icon: "fa-arrow-left-long", pos: "center" }],
+	ShiftLeft: [{ icon: "fa-up-long", pos: "center" }],
+	ShiftRight: [{ icon: "fa-up-long", pos: "center" }],
+	MetaLeft: [{ icon: "fa-linux", pos: "center", style: "brands" }],
+	MetaRight: [{ icon: "fa-linux", pos: "center", style: "brands" }],
+};
 
 // U is an arbitrary unit of width, used to scale each key's SVG
 const KEY_WIDTH_U = {
@@ -101,7 +135,23 @@ export function createVirtualKeyboard() {
 			down.src = `/assets/keyboard/${type}-pressed.svg`;
 			down.alt = "";
 
-			key.append(up, down);
+
+			// create the symbol to place on the key
+			const labelWrap = document.createElement("div");
+			labelWrap.className = "key-label";
+
+			const entries = LABELS[code] ?? [{ text: label, pos: "center" }];
+			entries.forEach(entry => {
+				// check if its a font-awesome icon before defaulting to text
+				const el = document.createElement(entry.icon ? "i" : "span");
+				el.className = entry.icon
+					? `fa-${entry.style ?? "solid"} ${entry.icon} ${entry.pos}`
+					: entry.pos;
+				if (!entry.icon) el.textContent = entry.text;
+				labelWrap.appendChild(el);
+			});
+			key.append(up, down, labelWrap);
+
 			row.appendChild(key);
 			keyboardState.keyRegistry.set(code, key);
 		});

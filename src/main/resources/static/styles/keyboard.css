@@ -53,3 +53,34 @@
     .key.pressed .key-img.down {
         opacity: .85;
     }
+
+    .key-label {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        user-select: none;
+        color: #3d4451;
+        line-height: 1;
+        font-family: system-ui, sans-serif;
+        font-weight: 600;
+        transition: transform 0.06s ease-out;
+    }
+
+    .key-label .top {
+        font-size: calc(var(--u) * 0.22);
+        opacity: 0.65;
+        margin-bottom: 2px;
+    }
+
+    .key-label .bottom,
+    .key-label .center {
+        font-size: calc(var(--u) * 0.3);
+    }
+
+    .key.pressed .key-label {
+        transform: translateY(calc(var(--u) * 0.15));
+    }
