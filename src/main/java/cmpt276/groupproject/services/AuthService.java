@@ -83,6 +83,11 @@ public class AuthService {
 			user.setTotalAccuracy(valueOrZero(user.getTotalAccuracy()) + request.getAccuracy());
 			user.setTotalWordsTyped(valueOrZero(user.getTotalWordsTyped()) + wordsTyped);
 			user.setTotalMistakes(valueOrZero(user.getTotalMistakes()) + mistakes);
+			if (request.getMistakeCounts() != null) {
+				request.getMistakeCounts().forEach((key, count) -> {
+					if (count > 0) user.getMistakeCounts().merge(key, count, Integer::sum);
+				});
+			}
 		}
 		return userAccountRepository.save(user);
 	}

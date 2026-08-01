@@ -97,12 +97,14 @@ export async function loadUserStats() {
 
 
 // function for event handlers to call to save user data
-export async function saveUserStats(wpm, accuracy, completed = false, wordsTyped = 0, mistakes = 0) {
+export async function saveUserStats(
+	wpm, accuracy, completed = false, wordsTyped = 0, mistakes = 0, mistakeCounts = {}
+) {
 	try {
 		await fetch('/api/typing/stats', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ wpm, accuracy, completed, wordsTyped, mistakes })
+			body: JSON.stringify({ wpm, accuracy, completed, wordsTyped, mistakes, mistakeCounts })
 		});
 	} catch (error) {
 		console.error("Failed to save user stats:", error);

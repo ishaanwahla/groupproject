@@ -46,19 +46,19 @@
                     <div><strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong><span>Personal best</span></div>
                     <div><strong th:text="${user.averageWpm != null ? user.averageWpm : '—'}">—</strong><span>Average WPM</span></div>
                     <div><strong th:text="${user.averageAccuracy != null ? user.averageAccuracy + '%' : '—'}">—</strong><span>Average accuracy</span></div>
-                    <div><strong th:text="${user.totalWordsTyped != null ? user.totalWordsTyped : 0}">0</strong><span>Total words</span></div>
-                    <div><strong th:text="${user.totalMistakes != null ? user.totalMistakes : 0}">0</strong><span>Total mistakes</span></div>
+                    <div><strong th:text="${user.mostMissedKeyDisplay != null ? user.mostMissedKeyDisplay : '—'}">—</strong><span>Most missed key</span></div>
+                    <div><strong th:text="${user.mostMissedKeyCount != null ? user.mostMissedKeyCount : 0}">0</strong><span>Times missed</span></div>
                     <div><strong th:text="${user.sessionsCompleted != null ? user.sessionsCompleted : 0}">0</strong><span>Sessions</span></div>
                 </div>
 
                 <h3>Performance Overview</h3>
                 <div class="profile-charts">
                     <div class="profile-chart-card accuracy-card">
-                        <h4>Latest Accuracy</h4>
+                        <h4>Overall Accuracy</h4>
                         <div class="accuracy-chart"
-                            th:style="'--accuracy: ' + ${user.lastAccuracy != null ? user.lastAccuracy : 0} + '%'">
+                            th:style="'--accuracy: ' + ${user.averageAccuracy != null ? user.averageAccuracy : 0} + '%'">
                             <div class="accuracy-chart-center">
-                                <strong th:text="${user.lastAccuracy != null ? user.lastAccuracy + '%' : '—'}">—</strong>
+                                <strong th:text="${user.averageAccuracy != null ? user.averageAccuracy + '%' : '—'}">—</strong>
                                 <span>Accuracy</span>
                             </div>
                         </div>

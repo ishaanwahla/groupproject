@@ -1,7 +1,10 @@
 package cmpt276.groupproject.models;
 
+import java.util.Map;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class TypingStatsRequest {
 
@@ -20,6 +23,9 @@ public class TypingStatsRequest {
 
 	@Min(value = 0, message = "Mistakes must be zero or greater.")
 	private Integer mistakes;
+
+	@Size(max = 128, message = "Mistake counts may contain at most 128 keys.")
+	private Map<@Size(min = 1, max = 8) String, @NotNull @Min(0) Integer> mistakeCounts;
 
 	public Integer getWpm() {
 		return wpm;
@@ -59,5 +65,13 @@ public class TypingStatsRequest {
 
 	public void setMistakes(Integer mistakes) {
 		this.mistakes = mistakes;
+	}
+
+	public Map<String, Integer> getMistakeCounts() {
+		return mistakeCounts;
+	}
+
+	public void setMistakeCounts(Map<String, Integer> mistakeCounts) {
+		this.mistakeCounts = mistakeCounts;
 	}
 }

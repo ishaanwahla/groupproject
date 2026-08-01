@@ -103,7 +103,7 @@ export function endSession(
 	clearInterval(app.intervalId);
 	saveReadingProgress(app.currentTypedWordIndex);
 	const mistakes = app.sessionKeystrokes - app.sessionCorrectKeystrokes;
-	saveUserStats(wpm, accuracy, true, app.sessionWordsTyped, mistakes);
+	saveUserStats(wpm, accuracy, true, app.sessionWordsTyped, mistakes, app.mistakeCounts);
 	showSessionSummary(wpm, accuracy);
 }
 

@@ -1,14 +1,23 @@
 package cmpt276.groupproject.models;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -70,6 +79,12 @@ public class UserAccount {
 	private Integer totalWordsTyped;
 
 	private Integer totalMistakes;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "user_mistake_counts", joinColumns = @JoinColumn(name = "user_id"))
+	@MapKeyColumn(name = "mistake_key", length = 8)
+	@Column(name = "mistake_count", nullable = false)
+	private Map<String, Integer> mistakeCounts = new HashMap<>();
 
 	@PrePersist
 	void onCreate() {
@@ -213,6 +228,32 @@ public class UserAccount {
 
 	public void setTotalMistakes(Integer totalMistakes) {
 		this.totalMistakes = totalMistakes;
+	}
+
+	public Map<String, Integer> getMistakeCounts() {
+		return mistakeCounts;
+	}
+
+	public String getMostMissedKey() {
+		return mistakeCounts.entrySet().stream()
+			.filter(entry -> entry.getValue() != null && entry.getValue() > 0)
+			.sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
+				.thenComparing(Map.Entry.comparingByKey()))
+			.map(Map.Entry::getKey)
+			.findFirst()
+			.orElse(null);
+	}
+
+	public String getMostMissedKeyDisplay() {
+		String key = getMostMissedKey();
+		if (key == null) return null;
+		if (" ".equals(key)) return "Space";
+		return key.toUpperCase(Locale.ROOT);
+	}
+
+	public Integer getMostMissedKeyCount() {
+		String key = getMostMissedKey();
+		return key == null ? null : mistakeCounts.get(key);
 	}
 
 	public Integer getAverageWpm() {
