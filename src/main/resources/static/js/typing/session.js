@@ -10,6 +10,7 @@ export function beginSessionSelect() {
 	const customInput = document.getElementById("custom-duration-input");
 	const customButton = document.getElementById("custom-duration-btn");
 	const endlessButton = document.getElementById("endless-mode-btn");
+	const typeAgainButton = document.getElementById("type-again-btn");
 
 	presetButtons.forEach(button => {
 		button.addEventListener("click", () => {
@@ -36,6 +37,10 @@ export function beginSessionSelect() {
 	endlessButton.addEventListener("click", () => {
 		startSession(0, true);
 	});
+
+	typeAgainButton.addEventListener("click", () => {
+		showSessionOverlay("Continue typing?");
+	});
 }
 
 // formats a whole number of seconds as M:SS (or returns the infinity symbol for endless mode)
@@ -50,6 +55,8 @@ export function formatTime(totalSeconds) {
 // Reset the scroll position and show the session start overlay with a custom message
 export function showSessionOverlay(messageText) {
 	scrollToCursor();
+	document.getElementById("session-summary").style.display = "none";
+	document.getElementById("session-select-content").style.display = "flex";
 
 	const message = document.getElementById("session-select-message");
 	if (message && messageText) message.textContent = messageText;
@@ -58,22 +65,54 @@ export function showSessionOverlay(messageText) {
 	if (overlay) overlay.style.display = "flex";
 }
 
-// for now: send the user back to the same selection as starting a new session
-export function endSession(wpm, accuracy) {
+function formatMissedKey(key) {
+	if (!key) return "None";
+	if (key === " ") return "Space";
+	return key.toUpperCase();
+}
+
+function showSessionSummary(wpm, accuracy) {
+	const mistakes = app.sessionKeystrokes - app.sessionCorrectKeystrokes;
+	const mostMissed = Object.entries(app.mistakeCounts)
+		.sort((first, second) => second[1] - first[1])[0];
+	const isPersonalBest = wpm > app.personalBestWpm;
+	app.personalBestWpm = Math.max(app.personalBestWpm, wpm);
+
+	document.getElementById("summary-wpm").textContent = wpm;
+	document.getElementById("summary-accuracy").textContent = `${accuracy}%`;
+	document.getElementById("summary-personal-best").textContent = app.personalBestWpm;
+	document.getElementById("summary-mistakes").textContent = mistakes;
+	document.getElementById("summary-words").textContent = app.sessionWordsTyped;
+	document.getElementById("summary-correct-keys").textContent = app.sessionCorrectKeystrokes;
+	document.getElementById("summary-missed-key").textContent = mostMissed
+		? `${formatMissedKey(mostMissed[0])} (${mostMissed[1]})`
+		: "None";
+	document.getElementById("summary-best-message").textContent = isPersonalBest ? "New personal best!" : "";
+
+	document.getElementById("session-select-content").style.display = "none";
+	document.getElementById("session-summary").style.display = "flex";
+	document.getElementById("session-select-overlay").style.display = "flex";
+}
+
+export function endSession(
+	wpm = Number(document.getElementById("wpm-value").textContent) || 0,
+	accuracy = Number(document.getElementById("accuracy-value").textContent) || stat.MAX_ACCURACY
+) {
 	app.sessionActive = false;
 	app.trackingStats = false;
 	clearInterval(app.intervalId);
 	saveReadingProgress(app.currentTypedWordIndex);
-	saveUserStats(wpm, accuracy);
-
-
-	showSessionOverlay("Continue typing?");
+	const mistakes = app.sessionKeystrokes - app.sessionCorrectKeystrokes;
+	saveUserStats(wpm, accuracy, true, app.sessionWordsTyped, mistakes, app.mistakeCounts);
+	showSessionSummary(wpm, accuracy);
 }
 
 // starts the actual timer
 export function startSession(durationSeconds, endless) {
 	app.sessionKeystrokes = 0;
 	app.sessionCorrectKeystrokes = 0;
+	app.sessionWordsTyped = 0;
+	app.mistakeCounts = {};
 
 	app.isEndlessMode = endless;
 	app.remainingSeconds = endless ? 0 : durationSeconds;
@@ -102,4 +141,3 @@ export function showErrorDialog(message) {
 function handleErrorDialogClosed() {
 	populateBuffer();
 }
-
