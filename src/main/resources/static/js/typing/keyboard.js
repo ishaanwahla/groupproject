@@ -123,6 +123,20 @@ export function createVirtualKeyboard() {
 			key.style.width = `calc(${KEY_WIDTH_U[type]} * var(--u))`;
 			key.dataset.code = code;
 
+			// tint to show accumulated errors
+			const tintUp = document.createElement("div");
+			tintUp.className = "key-tint up";
+			tintUp.style.setProperty("--key-mask", `url(/assets/keyboard/${type}.svg)`);
+
+			const tintDown = document.createElement("div");
+			tintDown.className = "key-tint down";
+			tintDown.style.setProperty("--key-mask", `url(/assets/keyboard/${type}-pressed.svg)`);
+
+			// animation showing incorrect keypresses
+			const flash = document.createElement("div");
+			flash.className = "key-flash";
+			flash.style.setProperty("--key-mask", `url(/assets/keyboard/${type}.svg)`);
+
 			// regular SVG
 			const up = document.createElement("img");
 			up.className = "key-img up";
@@ -150,12 +164,20 @@ export function createVirtualKeyboard() {
 				if (!entry.icon) el.textContent = entry.text;
 				labelWrap.appendChild(el);
 			});
-			key.append(up, down, labelWrap);
+			key.append(up, down, tintUp, tintDown, flash, labelWrap);
 
 			row.appendChild(key);
 			keyboardState.keyRegistry.set(code, key);
 		});
 
 		keyboardState.board.appendChild(row);
+
+	});
+
+	// event listener to remove the class for typo animations after they play
+	document.getElementById("keyboard").addEventListener("animationend", (e) => {
+		if (e.target.classList.contains("key-flash")) {
+			e.target.closest(".key")?.classList.remove("typo");
+		}
 	});
 };

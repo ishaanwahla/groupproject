@@ -54,6 +54,80 @@
         opacity: .85;
     }
 
+    .key-tint {
+        position: absolute;
+        left: 0;
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        mask-image: var(--key-mask);
+        -webkit-mask-image: var(--key-mask);
+        mix-blend-mode: multiply;
+        background: var(--tint-color, transparent);
+        pointer-events: none;
+    }
+
+    .key-tint.up {
+        top: 0;
+        height: var(--u);
+    }
+
+    .key-tint.down {
+        top: calc(var(--u) * 0.15);
+        height: calc(var(--u) * 0.85);
+        opacity: 0;
+    }
+
+    .key.pressed .key-tint.up {
+        opacity: 0;
+    }
+
+    .key.pressed .key-tint.down {
+        opacity: 1;
+    }
+
+    .key-tint.up::after,
+    .key-tint.down::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        mask-image: var(--key-mask);
+        -webkit-mask-image: var(--key-mask);
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        opacity: 0;
+    }
+
+    .key-flash {
+        position: absolute;
+        inset: 0;
+        mask-image: var(--key-mask);
+        -webkit-mask-image: var(--key-mask);
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    .key.typo .key-flash {
+        animation: flash-typo 250ms ease-out;
+    }
+
+    @keyframes flash-typo {
+        from {
+            opacity: 1;
+            background: rgba(239, 68, 68, 0.6);
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    .key.typo .key-tint.up::after,
+    .key.typo .key-tint.down::after {
+        animation: flash-typo 250ms ease-out;
+    }
+
     .key-label {
         position: absolute;
         inset: 0;

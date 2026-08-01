@@ -108,13 +108,13 @@ function handleTypo(span) {
 // Checks the keyboard input to determine the correct course of action
 // depending on whether the input matches the expected input
 //
-// Params: pressedKey the e.key property captured from the keydown event listener 
+// Params: event the e property captured from the keydown event listener 
 // span the Span DOM element corresponding to the current key to be typed
-function handleCharacterInput(pressedKey, span) {
+function handleCharacterInput(event, span) {
 	const targetUnit = app.visibleChunks[0].text[0];
 
 	const expectedKey = targetUnit.keys[input.currentUnitProgress];
-	const isCorrect = (pressedKey === expectedKey) & 1;
+	const isCorrect = (event.key === expectedKey) & 1;
 	if (isCorrect) {
 		input.currentTypingAttempt = 0;
 
@@ -143,6 +143,10 @@ function handleCharacterInput(pressedKey, span) {
 		input.currentSpanPosition++;
 		updateBookProgress(app.currentTypedWordIndex);
 	} else {
+		const keyElement = keyboardState.keyRegistry.get(event.code);
+		if (keyElement) {
+			keyElement.classList.add("pressed", "typo");
+		}
 		app.sessionKeystrokes++;
 		input.currentTypingAttempt++;
 		handleTypo(span);
@@ -203,7 +207,7 @@ window.addEventListener("keydown", (e) => {
 	// if we run past the available spans somehow, return to avoid a crash
 	if (!currentSpan) return;
 
-	handleCharacterInput(e.key, currentSpan);
+	handleCharacterInput(e, currentSpan);
 
 	if (app.visibleChunks[0].text.length === 0) {
 		cycleChunk();
