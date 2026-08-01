@@ -35,6 +35,28 @@ public class CollectionService {
 			.stream().map(CollectionBookResponse::from).toList();
 	}
 
+	public List<BookSearchResult> recommendations(UserAccount user, Long currentBookId) {
+		List<UserBook> collection = userBookRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId());
+		if (collection.isEmpty()) {
+			return List.of();
+		}
+		UserBook current = collection.stream()
+			.filter(userBook -> currentBookId != null && currentBookId.equals(userBook.getId()))
+			.findFirst()
+			.orElse(collection.get(0));
+		String subjects = current.getBook().getSubjects();
+		if (subjects == null || subjects.isBlank()) {
+			return List.of();
+		}
+		String subject = subjects.split("\\|")[0];
+		return catalogService.search(subject).stream()
+			.filter(book -> collection.stream().noneMatch(userBook ->
+				userBook.getBook().getGutenbergId() == book.gutenbergId()))
+			.limit(3)
+			.map(BookSearchResult::from)
+			.toList();
+	}
+
 	@Transactional
 	public CollectionBookResponse add(UserAccount user, int gutenbergId) {
 		return userBookRepository.findByUserIdAndBookGutenbergId(user.getId(), gutenbergId)

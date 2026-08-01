@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +33,13 @@ public class BookController {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required.");
 		}
 		return catalogService.search(q).stream().map(BookSearchResult::from).toList();
+	}
+
+	@GetMapping("/{gutenbergId}")
+	public BookSearchResult book(@PathVariable int gutenbergId, HttpSession session) {
+		if (authService.currentUser(session).isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required.");
+		}
+		return BookSearchResult.from(catalogService.getBook(gutenbergId));
 	}
 }

@@ -15,6 +15,7 @@
     <script src="/js/menu.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/new-book.js"></script>
+    <script src="/js/discover.js"></script>
 </head>
 
 <body>
@@ -41,41 +42,11 @@
             <div id="pause-instructions">Press ESC to Pause</div>
 
             <div class="section-heading">
-                <h3>More from this Genre</h3>
+                <h3>More like this</h3>
                 <span>See more</span>
             </div>
-            <div class="example-books">
-                <div class="book">
-                    <div class="book-info">
-                        <h4>Alice in Wonderland</h4>
-                        <p>Lewis Carroll</p>
-                        <button class="book-play" type="button">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="book-placeholder-image"></div>
-                </div>
-                <div class="book">
-                    <div class="book-info">
-                        <h4>The Time Machine</h4>
-                        <p>H.G. Wells</p>
-                        <button class="book-play" type="button">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="book-placeholder-image"></div>
-                </div>
-                <div class="book">
-                    <div class="book-info">
-                        <h4>Frankenstein</h4>
-                        <p>Mary Shelley</p>
-                        <button class="book-play" type="button">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="book-placeholder-image"></div>
-                </div>
-            </div>
+            <p class="recommendation-status">Loading recommendations...</p>
+            <div class="example-books discover-books recommendation-books"></div>
         </main>
         <aside class="right-sidebar">
             <p class="book-name">No book selected</p>
