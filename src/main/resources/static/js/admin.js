@@ -7,6 +7,7 @@ function setup() {
     let users = [];
     let visibleUsers = [];
     let selectedUserId = null;
+    let pendingDeleteUser = null;
 
     function findSelectedUser() {
         return users.find(user => user.id === selectedUserId) || null;
@@ -75,9 +76,9 @@ function setup() {
 
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
-        deleteButton.className = 'btn-secondary admin-delete-btn';
+        deleteButton.className = 'btn-danger admin-delete-btn';
         deleteButton.textContent = 'Delete User';
-        deleteButton.addEventListener('click', () => deleteUser(user));
+        deleteButton.addEventListener('click', () => requestDelete(user));
         panel.appendChild(deleteButton);
     }
 
@@ -115,11 +116,14 @@ function setup() {
         renderBooksPanel();
     }
 
-    function deleteUser(user) {
-        if (!confirm(`Delete ${user.name}'s account? This cannot be undone.`)) {
-            return;
-        }
+    function requestDelete(user) {
+        pendingDeleteUser = user;
+        document.getElementById('deleteUserMessage').textContent =
+            `Delete ${user.name}'s account? This cannot be undone.`;
+        document.getElementById('deleteUserDialog').showModal();
+    }
 
+    function performDelete(user) {
         fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' })
             .then(async response => {
                 if (!response.ok) {
@@ -162,6 +166,24 @@ function setup() {
 
     document.getElementById('searchBox').addEventListener('input', function() {
         applyFilter(this.value);
+    });
+
+    const deleteDialog = document.getElementById('deleteUserDialog');
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        const user = pendingDeleteUser;
+        deleteDialog.close();
+        if (user) {
+            performDelete(user);
+        }
+    });
+
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+        deleteDialog.close();
+    });
+
+    deleteDialog.addEventListener('close', () => {
+        pendingDeleteUser = null;
     });
 }
 

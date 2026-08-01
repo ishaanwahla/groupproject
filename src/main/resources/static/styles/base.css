@@ -95,6 +95,25 @@ main {
     cursor: pointer;
 }
 
+/*destructive action button, e.g. deleting an account*/
+.btn-danger {
+    border: 1px solid #ef4444;
+    background-color: #ef4444;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);
+}
+
 /*when hovered*/
 .btn-primary:hover,
 .btn-secondary:hover,

@@ -82,13 +82,30 @@
 
 .admin-delete-btn {
     margin-top: 20px;
-    background-color: #fee2e2;
-    color: #b91c1c;
 }
 
-.admin-delete-btn:hover {
-    background-color: #b91c1c;
-    color: #ffffff;
+/*confirmation dialog shown before deleting a user*/
+.admin-delete-dialog {
+    border: none;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 360px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+}
+
+.admin-delete-dialog::backdrop {
+    background-color: rgba(15, 23, 42, 0.5);
+}
+
+.admin-delete-dialog p {
+    margin: 0 0 20px;
+    color: #1e293b;
+}
+
+.admin-delete-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 /*right panel listing the selected user's book collection*/
