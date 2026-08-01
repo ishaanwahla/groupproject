@@ -16,6 +16,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 	@Query("select userBook from UserBook userBook where userBook.id = ?1 and userBook.user.id = ?2")
 	Optional<UserBook> findByIdAndUserIdForUpdate(Long id, Long userId);
 	Optional<UserBook> findByUserIdAndBookGutenbergId(Long userId, int gutenbergId);
+	Optional<UserBook> findByUserIdAndFavoriteTrue(Long userId);
 	@Query("select userBook.book.title from UserBook userBook where userBook.user.id = ?1 order by userBook.updatedAt desc")
 	List<String> findBookTitlesByUserId(Long userId);
 }

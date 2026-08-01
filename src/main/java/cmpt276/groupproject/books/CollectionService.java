@@ -73,6 +73,21 @@ public class CollectionService {
 		return CollectionBookResponse.from(userBookRepository.save(userBook));
 	}
 
+	@Transactional
+	public CollectionBookResponse favorite(UserAccount user, Long userBookId) {
+		UserBook favorite = ownedBook(user, userBookId);
+		userBookRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId()).forEach(userBook ->
+			userBook.setFavorite(userBook.getId().equals(userBookId)));
+		return CollectionBookResponse.from(userBookRepository.save(favorite));
+	}
+
+	@Transactional(readOnly = true)
+	public CollectionBookResponse favorite(UserAccount user) {
+		return userBookRepository.findByUserIdAndFavoriteTrue(user.getId())
+			.map(CollectionBookResponse::from)
+			.orElse(null);
+	}
+
 	@Transactional(readOnly = true)
 	// Params: chunkId - an integer representing a place in the blob of text we are grabbing from
 	// Returns: an object in the form { chunkId: chunkId, text: [...]} where "text" is an array of individual characters

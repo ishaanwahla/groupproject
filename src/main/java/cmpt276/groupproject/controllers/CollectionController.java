@@ -64,6 +64,11 @@ public class CollectionController {
 		return collectionService.updateProgress(currentUser(session), id, request.currentWordIndex());
 	}
 
+	@PatchMapping("/{id}/favorite")
+	public CollectionBookResponse favorite(@PathVariable Long id, HttpSession session) {
+		return collectionService.favorite(currentUser(session), id);
+	}
+
 	private UserAccount currentUser(HttpSession session) {
 		return authService.currentUser(session)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));

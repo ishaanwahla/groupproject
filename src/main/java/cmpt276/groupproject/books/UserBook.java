@@ -35,6 +35,9 @@ public class UserBook {
 	@Column(nullable = false)
 	private int currentWordIndex;
 
+	@Column(nullable = false)
+	private boolean favorite;
+
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime addedAt;
 
@@ -84,4 +87,13 @@ public class UserBook {
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
 	}
+
+	public boolean isFavorite() {
+		return favorite;
+	}
+
+	public void setFavorite(boolean favorite) {
+		this.favorite = favorite;
+	}
+
 }
