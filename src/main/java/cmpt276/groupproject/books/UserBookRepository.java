@@ -18,4 +18,5 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 	Optional<UserBook> findByUserIdAndBookGutenbergId(Long userId, int gutenbergId);
 	@Query("select userBook.book.title from UserBook userBook where userBook.user.id = ?1 order by userBook.updatedAt desc")
 	List<String> findBookTitlesByUserId(Long userId);
+	void deleteAllByUserId(Long userId);
 }
