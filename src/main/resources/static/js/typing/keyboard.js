@@ -1,100 +1,10 @@
 //keyboard.js
-//
-// Initializes the virtual keyboard in the DOM.
-// keys in each row are set up as follows:
-// [type, code, label]:
-//		type refers to the SVG graphic name,
-//		code is the lookup code for fetching the key element from the keyRegistry
-//		label is just a shorter name meant for debugging purposes (not reflected anywhere visually)
 
 import { keyboardState } from "./state.js";
 
-const ROWS = [
-	[
-		["letters-numbers", "Escape", "esc"],
-		["letters-numbers", "Digit1", "1"], ["letters-numbers", "Digit2", "2"],
-		["letters-numbers", "Digit3", "3"], ["letters-numbers", "Digit4", "4"],
-		["letters-numbers", "Digit5", "5"], ["letters-numbers", "Digit6", "6"],
-		["letters-numbers", "Digit7", "7"], ["letters-numbers", "Digit8", "8"],
-		["letters-numbers", "Digit9", "9"], ["letters-numbers", "Digit0", "0"],
-		["letters-numbers", "Minus", "-"], ["letters-numbers", "Equal", "="],
-		["backspace", "Backspace", "backspace"],
-	],
-	[
-		["tab-pipe", "Tab", "tab"],
-		["letters-numbers", "KeyQ", "Q"], ["letters-numbers", "KeyW", "W"],
-		["letters-numbers", "KeyE", "E"], ["letters-numbers", "KeyR", "R"],
-		["letters-numbers", "KeyT", "T"], ["letters-numbers", "KeyY", "Y"],
-		["letters-numbers", "KeyU", "U"], ["letters-numbers", "KeyI", "I"],
-		["letters-numbers", "KeyO", "O"], ["letters-numbers", "KeyP", "P"],
-		["letters-numbers", "BracketLeft", "["], ["letters-numbers", "BracketRight", "]"],
-		["tab-pipe", "Backslash", "\\"],
-	],
-	[
-		["caps", "CapsLock", "caps"],
-		["letters-numbers", "KeyA", "A"], ["letters-numbers", "KeyS", "S"],
-		["letters-numbers", "KeyD", "D"], ["letters-numbers", "KeyF", "F"],
-		["letters-numbers", "KeyG", "G"], ["letters-numbers", "KeyH", "H"],
-		["letters-numbers", "KeyJ", "J"], ["letters-numbers", "KeyK", "K"],
-		["letters-numbers", "KeyL", "L"], ["letters-numbers", "Semicolon", ";"],
-		["letters-numbers", "Quote", "'"],
-		["enter-leftshift", "Enter", "enter"],
-	],
-	[
-		["enter-leftshift", "ShiftLeft", "shift"],
-		["letters-numbers", "KeyZ", "Z"], ["letters-numbers", "KeyX", "X"],
-		["letters-numbers", "KeyC", "C"], ["letters-numbers", "KeyV", "V"],
-		["letters-numbers", "KeyB", "B"], ["letters-numbers", "KeyN", "N"],
-		["letters-numbers", "KeyM", "M"], ["letters-numbers", "Comma", ","],
-		["letters-numbers", "Period", "."], ["letters-numbers", "Slash", "/"],
-		["rightshift", "ShiftRight", "shift"],
-	],
-	[
-		["ctrl-alt-super", "ControlLeft", "ctrl"],
-		["ctrl-alt-super", "MetaLeft", "super"],
-		["ctrl-alt-super", "AltLeft", "alt"],
-		["space", "Space", "space"],
-		["ctrl-alt-super", "AltRight", "alt"],
-		["ctrl-alt-super", "MetaRight", "super"],
-		["ctrl-alt-super", "ContextMenu", "fn"],
-		["ctrl-alt-super", "ControlRight", "ctrl"],
-	],
-];
-
-// Used to add symbols on top of the key
-// text is a string literal
-// icon is a font-awesome icon
-const LABELS = {
-	Digit1: [{ text: "!", pos: "top" }, { text: "1", pos: "bottom" }],
-	Digit2: [{ text: "@", pos: "top" }, { text: "2", pos: "bottom" }],
-	Digit3: [{ text: "#", pos: "top" }, { text: "3", pos: "bottom" }],
-	Digit4: [{ text: "$", pos: "top" }, { text: "4", pos: "bottom" }],
-	Digit5: [{ text: "%", pos: "top" }, { text: "5", pos: "bottom" }],
-	Digit6: [{ text: "^", pos: "top" }, { text: "6", pos: "bottom" }],
-	Digit7: [{ text: "&", pos: "top" }, { text: "7", pos: "bottom" }],
-	Digit8: [{ text: "*", pos: "top" }, { text: "8", pos: "bottom" }],
-	Digit9: [{ text: "(", pos: "top" }, { text: "9", pos: "bottom" }],
-	Digit0: [{ text: ")", pos: "top" }, { text: "0", pos: "bottom" }],
-	Minus: [{ text: "_", pos: "top" }, { text: "-", pos: "bottom" }],
-	Equal: [{ text: "+", pos: "top" }, { text: "=", pos: "bottom" }],
-	BracketLeft: [{ text: "{", pos: "top" }, { text: "[", pos: "bottom" }],
-	BracketRight: [{ text: "}", pos: "top" }, { text: "]", pos: "bottom" }],
-	Backslash: [{ text: "|", pos: "top" }, { text: "\\", pos: "bottom" }],
-	Semicolon: [{ text: ":", pos: "top" }, { text: ";", pos: "bottom" }],
-	Quote: [{ text: "\"", pos: "top" }, { text: "'", pos: "bottom" }],
-	Comma: [{ text: "<", pos: "top" }, { text: ",", pos: "bottom" }],
-	Period: [{ text: ">", pos: "top" }, { text: ".", pos: "bottom" }],
-	Slash: [{ text: "?", pos: "top" }, { text: "/", pos: "bottom" }],
-	Space: [{ text: "", pos: "bottom" }],
-
-	Tab: [{ icon: "fa-arrow-right-arrow-left", pos: "center" }],
-	Enter: [{ text: "enter", pos: "center" }],
-	Backspace: [{ icon: "fa-arrow-left-long", pos: "center" }],
-	ShiftLeft: [{ icon: "fa-up-long", pos: "center" }],
-	ShiftRight: [{ icon: "fa-up-long", pos: "center" }],
-	MetaLeft: [{ icon: "fa-linux", pos: "center", style: "brands" }],
-	MetaRight: [{ icon: "fa-linux", pos: "center", style: "brands" }],
-};
+// Converts from raw text to lookup codes for KEYS
+// used for displaying the hint for the next key
+const CHAR_TO_CODE = new Map();
 
 // U is an arbitrary unit of width, used to scale each key's SVG
 const KEY_WIDTH_U = {
@@ -107,6 +17,129 @@ const KEY_WIDTH_U = {
 	"rightshift": 2.8,
 	"space": 6.55,
 };
+
+
+const ROW_LAYOUT = [
+	["Escape", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6",
+		"Digit7", "Digit8", "Digit9", "Digit0", "Minus", "Equal", "Backspace"],
+
+	["Tab", "KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI",
+		"KeyO", "KeyP", "BracketLeft", "BracketRight", "Backslash"],
+
+	["CapsLock", "KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ",
+		"KeyK", "KeyL", "Semicolon", "Quote", "Enter"],
+
+	["ShiftLeft", "KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM",
+		"Comma", "Period", "Slash", "ShiftRight"],
+
+	["ControlLeft", "MetaLeft", "AltLeft", "Space", "AltRight", "MetaRight",
+		"ContextMenu", "ControlRight"],
+];
+
+
+const KEYS = new Map([
+	// number row
+	["Escape", { image: "letters-numbers", symbols: [{ text: "esc", pos: "center" }] }],
+	["Digit1", { image: "letters-numbers", symbols: [{ text: "!", pos: "top" }, { text: "1", pos: "bottom" }] }],
+	["Digit2", { image: "letters-numbers", symbols: [{ text: "@", pos: "top" }, { text: "2", pos: "bottom" }] }],
+	["Digit3", { image: "letters-numbers", symbols: [{ text: "#", pos: "top" }, { text: "3", pos: "bottom" }] }],
+	["Digit4", { image: "letters-numbers", symbols: [{ text: "$", pos: "top" }, { text: "4", pos: "bottom" }] }],
+	["Digit5", { image: "letters-numbers", symbols: [{ text: "%", pos: "top" }, { text: "5", pos: "bottom" }] }],
+	["Digit6", { image: "letters-numbers", symbols: [{ text: "^", pos: "top" }, { text: "6", pos: "bottom" }] }],
+	["Digit7", { image: "letters-numbers", symbols: [{ text: "&", pos: "top" }, { text: "7", pos: "bottom" }] }],
+	["Digit8", { image: "letters-numbers", symbols: [{ text: "*", pos: "top" }, { text: "8", pos: "bottom" }] }],
+	["Digit9", { image: "letters-numbers", symbols: [{ text: "(", pos: "top" }, { text: "9", pos: "bottom" }] }],
+	["Digit0", { image: "letters-numbers", symbols: [{ text: ")", pos: "top" }, { text: "0", pos: "bottom" }] }],
+	["Minus", { image: "letters-numbers", symbols: [{ text: "_", pos: "top" }, { text: "-", pos: "bottom" }] }],
+	["Equal", { image: "letters-numbers", symbols: [{ text: "+", pos: "top" }, { text: "=", pos: "bottom" }] }],
+	["Backspace", { image: "backspace", symbols: [{ icon: "fa-delete-left", style: "solid", pos: "center" }] }],
+
+	// top letter row
+	["Tab", { image: "tab-pipe", symbols: [{ icon: "fa-arrow-right-to-bracket", style: "solid", pos: "center" }] }],
+	["KeyQ", { image: "letters-numbers", symbols: [{ text: "Q", pos: "center" }] }],
+	["KeyW", { image: "letters-numbers", symbols: [{ text: "W", pos: "center" }] }],
+	["KeyE", { image: "letters-numbers", symbols: [{ text: "E", pos: "center" }] }],
+	["KeyR", { image: "letters-numbers", symbols: [{ text: "R", pos: "center" }] }],
+	["KeyT", { image: "letters-numbers", symbols: [{ text: "T", pos: "center" }] }],
+	["KeyY", { image: "letters-numbers", symbols: [{ text: "Y", pos: "center" }] }],
+	["KeyU", { image: "letters-numbers", symbols: [{ text: "U", pos: "center" }] }],
+	["KeyI", { image: "letters-numbers", symbols: [{ text: "I", pos: "center" }] }],
+	["KeyO", { image: "letters-numbers", symbols: [{ text: "O", pos: "center" }] }],
+	["KeyP", { image: "letters-numbers", symbols: [{ text: "P", pos: "center" }] }],
+	["BracketLeft", { image: "letters-numbers", symbols: [{ text: "{", pos: "top" }, { text: "[", pos: "bottom" }] }],
+	["BracketRight", { image: "letters-numbers", symbols: [{ text: "}", pos: "top" }, { text: "]", pos: "bottom" }] }],
+	["Backslash", { image: "tab-pipe", symbols: [{ text: "|", pos: "top" }, { text: "\\", pos: "bottom" }] }],
+
+	// home row
+	["CapsLock", { image: "caps", symbols: [{ text: "caps", pos: "center" }] }],
+	["KeyA", { image: "letters-numbers", symbols: [{ text: "A", pos: "center" }] }],
+	["KeyS", { image: "letters-numbers", symbols: [{ text: "S", pos: "center" }] }],
+	["KeyD", { image: "letters-numbers", symbols: [{ text: "D", pos: "center" }] }],
+	["KeyF", { image: "letters-numbers", symbols: [{ text: "F", pos: "center" }] }],
+	["KeyG", { image: "letters-numbers", symbols: [{ text: "G", pos: "center" }] }],
+	["KeyH", { image: "letters-numbers", symbols: [{ text: "H", pos: "center" }] }],
+	["KeyJ", { image: "letters-numbers", symbols: [{ text: "J", pos: "center" }] }],
+	["KeyK", { image: "letters-numbers", symbols: [{ text: "K", pos: "center" }] }],
+	["KeyL", { image: "letters-numbers", symbols: [{ text: "L", pos: "center" }] }],
+	["Semicolon", { image: "letters-numbers", symbols: [{ text: ":", pos: "top" }, { text: ";", pos: "bottom" }] }],
+	["Quote", { image: "letters-numbers", symbols: [{ text: "\"", pos: "top" }, { text: "'", pos: "bottom" }] }],
+	["Enter", { image: "enter-leftshift", symbols: [{ icon: "fa-turn-down", style: "solid", pos: "center" }] }],
+
+	// bottom letter row
+	["ShiftLeft", { image: "enter-leftshift", symbols: [{ icon: "fa-angle-double-up", style: "solid", pos: "center" }] }],
+	["KeyZ", { image: "letters-numbers", symbols: [{ text: "Z", pos: "center" }] }],
+	["KeyX", { image: "letters-numbers", symbols: [{ text: "X", pos: "center" }] }],
+	["KeyC", { image: "letters-numbers", symbols: [{ text: "C", pos: "center" }] }],
+	["KeyV", { image: "letters-numbers", symbols: [{ text: "V", pos: "center" }] }],
+	["KeyB", { image: "letters-numbers", symbols: [{ text: "B", pos: "center" }] }],
+	["KeyN", { image: "letters-numbers", symbols: [{ text: "N", pos: "center" }] }],
+	["KeyM", { image: "letters-numbers", symbols: [{ text: "M", pos: "center" }] }],
+	["Comma", { image: "letters-numbers", symbols: [{ text: "<", pos: "top" }, { text: ",", pos: "bottom" }] }],
+	["Period", { image: "letters-numbers", symbols: [{ text: ">", pos: "top" }, { text: ".", pos: "bottom" }] }],
+	["Slash", { image: "letters-numbers", symbols: [{ text: "?", pos: "top" }, { text: "/", pos: "bottom" }] }],
+	["ShiftRight", { image: "rightshift", symbols: [{ icon: "fa-angle-double-up", style: "solid", pos: "center" }] }],
+
+	// spacebar row
+	["ControlLeft", { image: "ctrl-alt-super", symbols: [{ text: "ctrl", pos: "center" }] }],
+	["MetaLeft", { image: "ctrl-alt-super", symbols: [{ icon: "fa-linux", style: "brands", pos: "center" }] }],
+	["AltLeft", { image: "ctrl-alt-super", symbols: [{ text: "alt", pos: "center" }] }],
+	["Space", { image: "space", symbols: [] }],
+	["AltRight", { image: "ctrl-alt-super", symbols: [{ text: "alt", pos: "center" }] }],
+	["MetaRight", { image: "ctrl-alt-super", symbols: [{ icon: "fa-linux", style: "brands", pos: "center" }] }],
+	["ContextMenu", { image: "ctrl-alt-super", symbols: [{ text: "fn", pos: "center" }] }],
+	["ControlRight", { image: "ctrl-alt-super", symbols: [{ text: "ctrl", pos: "center" }] }],
+]);
+
+
+// Add rest of the required fields to each entry inside KEYS
+//
+// to save on space only the fields that differ are declared above
+export function setupKeys() {
+	for (const data of KEYS.values()) {
+		data.errors = { total: 0, mistakes: 0 };
+		data.dom = { keyElement: null, glyphElements: {} };
+	}
+}
+
+// Populate the CHAR_TO_CODE lookup map
+// allows finding a key from KEYS from a raw character
+export function populateCharLookup() {
+	for (const [code, data] of KEYS) {
+		data.symbols.forEach(s => {
+			if (s.text) CHAR_TO_CODE.set(s.text, code);
+		});
+
+	}
+	for (let c = 65; c <= 90; c++) {
+		const letter = String.fromCharCode(c);
+		CHAR_TO_CODE.set(letter, `Key${letter}`);
+		CHAR_TO_CODE.set(letter.toLowerCase(), `Key${letter}`);
+	}
+	for (let d = 0; d <= 9; d++) {
+		CHAR_TO_CODE.set(String(d), `Digit${d}`);
+	}
+	CHAR_TO_CODE.set(" ", "Space");
+}
 
 // creates the virtual keyboard in the DOM
 // from SVG images stored in /resources/static/assets/keyboard
