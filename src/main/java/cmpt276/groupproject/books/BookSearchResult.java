@@ -16,4 +16,13 @@ public record BookSearchResult(
 			book.coverUrl()
 		);
 	}
+
+	public static BookSearchResult from(Book book) {
+		return new BookSearchResult(
+			book.getGutenbergId(),
+			book.getTitle(),
+			book.getAuthors().isBlank() ? List.of() : List.of(book.getAuthors().split("\\|")),
+			book.getCoverUrl()
+		);
+	}
 }

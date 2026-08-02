@@ -2,8 +2,9 @@ import { appState as app, inputState as input, bufferState } from './state.js';
 import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './buffer.js';
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
-import { updateBookProgress, updateStats } from './progress.js';
+import { loadUserStats, updateBookProgress, updateStats } from './progress.js';
 import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS, CHAR_TO_CODE } from './keyboard.js';
+
 
 
 // Check if stat tracking needs to be enabled
@@ -170,7 +171,10 @@ function handleCharacterInput(event, span) {
 
 		span.classList.remove("cursor");
 		span.classList.add("correct")
-		if (targetUnit.display === " ") app.currentTypedWordIndex++;
+		if (targetUnit.display === " ") {
+			app.currentTypedWordIndex++;
+			app.sessionWordsTyped++;
+		}
 
 		handleScroll(span);
 
@@ -184,6 +188,7 @@ function handleCharacterInput(event, span) {
 		}
 		app.sessionKeystrokes++;
 		input.currentTypingAttempt++;
+		app.mistakeCounts[expectedKey] = (app.mistakeCounts[expectedKey] || 0) + 1;
 		handleTypo(span);
 	};
 }
@@ -216,6 +221,7 @@ async function setup() {
 	window.addEventListener("keyup", handleKeyUp);
 	window.addEventListener("blur", handleBlur);
 
+	loadUserStats();
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {
 		showSessionOverlay("Unable to load your book right now. Please check your connection and try again.");

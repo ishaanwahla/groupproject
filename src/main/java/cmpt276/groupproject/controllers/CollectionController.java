@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import cmpt276.groupproject.books.AddBookRequest;
+import cmpt276.groupproject.books.BookSearchResult;
 import cmpt276.groupproject.books.CollectionBookResponse;
 import cmpt276.groupproject.books.CollectionService;
 import cmpt276.groupproject.books.ProgressRequest;
@@ -40,6 +41,17 @@ public class CollectionController {
 		return collectionService.list(currentUser(session));
 	}
 
+	@GetMapping("/recommendations")
+	public List<BookSearchResult> recommendations(HttpSession session) {
+		Long currentBookId = (Long) session.getAttribute("currentBookId");
+		return collectionService.recommendations(currentUser(session), currentBookId);
+	}
+
+	@GetMapping("/popular")
+	public List<BookSearchResult> popularBooks() {
+		return collectionService.popularBooks();
+	}
+
 	@PostMapping
 	public CollectionBookResponse add(@Valid @RequestBody AddBookRequest request, HttpSession session) {
 		return collectionService.add(currentUser(session), request.gutenbergId());
@@ -57,6 +69,11 @@ public class CollectionController {
 	public CollectionBookResponse progress(@PathVariable Long id, @Valid @RequestBody ProgressRequest request,
 			HttpSession session) {
 		return collectionService.updateProgress(currentUser(session), id, request.currentWordIndex());
+	}
+
+	@PatchMapping("/{id}/favorite")
+	public CollectionBookResponse favorite(@PathVariable Long id, HttpSession session) {
+		return collectionService.favorite(currentUser(session), id);
 	}
 
 	private UserAccount currentUser(HttpSession session) {

@@ -1,7 +1,10 @@
 package cmpt276.groupproject.models;
 
+import java.util.Map;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class TypingStatsRequest {
 
@@ -12,6 +15,17 @@ public class TypingStatsRequest {
 	@NotNull(message = "Accuracy is required.")
 	@Min(value = 0, message = "Accuracy must be zero or greater.")
 	private Integer accuracy;
+
+	private boolean completed;
+
+	@Min(value = 0, message = "Words typed must be zero or greater.")
+	private Integer wordsTyped;
+
+	@Min(value = 0, message = "Mistakes must be zero or greater.")
+	private Integer mistakes;
+
+	@Size(max = 128, message = "Mistake counts may contain at most 128 keys.")
+	private Map<@Size(min = 1, max = 8) String, @NotNull @Min(0) Integer> mistakeCounts;
 
 	public Integer getWpm() {
 		return wpm;
@@ -27,5 +41,37 @@ public class TypingStatsRequest {
 
 	public void setAccuracy(Integer accuracy) {
 		this.accuracy = accuracy;
+	}
+
+	public boolean isCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
+	}
+
+	public Integer getWordsTyped() {
+		return wordsTyped;
+	}
+
+	public void setWordsTyped(Integer wordsTyped) {
+		this.wordsTyped = wordsTyped;
+	}
+
+	public Integer getMistakes() {
+		return mistakes;
+	}
+
+	public void setMistakes(Integer mistakes) {
+		this.mistakes = mistakes;
+	}
+
+	public Map<String, Integer> getMistakeCounts() {
+		return mistakeCounts;
+	}
+
+	public void setMistakeCounts(Map<String, Integer> mistakeCounts) {
+		this.mistakeCounts = mistakeCounts;
 	}
 }

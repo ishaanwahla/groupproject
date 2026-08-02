@@ -29,41 +29,80 @@
                         <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
                         <div>
                             <h2 th:text="${user.name}">Name</h2>
-                            <p>Role: User</p>
                         </div>
-                    </div>
-                    <div class="profile-stats">
-                        <p>WPM: 50</p>
-                        <p>Accuracy: 75%</p>
                     </div>
                 </div>
 
-                <h3>Favorite Books:</h3>
+                <h3>Latest Session</h3>
+                <div class="profile-stats latest-stats">
+                    <div><strong th:text="${user.lastWpm != null ? user.lastWpm : '—'}">—</strong><span>WPM</span></div>
+                    <div><strong th:text="${user.lastAccuracy != null ? user.lastAccuracy + '%' : '—'}">—</strong><span>Accuracy</span></div>
+                    <div><strong th:text="${user.lastWordsTyped != null ? user.lastWordsTyped : '—'}">—</strong><span>Words typed</span></div>
+                    <div><strong th:text="${user.lastMistakes != null ? user.lastMistakes : '—'}">—</strong><span>Mistakes</span></div>
+                </div>
+
+                <h3>Overall Statistics</h3>
+                <div class="profile-stats overall-stats">
+                    <div><strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong><span>Personal best</span></div>
+                    <div><strong th:text="${user.averageWpm != null ? user.averageWpm : '—'}">—</strong><span>Average WPM</span></div>
+                    <div><strong th:text="${user.averageAccuracy != null ? user.averageAccuracy + '%' : '—'}">—</strong><span>Average accuracy</span></div>
+                    <div><strong th:text="${user.mostMissedKeyDisplay != null ? user.mostMissedKeyDisplay : '—'}">—</strong><span>Most missed key</span></div>
+                    <div><strong th:text="${user.mostMissedKeyCount != null ? user.mostMissedKeyCount : 0}">0</strong><span>Times missed</span></div>
+                    <div><strong th:text="${user.sessionsCompleted != null ? user.sessionsCompleted : 0}">0</strong><span>Sessions</span></div>
+                </div>
+
+                <h3>Performance Overview</h3>
+                <div class="profile-charts">
+                    <div class="profile-chart-card accuracy-card">
+                        <h4>Overall Accuracy</h4>
+                        <div class="accuracy-chart"
+                            th:style="'--accuracy: ' + ${user.averageAccuracy != null ? user.averageAccuracy : 0} + '%'">
+                            <div class="accuracy-chart-center">
+                                <strong th:text="${user.averageAccuracy != null ? user.averageAccuracy + '%' : '—'}">—</strong>
+                                <span>Accuracy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-chart-card wpm-chart-card">
+                        <h4>WPM Comparison</h4>
+                        <div class="wpm-chart">
+                            <div class="wpm-chart-row">
+                                <span>Latest</span>
+                                <div class="wpm-chart-track">
+                                    <div class="wpm-chart-bar"
+                                        th:style="'width: ' + ${user.lastWpm != null ? (user.bestWpm != null && user.bestWpm > user.lastWpm ? user.lastWpm * 100 / user.bestWpm : 100) : 0} + '%'">
+                                    </div>
+                                </div>
+                                <strong th:text="${user.lastWpm != null ? user.lastWpm : '—'}">—</strong>
+                            </div>
+                            <div class="wpm-chart-row">
+                                <span>Best</span>
+                                <div class="wpm-chart-track">
+                                    <div class="wpm-chart-bar personal-best-bar"
+                                        th:style="'width: ' + ${user.bestWpm != null ? 100 : 0} + '%'">
+                                    </div>
+                                </div>
+                                <strong th:text="${user.bestWpm != null ? user.bestWpm : '—'}">—</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Favorite Book:</h3>
                 <div class="example-books profile-favorites">
-                    <div class="book">
+                    <div class="book" th:if="${favoriteBook != null}">
                         <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
+                            <h4 th:text="${favoriteBook.title}">Book</h4>
+                            <p th:text="${favoriteBook.authors.isEmpty() ? 'Unknown author' : #strings.listJoin(favoriteBook.authors, ', ')}">Author</p>
+                            <a class="book-play" th:href="@{/app(book=${favoriteBook.id})}"><i
+                                    class="fa-solid fa-play"></i></a>
                         </div>
-                        <div class="book-placeholder-image"></div>
+                        <img class="book-cover-image" th:if="${favoriteBook.coverUrl != null}"
+                            th:src="${favoriteBook.coverUrl}" th:alt="|'Cover of ${favoriteBook.title}'|">
+                        <div class="book-placeholder-image" th:unless="${favoriteBook.coverUrl != null}"></div>
                     </div>
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
-                    <div class="book">
-                        <div class="book-info">
-                            <h4>Book</h4>
-                            <p>Author</p><button class="book-play" type="button"><i
-                                    class="fa-solid fa-play"></i></button>
-                        </div>
-                        <div class="book-placeholder-image"></div>
-                    </div>
+                    <p th:if="${favoriteBook == null}">No favorite book selected.</p>
                 </div>
             </div>
         </main>

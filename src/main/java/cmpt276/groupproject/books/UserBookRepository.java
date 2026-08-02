@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,6 +17,11 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 	@Query("select userBook from UserBook userBook where userBook.id = ?1 and userBook.user.id = ?2")
 	Optional<UserBook> findByIdAndUserIdForUpdate(Long id, Long userId);
 	Optional<UserBook> findByUserIdAndBookGutenbergId(Long userId, int gutenbergId);
+	Optional<UserBook> findByUserIdAndFavoriteTrue(Long userId);
+	@Query("select userBook.book from UserBook userBook where userBook.favorite = true "
+		+ "group by userBook.book order by count(userBook) desc, userBook.book.title asc")
+	List<Book> findMostFavoritedBooks(Pageable pageable);
 	@Query("select userBook.book.title from UserBook userBook where userBook.user.id = ?1 order by userBook.updatedAt desc")
 	List<String> findBookTitlesByUserId(Long userId);
+	void deleteAllByUserId(Long userId);
 }

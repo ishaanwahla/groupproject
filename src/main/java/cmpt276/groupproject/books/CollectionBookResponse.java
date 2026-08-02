@@ -14,6 +14,7 @@ public record CollectionBookResponse(
 	int currentWordIndex,
 	int totalWords,
 	int progressPercent,
+	boolean favorite,
 	LocalDateTime updatedAt
 ) {
 	public static CollectionBookResponse from(UserBook userBook) {
@@ -30,6 +31,7 @@ public record CollectionBookResponse(
 			userBook.getCurrentWordIndex(),
 			book.getTotalWords(),
 			progress,
+			userBook.isFavorite(),
 			userBook.getUpdatedAt()
 		);
 	}

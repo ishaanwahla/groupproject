@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,6 +24,32 @@ class CollectionServiceTest {
 		return book;
 	}
 
+	// Recommends a related book, but not one that the user already owns
+	@Test
+	void recommendsRelatedBooksNotAlreadyInTheCollection() {
+		UserBookRepository userBookRepository = mock(UserBookRepository.class);
+		GutenbergCatalogService catalogService = mock(GutenbergCatalogService.class);
+		CollectionService service = new CollectionService(mock(BookRepository.class), userBookRepository,
+			catalogService, mock(GutenbergTextService.class));
+		UserAccount user = new UserAccount();
+		user.setId(7L);
+		Book ownedBook = new Book();
+		ownedBook.setGutenbergId(1);
+		ownedBook.setSubjects("Science fiction|Adventure");
+		UserBook userBook = new UserBook();
+		userBook.setUser(user);
+		userBook.setBook(ownedBook);
+		when(userBookRepository.findAllByUserIdOrderByUpdatedAtDesc(7L)).thenReturn(List.of(userBook));
+		when(catalogService.search("Science fiction")).thenReturn(List.of(
+			new GutenbergBook(1, "Owned book", List.of(), List.of(), null, null),
+			new GutenbergBook(2, "New book", List.of(), List.of(), null, null)));
+
+		List<BookSearchResult> recommendations = service.recommendations(user, null);
+
+		assertThat(recommendations).extracting(BookSearchResult::gutenbergId).containsExactly(2);
+	}
+
+	// Makes sure the correct 20 words are returned for a book the user owns
 	@Test
 	void packsWordsUpToTheCharsPerLineBoundary() {
 		UserBookRepository userBookRepository = mock(UserBookRepository.class);
