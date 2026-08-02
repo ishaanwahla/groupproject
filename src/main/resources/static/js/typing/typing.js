@@ -162,6 +162,10 @@ async function setup() {
 	populateCharLookup(); // creates a lookup table to grab keys from a raw character
 	showSessionOverlay();
 
+	window.addEventListener("keydown", handleKeyDown);
+	window.addEventListener("keyup", handleKeyUp);
+	window.addEventListener("blur", handleBlur);
+
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {
 		showSessionOverlay("Unable to load your book right now. Please check your connection and try again.");
@@ -185,9 +189,10 @@ async function setup() {
 	beginSessionSelect();
 }
 
-window.addEventListener("keydown", (e) => {
+function handleKeyDown(e) {
 	// play the keypress animation on the virtual keyboard
-	const keyElement = KEYS.get(e.code).dom.keyElement;
+	const data = KEYS.get(e.code);
+	const keyElement = data?.dom.keyElement;
 	if (keyElement) keyElement.classList.add("pressed");
 
 	// pauses the typing test
@@ -217,18 +222,19 @@ window.addEventListener("keydown", (e) => {
 	if (app.visibleChunks[0].text.length === 0) {
 		cycleChunk();
 	}
-});
+};
 
 // revert the virtual keyboard key back to its unpressed state
-window.addEventListener("keyup", (e) => {
-	const keyElement = KEYS.get(e.code).dom.keyElement;
+function handleKeyUp(e) {
+	const data = KEYS.get(e.code);
+	const keyElement = data?.dom.keyElement;
 	if (keyElement) keyElement.classList.remove("pressed");
-});
+};
 
 // if the window loses focus keyup will never fire, clear every pressed key manually
-window.addEventListener("blur", () => {
+function handleBlur() {
 	KEYS.forEach(data => data.dom.keyElement.classList.remove("pressed"));
-});
+};
 
 /* Wait until the page loads before attempting to access DOM elements */
 document.addEventListener('DOMContentLoaded', setup);
