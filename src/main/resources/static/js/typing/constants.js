@@ -37,5 +37,15 @@ export const uiConstants = {
 	MISTAKE_STEP: 64,
 	LINE_HEIGHT: 40,
 	PAUSED_OPACITY: 0.3,
+
+	ERROR_COLOR_STOPS: [
+		{ rate: 0.00, rgb: null },
+		{ rate: 0.01, rgb: [250, 204, 21] },    // yellow
+		{ rate: 0.02, rgb: [251, 146, 60] },    // orange
+		{ rate: 0.03, rgb: [239, 68, 68] },     // orangey-red
+		{ rate: 0.04, rgb: [220, 38, 38] },     // red
+		{ rate: 0.05, rgb: [153, 27, 27] },     // deep red
+	],
 };
 Object.freeze(uiConstants);
+

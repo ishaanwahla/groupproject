@@ -3,7 +3,7 @@ import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './bu
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
 import { updateBookProgress, updateStats } from './progress.js';
-import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS } from './keyboard.js';
+import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS, CHAR_TO_CODE } from './keyboard.js';
 
 
 // Check if stat tracking needs to be enabled
@@ -52,6 +52,37 @@ export function scrollToCursor() {
 	} else if (typingInterface) {
 		// fallback in case its a fresh session
 		typingInterface.scrollTop = 0;
+	}
+}
+
+
+// Calculate a colour for the key based on the accuracy rating
+//
+// Params: rate - a percentage float representing the accuracy rating of the current key
+// Returns: a string representing the colour to style the key
+function getErrorTintColor(rate) {
+	if (rate < ui.ERROR_COLOR_STOPS[1].rate) return "transparent";
+
+	const stops = ui.ERROR_COLOR_STOPS;
+	const last = stops[stops.length - 1];
+	if (rate >= last.rate) {
+		const [r, g, b] = last.rgb;
+		return `rgba(${r}, ${g}, ${b}, 0.55)`;
+	}
+
+	for (let i = 1; i < stops.length - 1; i++) {
+		const a = stops[i], b = stops[i + 1];
+		if (rate >= a.rate && rate <= b.rate) {
+			// takes an average between the current colour stop
+			// and the next, in order to smoothly transition between them
+			const t = (rate - a.rate) / (b.rate - a.rate);
+			const [r1, g1, b1] = a.rgb;
+			const [r2, g2, b2] = b.rgb;
+			const r = Math.round(r1 + (r2 - r1) * t);
+			const g = Math.round(g1 + (g2 - g1) * t);
+			const bch = Math.round(b1 + (b2 - b1) * t);
+			return `rgba(${r}, ${g}, ${bch}, 0.55)`;
+		}
 	}
 }
 
@@ -115,6 +146,7 @@ function handleCharacterInput(event, span) {
 
 	const expectedKey = targetUnit.keys[input.currentUnitProgress];
 	const isCorrect = (event.key === expectedKey) & 1;
+	recordKeyAttempt(expectedKey, isCorrect);
 	if (isCorrect) {
 		input.currentTypingAttempt = 0;
 
@@ -155,6 +187,23 @@ function handleCharacterInput(event, span) {
 	};
 }
 
+
+// Keep track of the accuracy rating for the current letter being typed
+//
+// Params: expectedChar - raw character string of the current character being typed
+//		   isCorrect - boolean representing whether the current attempt was a typo or not
+function recordKeyAttempt(expectedChar, isCorrect) {
+	const code = CHAR_TO_CODE.get(expectedChar);
+	const data = code && KEYS.get(code);
+	if (!data) return;
+
+	data.errors.total++;
+	if (!isCorrect) data.errors.mistakes++;
+
+	const rate = data.errors.mistakes / data.errors.total;
+	data.dom.keyElement.style.setProperty("--tint-color", getErrorTintColor(rate));
+}
+
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
 	setupKeys(); // sets up the structure for all required fields on the virtual keyboard
@@ -189,6 +238,9 @@ async function setup() {
 	beginSessionSelect();
 }
 
+// Helper function called by the Event Listener for keydown events
+//
+// e - the key event propagated from the EventListener
 function handleKeyDown(e) {
 	// play the keypress animation on the virtual keyboard
 	const data = KEYS.get(e.code);
@@ -224,13 +276,17 @@ function handleKeyDown(e) {
 	}
 };
 
-// revert the virtual keyboard key back to its unpressed state
+// Helper function called by the Event Listener for keyup events
+// reverts the virtual keyboard key back to its unpressed state
+//
+// e - the key event propagated from the EventListener
 function handleKeyUp(e) {
 	const data = KEYS.get(e.code);
 	const keyElement = data?.dom.keyElement;
 	if (keyElement) keyElement.classList.remove("pressed");
 };
 
+// Helper function called by the Event Listener when the window loses focus
 // if the window loses focus keyup will never fire, clear every pressed key manually
 function handleBlur() {
 	KEYS.forEach(data => data.dom.keyElement.classList.remove("pressed"));
