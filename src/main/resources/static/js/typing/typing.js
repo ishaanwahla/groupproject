@@ -43,18 +43,30 @@ export function togglePause() {
 }
 
 // Scroll the typing Interface to the cursor's current location
+// export function scrollToCursor() {
+// 	const typingInterface = document.getElementById("typing-interface");
+// 	const currentSpan = app.spanElements[input.currentSpanPosition];
+//
+// 	if (typingInterface && currentSpan) {
+// 		typingInterface.scrollTop = currentSpan.offsetTop - ui.LINE_HEIGHT;
+// 	} else if (typingInterface) {
+// 		// fallback in case its a fresh session
+// 		typingInterface.scrollTop = 0;
+// 	}
+// }
 export function scrollToCursor() {
 	const typingInterface = document.getElementById("typing-interface");
 	const currentSpan = app.spanElements[input.currentSpanPosition];
 
 	if (typingInterface && currentSpan) {
-		typingInterface.scrollTop = currentSpan.offsetTop - ui.LINE_HEIGHT;
+		typingInterface.scrollTo({
+			top: currentSpan.offsetTop - ui.LINE_HEIGHT,
+			behavior: "instant",
+		});
 	} else if (typingInterface) {
-		// fallback in case its a fresh session
-		typingInterface.scrollTop = 0;
+		typingInterface.scrollTo({ top: 0, behavior: "instant" });
 	}
 }
-
 
 // Calculate a colour for the key based on the accuracy rating
 //
@@ -273,6 +285,7 @@ function handleKeyDown(e) {
 
 	if (app.visibleChunks[0].text.length === 0) {
 		cycleChunk();
+		scrollToCursor();
 	}
 };
 

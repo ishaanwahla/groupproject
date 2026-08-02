@@ -4,9 +4,10 @@
 // Note: Object.freeze ensures none of this data can be altered
 
 export const bufferConstants = {
-	CHUNK_SIZE: 20,
 	TARGET_BUFFER_SIZE: 5,
 	MAX_VISIBILE_CHUNKS: 4,
+	RETAINED_LINES: 2,
+	CHARS_PER_LINE: 88,
 };
 Object.freeze(bufferConstants);
 

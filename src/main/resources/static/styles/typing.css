@@ -94,6 +94,7 @@
     white-space: pre;
     line-height: 1.2;
     vertical-align: middle;
+    font-family: Consolas, Menlo, "DejaVu Sans Mono", monospace;
 }
 
 .word-block {
@@ -254,4 +255,5 @@ span.cursor::before {
 
 #typing-wrapper {
     position: relative;
+    width: min(840px, 90%);
 }

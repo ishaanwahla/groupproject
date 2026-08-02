@@ -1,13 +1,16 @@
-import { appState as app, bufferState as bufState } from './state.js';
-import { bufferConstants as buf } from './constants.js';
+import { appState as app, bufferState as bufState, inputState as input } from './state.js';
+import { bufferConstants as buf, uiConstants as ui } from './constants.js';
 import { togglePause } from './typing.js';
 import { skipCompletedWords, saveReadingProgress, updateBookProgress } from './progress.js';
 import { endSession, showErrorDialog } from './session.js';
 import { textToTypingUnits } from './text.js';
 
-async function fetchText(chunkId) {
+
+async function fetchText(startWordIndex) {
 	try {
-		const response = await fetch(`/api/collection/${app.selectedCollectionBook.id}/chunks?chunk=${chunkId}`);
+		const response = await fetch(
+			`/api/collection/${app.selectedCollectionBook.id}/chunks?startWordIndex=${startWordIndex}&charsPerLine=${buf.CHARS_PER_LINE}`
+		);
 		if (!response.ok) throw new Error("Network response returned error");
 		const chunk = await response.json();
 		chunk.text = textToTypingUnits(chunk.text);
@@ -20,7 +23,6 @@ async function fetchText(chunkId) {
 	}
 }
 
-
 // Refills the buffer when it gets too low
 export async function populateBuffer() {
 	let chunksAdded = 0;
@@ -28,10 +30,9 @@ export async function populateBuffer() {
 		const newChunk = await fetchText(bufState.currentChunkId);
 		if (!newChunk || newChunk.text.length === 0) break;
 		bufState.textBuffer.push(newChunk);
-		bufState.currentChunkId++;
+		bufState.currentChunkId = newChunk.nextWordIndex;
 		chunksAdded++;
 	}
-
 	// display an error if we can't add anything to the buffer at all (as in: empty)
 	if (chunksAdded === 0 && bufState.textBuffer.length === 0 && !bufState.reachedEndOfBook) {
 		if (!app.isPaused) togglePause();
@@ -48,21 +49,19 @@ export async function populateBuffer() {
 
 // Discards old chunks and repopulates buffer, adds new spans to NodeList for rendering
 export function cycleChunk() {
-	const completedChunk = app.visibleChunks.shift();
-	if (completedChunk) saveReadingProgress(completedChunk.nextWordIndex);
+	const chunkContainer = document.getElementById("chunk-container");
 
-	// prepare a reserve chunk so we don't run out while typing
+	const completedChunk = app.visibleChunks.shift();
+	if (completedChunk) {
+		saveReadingProgress(completedChunk.nextWordIndex);
+		trimAboveViewport();
+	}
+
 	if (bufState.textBuffer.length > 0) {
 		const newChunk = bufState.textBuffer.shift();
 		app.visibleChunks.push(newChunk);
-
 		populateBuffer();
-
-		// add new chunk to the very bottom of the DOM
-		const chunkContainer = document.getElementById("chunk-container");
 		chunkContainer.appendChild(createChunkPageElement(newChunk));
-
-		// populate the new letters into the array for the event handler to use
 		app.spanElements = Array.from(chunkContainer.querySelectorAll("span.char-span"));
 	}
 	if (app.visibleChunks.length === 0 && bufState.textBuffer.length === 0 && bufState.reachedEndOfBook) endSession();
@@ -72,7 +71,7 @@ export function cycleChunk() {
 function createChunkPageElement(chunk) {
 	const chunkDiv = document.createElement("div");
 	chunkDiv.classList.add("chunk-block");
-	chunkDiv.style.display = "inline";
+	//chunkDiv.style.display = "inline";
 
 	let wordWrapper = document.createElement("span");
 	wordWrapper.classList.add("word-block");
@@ -129,7 +128,7 @@ export async function loadSelectedBook() {
 		const requestedId = Number(new URLSearchParams(window.location.search).get('book'));
 		app.selectedCollectionBook = collection.find(book => book.id === requestedId) || collection[0];
 		if (!app.selectedCollectionBook) return false;
-		bufState.currentChunkId = Math.floor(app.selectedCollectionBook.currentWordIndex / buf.CHUNK_SIZE);
+		bufState.currentChunkId = app.selectedCollectionBook.currentWordIndex;
 		app.currentTypedWordIndex = app.selectedCollectionBook.currentWordIndex;
 		document.querySelector('.book-name').textContent = app.selectedCollectionBook.title;
 		document.querySelector('.author-name').textContent = `Author: ${app.selectedCollectionBook.authors.join(', ') || 'Unknown'}`;
@@ -145,4 +144,23 @@ export async function loadSelectedBook() {
 		console.error("Failed to load collection:", error);
 		return null;
 	}
+}
+
+function trimAboveViewport() {
+	const spans = app.spanElements;
+	const cursorSpan = spans[input.currentSpanPosition];
+	if (!cursorSpan) return;
+
+	const safeTop = cursorSpan.offsetTop - (buf.RETAINED_LINES * ui.LINE_HEIGHT);
+
+	let cutIndex = -1;
+	for (let i = 0; i < spans.length - 1; i++) {
+		if (spans[i].offsetTop >= safeTop) break;
+		if (spans[i + 1].offsetTop > spans[i].offsetTop) cutIndex = i;
+	}
+	if (cutIndex < 0) return;
+
+	for (let i = 0; i <= cutIndex; i++) spans[i].remove();
+	input.currentSpanPosition -= (cutIndex + 1);
+	app.spanElements = spans.slice(cutIndex + 1);
 }
