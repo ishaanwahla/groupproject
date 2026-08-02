@@ -1,7 +1,5 @@
 //keyboard.js
 
-import { keyboardState } from "./state.js";
-
 // Converts from raw text to lookup codes for KEYS
 // used for displaying the hint for the next key
 const CHAR_TO_CODE = new Map();
@@ -141,76 +139,93 @@ export function populateCharLookup() {
 	CHAR_TO_CODE.set(" ", "Space");
 }
 
+// Create all 5 dom elements needed for each key
+//
+// Params: type - a string representing a filename for an SVG image (minus the extension)
+// Returns: an array of 5 dom elements: 2 img elements and 3 div elements
+function createKeyDomElements(type) {
+	// create normal and pressed variants of the key
+	const [up, down] = ["up", "down"].map((state) => {
+		const imgEl = document.createElement("img");
+		imgEl.className = `key-img ${state}`;
+		const svgFile = state == "down" ? `${type}-pressed.svg` : `${type}.svg`;
+		imgEl.src = `/assets/keyboard/${svgFile}`;
+		return imgEl;
+	});
+
+	// create tinted variants of both images for displaying dynamic colours on error accumulation
+	// and "flash" variant for typo animation
+	const [tintUp, tintDown, flash] = ["tint up", "tint down", "flash"].map((label) => {
+		const el = document.createElement("div");
+		el.className = `key-${label}`;
+		const svgFile = label === "tint down" ? `${type}-pressed.svg` : `${type}.svg`;
+		el.style.setProperty("--key-mask", `url(/assets/keyboard/${svgFile})`);
+		return el;
+	});
+	return [up, down, tintUp, tintDown, flash];
+}
+
+// Create the symbol displayed on a key - either text, stacked symbols, or a font-awesome icon
+//
+// Params: data - the relevant key object pulled from KEYS
+// Returns: a div dom element with appropriately styled symbols inside of it
+function createKeyLabel(data) {
+	const labelWrap = document.createElement("div");
+	labelWrap.className = "key-label";
+	data.symbols.forEach(entry => {
+		const el = document.createElement(entry.icon ? "i" : "span");
+		el.className = entry.icon
+			? `fa-${entry.style ?? "solid"} ${entry.icon} ${entry.pos}`
+			: entry.pos;
+		if (!entry.icon) {
+			el.textContent = entry.text;
+			el.dataset.char = entry.text;
+			data.dom.glyphElements[entry.text] = el;
+		}
+		labelWrap.appendChild(el);
+	});
+
+	return labelWrap;
+}
+
 // creates the virtual keyboard in the DOM
 // from SVG images stored in /resources/static/assets/keyboard
 export function createVirtualKeyboard() {
-	keyboardState.board = document.getElementById("keyboard");
+	const board = document.getElementById("keyboard");
+	const fragment = document.createDocumentFragment();
 
-	ROWS.forEach(rowData => {
+	ROW_LAYOUT.forEach(rowCodes => {
 		const row = document.createElement("div");
 		row.className = "row";
 
-		rowData.forEach(([type, code, label]) => {
+		rowCodes.forEach(code => {
+			const data = KEYS.get(code);
+			const type = data.image;
+
 			const key = document.createElement("div");
 			key.className = "key";
 			key.style.width = `calc(${KEY_WIDTH_U[type]} * var(--u))`;
 			key.dataset.code = code;
 
-			// tint to show accumulated errors
-			const tintUp = document.createElement("div");
-			tintUp.className = "key-tint up";
-			tintUp.style.setProperty("--key-mask", `url(/assets/keyboard/${type}.svg)`);
+			const domElements = createKeyDomElements(type);
+			const labelWrap = createKeyLabel(data);
 
-			const tintDown = document.createElement("div");
-			tintDown.className = "key-tint down";
-			tintDown.style.setProperty("--key-mask", `url(/assets/keyboard/${type}-pressed.svg)`);
-
-			// animation showing incorrect keypresses
-			const flash = document.createElement("div");
-			flash.className = "key-flash";
-			flash.style.setProperty("--key-mask", `url(/assets/keyboard/${type}.svg)`);
-
-			// regular SVG
-			const up = document.createElement("img");
-			up.className = "key-img up";
-			up.src = `/assets/keyboard/${type}.svg`;
-			up.alt = label;
-
-			// keydown SVG
-			const down = document.createElement("img");
-			down.className = "key-img down";
-			down.src = `/assets/keyboard/${type}-pressed.svg`;
-			down.alt = "";
-
-
-			// create the symbol to place on the key
-			const labelWrap = document.createElement("div");
-			labelWrap.className = "key-label";
-
-			const entries = LABELS[code] ?? [{ text: label, pos: "center" }];
-			entries.forEach(entry => {
-				// check if its a font-awesome icon before defaulting to text
-				const el = document.createElement(entry.icon ? "i" : "span");
-				el.className = entry.icon
-					? `fa-${entry.style ?? "solid"} ${entry.icon} ${entry.pos}`
-					: entry.pos;
-				if (!entry.icon) el.textContent = entry.text;
-				labelWrap.appendChild(el);
-			});
-			key.append(up, down, tintUp, tintDown, flash, labelWrap);
-
+			key.append(...domElements, labelWrap);
 			row.appendChild(key);
-			keyboardState.keyRegistry.set(code, key);
+
+			data.dom.keyElement = key;
 		});
 
-		keyboardState.board.appendChild(row);
-
+		fragment.appendChild(row);
 	});
 
-	// event listener to remove the class for typo animations after they play
-	document.getElementById("keyboard").addEventListener("animationend", (e) => {
+	board.appendChild(fragment);
+
+	// listen for the end of the typo animation and remove the class after
+	board.addEventListener("animationend", (e) => {
 		if (e.target.classList.contains("key-flash")) {
 			e.target.closest(".key")?.classList.remove("typo");
 		}
 	});
-};
+}
+
