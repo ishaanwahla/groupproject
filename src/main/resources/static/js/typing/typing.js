@@ -3,7 +3,7 @@ import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './bu
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
 import { updateBookProgress, updateStats } from './progress.js';
-import { createVirtualKeyboard, setupKeys, populateCharLookup, KEYS, CHAR_TO_CODE } from './keyboard.js';
+import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS } from './keyboard.js';
 
 
 // Check if stat tracking needs to be enabled
@@ -127,6 +127,7 @@ function handleCharacterInput(event, span) {
 			// more keys required before this unit is complete —
 			// don't advance the position, don't touch the span yet
 			input.currentUnitProgress++;
+			updateKeyHint();
 			return;
 		}
 
@@ -142,6 +143,7 @@ function handleCharacterInput(event, span) {
 
 		input.currentSpanPosition++;
 		updateBookProgress(app.currentTypedWordIndex);
+		updateKeyHint();
 	} else {
 		const keyElement = KEYS.get(event.code).dom.keyElement;
 		if (keyElement) {
@@ -155,10 +157,11 @@ function handleCharacterInput(event, span) {
 
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
-	setupKeys();
+	setupKeys(); // sets up the structure for all required fields on the virtual keyboard
 	createVirtualKeyboard();
-	populateCharLookup();
+	populateCharLookup(); // creates a lookup table to grab keys from a raw character
 	showSessionOverlay();
+
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {
 		showSessionOverlay("Unable to load your book right now. Please check your connection and try again.");

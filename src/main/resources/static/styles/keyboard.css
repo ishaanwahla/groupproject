@@ -123,6 +123,24 @@
         }
     }
 
+    @keyframes hint-pulse {
+
+        0%,
+        100% {
+            color: #3d4451;
+            transform: scale(1);
+        }
+
+        50% {
+            color: #d97706;
+            transform: scale(1.15);
+        }
+    }
+
+    .hint {
+        animation: hint-pulse 1.1s ease-in-out infinite;
+    }
+
     .key.typo .key-tint.up::after,
     .key.typo .key-tint.down::after {
         animation: flash-typo 250ms ease-out;

@@ -1,8 +1,14 @@
 //keyboard.js
 
+import { appState as app } from './state.js';
+import { inputState as input } from './state.js';
+
 // Converts from raw text to lookup codes for KEYS
 // used for displaying the hint for the next key
 export const CHAR_TO_CODE = new Map();
+
+// current key to highlight on virtual keyboard
+let hintedGlyph = null;
 
 // U is an arbitrary unit of width, used to scale each key's SVG
 const KEY_WIDTH_U = {
@@ -101,7 +107,7 @@ export const KEYS = new Map([
 	["ControlLeft", { image: "ctrl-alt-super", symbols: [{ text: "ctrl", pos: "center" }] }],
 	["MetaLeft", { image: "ctrl-alt-super", symbols: [{ icon: "fa-linux", style: "brands", pos: "center" }] }],
 	["AltLeft", { image: "ctrl-alt-super", symbols: [{ text: "alt", pos: "center" }] }],
-	["Space", { image: "space", symbols: [] }],
+	["Space", { image: "space", symbols: [{ text: "space", pos: "center" }] }],
 	["AltRight", { image: "ctrl-alt-super", symbols: [{ text: "alt", pos: "center" }] }],
 	["MetaRight", { image: "ctrl-alt-super", symbols: [{ icon: "fa-linux", style: "brands", pos: "center" }] }],
 	["ContextMenu", { image: "ctrl-alt-super", symbols: [{ text: "fn", pos: "center" }] }],
@@ -229,3 +235,24 @@ export function createVirtualKeyboard() {
 	});
 }
 
+// Updates the hint for the next key to type
+export function updateKeyHint() {
+	if (hintedGlyph) {
+		hintedGlyph.classList.remove("hint");
+		hintedGlyph = null;
+	}
+
+	if (app.isPaused) return;
+
+	const targetUnit = app.visibleChunks[0]?.text[0];
+	if (!targetUnit) return;
+
+	const expectedChar = targetUnit.keys[input.currentUnitProgress];
+	const code = CHAR_TO_CODE.get(expectedChar);
+	const data = code && KEYS.get(code);
+	if (!data) return;
+
+	const glyph = data.dom.glyphElements[expectedChar] ?? data.dom.keyElement.querySelector(".key-label");
+	glyph.classList.add("hint");
+	hintedGlyph = glyph;
+}

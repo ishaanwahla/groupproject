@@ -3,6 +3,7 @@ import { sessionConstants as session, statsConstants as stat } from './constants
 import { populateBuffer } from './buffer.js';
 import { scrollToCursor } from './typing.js';
 import { saveReadingProgress, saveUserStats } from './progress.js';
+import { updateKeyHint } from './keyboard.js';
 
 // Sets up event listeners for the session start UI elements
 export function beginSessionSelect() {
@@ -89,6 +90,8 @@ export function startSession(durationSeconds, endless) {
 
 	const overlay = document.getElementById("session-select-overlay");
 	if (overlay) overlay.style.display = "none";
+
+	updateKeyHint();
 }
 
 export function showErrorDialog(message) {
