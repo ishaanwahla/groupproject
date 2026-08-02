@@ -111,6 +111,7 @@
     align-items: center;
 }
 
+
 #pause-instructions {
 
     display: flex;
@@ -138,8 +139,36 @@
     font-size: 0.9rem;
 }
 
+#end-session-btn {
+    width: auto;
+}
+
+#endSessionDialog {
+    width: min(400px, 50vw);
+    text-align: center;
+}
+
+#endSessionDialog .session-select-row {
+    justify-content: center;
+}
+
+#confirmEndSession,
+#cancelEndSession {
+    width: auto;
+}
+
 .session-preset-btn {
     white-space: nowrap;
+}
+
+#session-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#session-controls.endless {
+    justify-content: space-around;
 }
 
 /* Session select overlay (timer) */

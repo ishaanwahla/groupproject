@@ -1,7 +1,7 @@
 import { appState as app, inputState as input, bufferState } from './state.js';
 import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './buffer.js';
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
-import { showSessionOverlay, beginSessionSelect } from './session.js';
+import { showSessionOverlay, beginSessionSelect, setupEndSessionControls } from './session.js';
 import { loadUserStats, updateBookProgress, updateStats } from './progress.js';
 import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS, CHAR_TO_CODE } from './keyboard.js';
 
@@ -215,6 +215,7 @@ async function setup() {
 	setupKeys(); // sets up the structure for all required fields on the virtual keyboard
 	createVirtualKeyboard();
 	populateCharLookup(); // creates a lookup table to grab keys from a raw character
+	setupEndSessionControls();
 	showSessionOverlay();
 
 	window.addEventListener("keydown", handleKeyDown);
@@ -264,7 +265,7 @@ function handleKeyDown(e) {
 	if (keyElement) keyElement.classList.add("pressed");
 
 	// pauses the typing test
-	if (document.getElementById("errorDialog").open) return;
+	if (document.getElementById("errorDialog").open || document.getElementById("endSessionDialog").open) return;
 	if (e.key === "Escape") {
 		togglePause();
 		return;
