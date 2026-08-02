@@ -43,17 +43,6 @@ export function togglePause() {
 }
 
 // Scroll the typing Interface to the cursor's current location
-// export function scrollToCursor() {
-// 	const typingInterface = document.getElementById("typing-interface");
-// 	const currentSpan = app.spanElements[input.currentSpanPosition];
-//
-// 	if (typingInterface && currentSpan) {
-// 		typingInterface.scrollTop = currentSpan.offsetTop - ui.LINE_HEIGHT;
-// 	} else if (typingInterface) {
-// 		// fallback in case its a fresh session
-// 		typingInterface.scrollTop = 0;
-// 	}
-// }
 export function scrollToCursor() {
 	const typingInterface = document.getElementById("typing-interface");
 	const currentSpan = app.spanElements[input.currentSpanPosition];
@@ -254,6 +243,15 @@ async function setup() {
 //
 // e - the key event propagated from the EventListener
 function handleKeyDown(e) {
+	// give up input if the user is typing inside some form control
+	const active = document.activeElement;
+	const isTypingElsewhere = active && (
+		active.tagName === "INPUT" ||
+		active.tagName === "TEXTAREA" ||
+		active.isContentEditable
+	);
+	if (isTypingElsewhere) return;
+
 	// play the keypress animation on the virtual keyboard
 	const data = KEYS.get(e.code);
 	const keyElement = data?.dom.keyElement;
@@ -304,6 +302,15 @@ function handleKeyUp(e) {
 function handleBlur() {
 	KEYS.forEach(data => data.dom.keyElement.classList.remove("pressed"));
 };
+
+// Pause the app if the search dialog is opened
+document.addEventListener("focusin", (e) => {
+	const el = e.target;
+	const isTypingElsewhere = el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable;
+	if (isTypingElsewhere && app.sessionActive && !app.isPaused) {
+		togglePause();
+	}
+});
 
 /* Wait until the page loads before attempting to access DOM elements */
 document.addEventListener('DOMContentLoaded', setup);
