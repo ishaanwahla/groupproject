@@ -1,8 +1,10 @@
 import { appState as app, inputState as input, bufferState } from './state.js';
 import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './buffer.js';
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
-import { showSessionOverlay, beginSessionSelect } from './session.js';
+import { showSessionOverlay, beginSessionSelect, setupEndSessionControls } from './session.js';
 import { loadUserStats, updateBookProgress, updateStats } from './progress.js';
+import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS, CHAR_TO_CODE } from './keyboard.js';
+
 
 
 // Check if stat tracking needs to be enabled
@@ -28,7 +30,7 @@ export function togglePause() {
 		// this class will pause the cursor blinking animation
 		typingInterface.classList.add("interface-paused");
 		pauseInstructions.style.display = "none";
-		if (pauseIndicator) pauseIndicator.style.display = "block";
+		if (pauseIndicator) pauseIndicator.style.display = "flex";
 	} else { // Resume
 		if (app.bufferError) return; // refuse to unpause while in error state
 
@@ -36,7 +38,7 @@ export function togglePause() {
 		typingInterface.style.opacity = "1.0";
 		// start the cursor flashing again
 		typingInterface.classList.remove("interface-paused");
-		pauseInstructions.style.display = "block";
+		pauseInstructions.style.display = "flex";
 		if (pauseIndicator) pauseIndicator.style.display = "none";
 	}
 }
@@ -47,10 +49,42 @@ export function scrollToCursor() {
 	const currentSpan = app.spanElements[input.currentSpanPosition];
 
 	if (typingInterface && currentSpan) {
-		typingInterface.scrollTop = currentSpan.offsetTop - ui.LINE_HEIGHT;
+		typingInterface.scrollTo({
+			top: currentSpan.offsetTop - ui.LINE_HEIGHT,
+			behavior: "instant",
+		});
 	} else if (typingInterface) {
-		// fallback in case its a fresh session
-		typingInterface.scrollTop = 0;
+		typingInterface.scrollTo({ top: 0, behavior: "instant" });
+	}
+}
+
+// Calculate a colour for the key based on the accuracy rating
+//
+// Params: rate - a percentage float representing the accuracy rating of the current key
+// Returns: a string representing the colour to style the key
+function getErrorTintColor(rate) {
+	if (rate < ui.ERROR_COLOR_STOPS[1].rate) return "transparent";
+
+	const stops = ui.ERROR_COLOR_STOPS;
+	const last = stops[stops.length - 1];
+	if (rate >= last.rate) {
+		const [r, g, b] = last.rgb;
+		return `rgba(${r}, ${g}, ${b}, 0.55)`;
+	}
+
+	for (let i = 1; i < stops.length - 1; i++) {
+		const a = stops[i], b = stops[i + 1];
+		if (rate >= a.rate && rate <= b.rate) {
+			// takes an average between the current colour stop
+			// and the next, in order to smoothly transition between them
+			const t = (rate - a.rate) / (b.rate - a.rate);
+			const [r1, g1, b1] = a.rgb;
+			const [r2, g2, b2] = b.rgb;
+			const r = Math.round(r1 + (r2 - r1) * t);
+			const g = Math.round(g1 + (g2 - g1) * t);
+			const bch = Math.round(b1 + (b2 - b1) * t);
+			return `rgba(${r}, ${g}, ${bch}, 0.55)`;
+		}
 	}
 }
 
@@ -107,13 +141,14 @@ function handleTypo(span) {
 // Checks the keyboard input to determine the correct course of action
 // depending on whether the input matches the expected input
 //
-// Params: pressedKey the e.key property captured from the keydown event listener 
+// Params: event the e property captured from the keydown event listener 
 // span the Span DOM element corresponding to the current key to be typed
-function handleCharacterInput(pressedKey, span) {
+function handleCharacterInput(event, span) {
 	const targetUnit = app.visibleChunks[0].text[0];
 
 	const expectedKey = targetUnit.keys[input.currentUnitProgress];
-	const isCorrect = (pressedKey === expectedKey) & 1;
+	const isCorrect = (event.key === expectedKey) & 1;
+	recordKeyAttempt(expectedKey, isCorrect);
 	if (isCorrect) {
 		input.currentTypingAttempt = 0;
 
@@ -126,6 +161,7 @@ function handleCharacterInput(pressedKey, span) {
 			// more keys required before this unit is complete —
 			// don't advance the position, don't touch the span yet
 			input.currentUnitProgress++;
+			updateKeyHint();
 			return;
 		}
 
@@ -144,7 +180,12 @@ function handleCharacterInput(pressedKey, span) {
 
 		input.currentSpanPosition++;
 		updateBookProgress(app.currentTypedWordIndex);
+		updateKeyHint();
 	} else {
+		const keyElement = KEYS.get(event.code).dom.keyElement;
+		if (keyElement) {
+			keyElement.classList.add("pressed", "typo");
+		}
 		app.sessionKeystrokes++;
 		input.currentTypingAttempt++;
 		app.mistakeCounts[expectedKey] = (app.mistakeCounts[expectedKey] || 0) + 1;
@@ -152,9 +193,35 @@ function handleCharacterInput(pressedKey, span) {
 	};
 }
 
+
+// Keep track of the accuracy rating for the current letter being typed
+//
+// Params: expectedChar - raw character string of the current character being typed
+//		   isCorrect - boolean representing whether the current attempt was a typo or not
+function recordKeyAttempt(expectedChar, isCorrect) {
+	const code = CHAR_TO_CODE.get(expectedChar);
+	const data = code && KEYS.get(code);
+	if (!data) return;
+
+	data.errors.total++;
+	if (!isCorrect) data.errors.mistakes++;
+
+	const rate = data.errors.mistakes / data.errors.total;
+	data.dom.keyElement.style.setProperty("--tint-color", getErrorTintColor(rate));
+}
+
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
+	setupKeys(); // sets up the structure for all required fields on the virtual keyboard
+	createVirtualKeyboard();
+	populateCharLookup(); // creates a lookup table to grab keys from a raw character
+	setupEndSessionControls();
 	showSessionOverlay();
+
+	window.addEventListener("keydown", handleKeyDown);
+	window.addEventListener("keyup", handleKeyUp);
+	window.addEventListener("blur", handleBlur);
+
 	loadUserStats();
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {
@@ -179,9 +246,26 @@ async function setup() {
 	beginSessionSelect();
 }
 
-window.addEventListener("keydown", (e) => {
+// Helper function called by the Event Listener for keydown events
+//
+// e - the key event propagated from the EventListener
+function handleKeyDown(e) {
+	// give up input if the user is typing inside some form control
+	const active = document.activeElement;
+	const isTypingElsewhere = active && (
+		active.tagName === "INPUT" ||
+		active.tagName === "TEXTAREA" ||
+		active.isContentEditable
+	);
+	if (isTypingElsewhere) return;
+
+	// play the keypress animation on the virtual keyboard
+	const data = KEYS.get(e.code);
+	const keyElement = data?.dom.keyElement;
+	if (keyElement) keyElement.classList.add("pressed");
+
 	// pauses the typing test
-	if (document.getElementById("errorDialog").open) return;
+	if (document.getElementById("errorDialog").open || document.getElementById("endSessionDialog").open) return;
 	if (e.key === "Escape") {
 		togglePause();
 		return;
@@ -202,10 +286,36 @@ window.addEventListener("keydown", (e) => {
 	// if we run past the available spans somehow, return to avoid a crash
 	if (!currentSpan) return;
 
-	handleCharacterInput(e.key, currentSpan);
+	handleCharacterInput(e, currentSpan);
 
 	if (app.visibleChunks[0].text.length === 0) {
 		cycleChunk();
+		scrollToCursor();
+	}
+};
+
+// Helper function called by the Event Listener for keyup events
+// reverts the virtual keyboard key back to its unpressed state
+//
+// e - the key event propagated from the EventListener
+function handleKeyUp(e) {
+	const data = KEYS.get(e.code);
+	const keyElement = data?.dom.keyElement;
+	if (keyElement) keyElement.classList.remove("pressed");
+};
+
+// Helper function called by the Event Listener when the window loses focus
+// if the window loses focus keyup will never fire, clear every pressed key manually
+function handleBlur() {
+	KEYS.forEach(data => data.dom.keyElement.classList.remove("pressed"));
+};
+
+// Pause the app if the search dialog is opened
+document.addEventListener("focusin", (e) => {
+	const el = e.target;
+	const isTypingElsewhere = el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable;
+	if (isTypingElsewhere && app.sessionActive && !app.isPaused) {
+		togglePause();
 	}
 });
 

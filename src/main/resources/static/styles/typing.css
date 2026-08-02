@@ -94,6 +94,7 @@
     white-space: pre;
     line-height: 1.2;
     vertical-align: middle;
+    font-family: Consolas, Menlo, "DejaVu Sans Mono", monospace;
 }
 
 .word-block {
@@ -102,15 +103,24 @@
 
 #pause-indicator {
     display: none;
+    flex-direction: column;
     color: #ff3333;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    align-items: center;
 }
 
+
 #pause-instructions {
+
+    display: flex;
+    flex-direction: column;
     font-weight: bold;
     color: gray;
+    align-items: center;
     margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 #user-stats {
@@ -129,8 +139,36 @@
     font-size: 0.9rem;
 }
 
+#end-session-btn {
+    width: auto;
+}
+
+#endSessionDialog {
+    width: min(400px, 50vw);
+    text-align: center;
+}
+
+#endSessionDialog .session-select-row {
+    justify-content: center;
+}
+
+#confirmEndSession,
+#cancelEndSession {
+    width: auto;
+}
+
 .session-preset-btn {
     white-space: nowrap;
+}
+
+#session-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#session-controls.endless {
+    justify-content: space-around;
 }
 
 /* Session select overlay (timer) */
@@ -325,5 +363,7 @@ span.cursor::before {
 }
 
 #typing-wrapper {
+    margin-inline: auto;
     position: relative;
+    width: min(840px, 90%);
 }

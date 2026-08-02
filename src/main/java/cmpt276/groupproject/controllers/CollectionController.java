@@ -58,9 +58,11 @@ public class CollectionController {
 	}
 
 	@GetMapping("/{id}/chunks")
-	public TextChunkResponse chunk(@PathVariable Long id, @RequestParam(defaultValue = "0") int chunk,
+	public TextChunkResponse chunk(@PathVariable Long id,
+			@RequestParam(defaultValue = "0") int startWordIndex,
+			@RequestParam int charsPerLine,
 			HttpSession session) {
-		return collectionService.chunk(currentUser(session), id, chunk);
+		return collectionService.chunk(currentUser(session), id, startWordIndex, charsPerLine);
 	}
 
 	@PatchMapping("/{id}/progress")
@@ -76,6 +78,6 @@ public class CollectionController {
 
 	private UserAccount currentUser(HttpSession session) {
 		return authService.currentUser(session)
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required."));
 	}
 }

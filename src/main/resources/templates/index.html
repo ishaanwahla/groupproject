@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/styles/book-cards.css">
     <link rel="stylesheet" href="/styles/dialog.css">
     <link rel="stylesheet" href="/styles/typing.css">
+    <link rel="stylesheet" href="/styles/keyboard.css">
     <script type="module" src="/js/typing/typing.js"></script>
     <script type="module" src="/js/favorite.js"></script>
     <script src="/js/menu.js"></script>
@@ -33,14 +34,18 @@
                 <div id="time-display"><i class="fa-solid fa-hourglass-half"></i> Time: <span
                         id="time-value">--:--</span></div>
             </div>
-            <div id="pause-indicator">Press ESC to Resume</div>
             <div id="typing-wrapper">
                 <div id="typing-interface">
                     <div id="chunk-container"></div>
                 </div>
                 <div th:insert="~{session-select :: session-select}"></div>
             </div>
-            <div id="pause-instructions">Press ESC to Pause</div>
+            <div id="session-controls">
+                <div id="pause-indicator">Press ESC to Resume</div>
+                <div id="pause-instructions">Press ESC to Pause</div>
+                <button id="end-session-btn" class="btn-primary" hidden disabled>End Session</button>
+            </div>
+            <div id="keyboard"></div>
 
             <div class="section-heading">
                 <h3>More like this</h3>
@@ -65,6 +70,13 @@
         <form method="dialog"><button class="dialog-close"><i class="fa-solid fa-xmark"></i></button></form>
         <h2>Something went wrong</h2>
         <p id="errorDialogMessage"></p>
+    </dialog>
+    <dialog id="endSessionDialog" class="new-book-dialog">
+        <p>Are you sure you want to end the session?</p>
+        <div class="session-select-row">
+            <button id="confirmEndSession" class="btn-primary">End Session</button>
+            <button id="cancelEndSession" class="btn-secondary" autofocus>Cancel</button>
+        </div>
     </dialog>
 
 </body>

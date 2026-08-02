@@ -34,6 +34,7 @@ export const bufferState = {
 	textBuffer: [], // an array of objects representing the fetched text
 	currentChunkId: 0,
 	reachedEndOfBook: false,
+	pendingRemovalCount: 0,
 };
 Object.seal(bufferState);
 

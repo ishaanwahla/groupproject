@@ -1,0 +1,179 @@
+    :root {
+        /* represents a single width unit */
+        --u: 40px;
+        --gap: 2px;
+    }
+
+    #keyboard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--gap);
+    }
+
+    .row {
+        display: flex;
+        gap: var(--gap);
+    }
+
+    .key {
+        position: relative;
+        height: var(--u);
+    }
+
+    /* base key image container, contains both pressed and unpressed variants */
+    .key-img {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        object-fit: fill;
+        transition: opacity 0.06s ease-out;
+    }
+
+    /* unpressed key, full height*/
+    .key-img.up {
+        top: 0;
+        height: var(--u);
+        opacity: 1;
+    }
+
+    /* pressed key, slightly shorter and sits a bit lower*/
+    .key-img.down {
+        top: calc(var(--u) * 0.15);
+        height: calc(var(--u) * 0.85);
+        /* prevents the jarring darkness flicker when fading keys into each other*/
+        mix-blend-mode: plus-darker;
+        opacity: 0;
+    }
+
+    .key.pressed .key-img.up {
+        opacity: 0;
+    }
+
+    .key.pressed .key-img.down {
+        opacity: .85;
+    }
+
+    .key-tint {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        mask-image: var(--key-mask);
+        -webkit-mask-image: var(--key-mask);
+        mix-blend-mode: multiply;
+        background: var(--tint-color, transparent);
+        pointer-events: none;
+    }
+
+    .key-tint.up {
+        top: 0;
+        height: var(--u);
+    }
+
+    .key-tint.down {
+        top: calc(var(--u) * 0.15);
+        height: calc(var(--u) * 0.85);
+        opacity: 0;
+    }
+
+    .key.pressed .key-tint.up {
+        opacity: 0;
+    }
+
+    .key.pressed .key-tint.down {
+        opacity: 1;
+    }
+
+    .key-tint.up::after,
+    .key-tint.down::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        mask-image: var(--key-mask);
+        -webkit-mask-image: var(--key-mask);
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        opacity: 0;
+    }
+
+    .key-flash {
+        position: absolute;
+        inset: 0;
+        mask-image: var(--key-mask);
+        -webkit-mask-image: var(--key-mask);
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    .key.typo .key-flash {
+        animation: flash-typo 250ms ease-out;
+    }
+
+    @keyframes flash-typo {
+        from {
+            opacity: 1;
+            background: rgba(239, 68, 68, 0.6);
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes hint-pulse {
+
+        0%,
+        100% {
+            color: #3d4451;
+            transform: scale(1);
+        }
+
+        50% {
+            color: #d97706;
+            transform: scale(1.15);
+        }
+    }
+
+    .hint {
+        animation: hint-pulse 1.1s ease-in-out infinite;
+    }
+
+    .key.typo .key-tint.up::after,
+    .key.typo .key-tint.down::after {
+        animation: flash-typo 250ms ease-out;
+    }
+
+    .key-label {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        user-select: none;
+        color: #3d4451;
+        line-height: 1;
+        font-family: system-ui, sans-serif;
+        font-weight: 600;
+        transition: transform 0.06s ease-out;
+    }
+
+    .key-label .top {
+        font-size: calc(var(--u) * 0.22);
+        opacity: 0.65;
+        margin-bottom: 2px;
+    }
+
+    .key-label .bottom,
+    .key-label .center {
+        font-size: calc(var(--u) * 0.3);
+    }
+
+    .key.pressed .key-label {
+        transform: translateY(calc(var(--u) * 0.15));
+    }

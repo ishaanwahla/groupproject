@@ -1,8 +1,9 @@
 import { appState as app } from './state.js';
 import { sessionConstants as session, statsConstants as stat } from './constants.js';
 import { populateBuffer } from './buffer.js';
-import { scrollToCursor } from './typing.js';
+import { scrollToCursor, togglePause } from './typing.js';
 import { saveReadingProgress, saveUserStats } from './progress.js';
+import { updateKeyHint } from './keyboard.js';
 
 // Sets up event listeners for the session start UI elements
 export function beginSessionSelect() {
@@ -40,6 +41,27 @@ export function beginSessionSelect() {
 
 	typeAgainButton.addEventListener("click", () => {
 		showSessionOverlay("Continue typing?");
+	});
+}
+// Sets up End Session button for Endless Mode (and its confirmation dialog).
+export function setupEndSessionControls() {
+	const endBtn = document.getElementById("end-session-btn");
+	const endDialog = document.getElementById("endSessionDialog");
+	const confirmBtn = document.getElementById("confirmEndSession");
+	const cancelBtn = document.getElementById("cancelEndSession");
+
+	endBtn.addEventListener("click", () => {
+		if (!app.isPaused) togglePause();
+		endDialog.showModal();
+	});
+
+	confirmBtn.addEventListener("click", () => endDialog.close("confirmed"));
+	cancelBtn.addEventListener("click", () => endDialog.close("cancelled"));
+
+	endDialog.addEventListener("close", () => {
+		if (endDialog.returnValue === "confirmed") {
+			endSession();
+		}
 	});
 }
 
@@ -98,12 +120,25 @@ export function endSession(
 	wpm = Number(document.getElementById("wpm-value").textContent) || 0,
 	accuracy = Number(document.getElementById("accuracy-value").textContent) || stat.MAX_ACCURACY
 ) {
+
+	if (app.isPaused) togglePause();
 	app.sessionActive = false;
 	app.trackingStats = false;
 	clearInterval(app.intervalId);
 	saveReadingProgress(app.currentTypedWordIndex);
 	const mistakes = app.sessionKeystrokes - app.sessionCorrectKeystrokes;
 	saveUserStats(wpm, accuracy, true, app.sessionWordsTyped, mistakes, app.mistakeCounts);
+
+	// hide the end session button
+	const endBtn = document.getElementById("end-session-btn");
+	const sessionControls = document.getElementById("session-controls");
+	if (endBtn) {
+		endBtn.hidden = true;
+		endBtn.disabled = true;
+	}
+	if (sessionControls) sessionControls.classList.remove("endless");
+
+
 	showSessionSummary(wpm, accuracy);
 }
 
@@ -128,6 +163,16 @@ export function startSession(durationSeconds, endless) {
 
 	const overlay = document.getElementById("session-select-overlay");
 	if (overlay) overlay.style.display = "none";
+
+	const endBtn = document.getElementById("end-session-btn");
+	const sessionControls = document.getElementById("session-controls");
+	if (endBtn) {
+		endBtn.hidden = !endless;
+		endBtn.disabled = !endless;
+	}
+	if (sessionControls) sessionControls.classList.toggle("endless", endless);
+
+	updateKeyHint();
 }
 
 export function showErrorDialog(message) {

@@ -4,9 +4,10 @@
 // Note: Object.freeze ensures none of this data can be altered
 
 export const bufferConstants = {
-	CHUNK_SIZE: 20,
 	TARGET_BUFFER_SIZE: 5,
 	MAX_VISIBILE_CHUNKS: 4,
+	RETAINED_LINES: 2,
+	CHARS_PER_LINE: 88,
 };
 Object.freeze(bufferConstants);
 
@@ -37,5 +38,15 @@ export const uiConstants = {
 	MISTAKE_STEP: 64,
 	LINE_HEIGHT: 40,
 	PAUSED_OPACITY: 0.3,
+
+	ERROR_COLOR_STOPS: [
+		{ rate: 0.00, rgb: null },
+		{ rate: 0.01, rgb: [250, 204, 21] },    // yellow
+		{ rate: 0.02, rgb: [251, 146, 60] },    // orange
+		{ rate: 0.03, rgb: [239, 68, 68] },     // orangey-red
+		{ rate: 0.04, rgb: [220, 38, 38] },     // red
+		{ rate: 0.05, rgb: [153, 27, 27] },     // deep red
+	],
 };
 Object.freeze(uiConstants);
+
