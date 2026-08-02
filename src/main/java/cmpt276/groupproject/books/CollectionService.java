@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -53,6 +54,13 @@ public class CollectionService {
 			.filter(book -> collection.stream().noneMatch(userBook ->
 				userBook.getBook().getGutenbergId() == book.gutenbergId()))
 			.limit(3)
+			.map(BookSearchResult::from)
+			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public List<BookSearchResult> popularBooks() {
+		return userBookRepository.findMostFavoritedBooks(PageRequest.of(0, 3)).stream()
 			.map(BookSearchResult::from)
 			.toList();
 	}

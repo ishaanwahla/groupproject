@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.api-book').forEach(loadBook);
     document.querySelectorAll('.recommendation-books').forEach(loadRecommendations);
+    document.querySelectorAll('.popular-books').forEach(loadPopularBooks);
 
     async function loadBook(card) {
         const gutenbergId = Number(card.dataset.gutenbergId);
@@ -40,6 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (error) {
             status.textContent = 'Unable to load recommendations.';
+        }
+    }
+
+    async function loadPopularBooks(container) {
+        try {
+            const response = await fetch('/api/collection/popular');
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+            const books = await response.json();
+            books.forEach(book => {
+                const card = document.createElement('article');
+                card.className = 'book';
+                container.appendChild(card);
+                renderBook(card, book);
+            });
+        } catch (error) {
+            container.textContent = 'Unable to load popular books.';
         }
     }
 

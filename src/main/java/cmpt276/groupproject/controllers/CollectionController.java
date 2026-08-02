@@ -47,6 +47,11 @@ public class CollectionController {
 		return collectionService.recommendations(currentUser(session), currentBookId);
 	}
 
+	@GetMapping("/popular")
+	public List<BookSearchResult> popularBooks() {
+		return collectionService.popularBooks();
+	}
+
 	@PostMapping
 	public CollectionBookResponse add(@Valid @RequestBody AddBookRequest request, HttpSession session) {
 		return collectionService.add(currentUser(session), request.gutenbergId());
