@@ -254,6 +254,7 @@ span.cursor::before {
 }
 
 #typing-wrapper {
+    margin-inline: auto;
     position: relative;
     width: min(840px, 90%);
 }
