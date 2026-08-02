@@ -98,7 +98,12 @@ function setup() {
         if (user.bookTitles && user.bookTitles.length > 0) {
             for (const title of user.bookTitles) {
                 const item = document.createElement('li');
-                item.textContent = title;
+                if (user.favoriteBookTitle && title === user.favoriteBookTitle) {
+                    item.className = 'admin-books-favorite';
+                    item.textContent = `★ ${title}`;
+                } else {
+                    item.textContent = title;
+                }
                 list.appendChild(item);
             }
         } else {

@@ -44,7 +44,10 @@ public class AdminController {
 
 		return userAccountRepository.findAllByOrderByCreatedAtDescIdDesc()
 			.stream()
-			.map(user -> UserResponse.from(user, userBookRepository.findBookTitlesByUserId(user.getId())))
+			.map(user -> UserResponse.from(user, userBookRepository.findBookTitlesByUserId(user.getId()),
+				userBookRepository.findByUserIdAndFavoriteTrue(user.getId())
+					.map(userBook -> userBook.getBook().getTitle())
+					.orElse(null)))
 			.toList();
 	}
 
