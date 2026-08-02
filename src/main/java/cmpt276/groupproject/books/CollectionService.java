@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -57,6 +58,13 @@ public class CollectionService {
 			.toList();
 	}
 
+	@Transactional(readOnly = true)
+	public List<BookSearchResult> popularBooks() {
+		return userBookRepository.findMostFavoritedBooks(PageRequest.of(0, 3)).stream()
+			.map(BookSearchResult::from)
+			.toList();
+	}
+
 	@Transactional
 	public CollectionBookResponse add(UserAccount user, int gutenbergId) {
 		return userBookRepository.findByUserIdAndBookGutenbergId(user.getId(), gutenbergId)
@@ -71,6 +79,21 @@ public class CollectionService {
 		int newWordIndex = Math.min(Math.max(0, wordIndex), userBook.getBook().getTotalWords());
 		userBook.setCurrentWordIndex(Math.max(userBook.getCurrentWordIndex(), newWordIndex));
 		return CollectionBookResponse.from(userBookRepository.save(userBook));
+	}
+
+	@Transactional
+	public CollectionBookResponse favorite(UserAccount user, Long userBookId) {
+		UserBook favorite = ownedBook(user, userBookId);
+		userBookRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId()).forEach(userBook ->
+			userBook.setFavorite(userBook.getId().equals(userBookId)));
+		return CollectionBookResponse.from(userBookRepository.save(favorite));
+	}
+
+	@Transactional(readOnly = true)
+	public CollectionBookResponse favorite(UserAccount user) {
+		return userBookRepository.findByUserIdAndFavoriteTrue(user.getId())
+			.map(CollectionBookResponse::from)
+			.orElse(null);
 	}
 
 	@Transactional(readOnly = true)

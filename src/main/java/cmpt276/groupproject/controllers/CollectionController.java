@@ -47,6 +47,11 @@ public class CollectionController {
 		return collectionService.recommendations(currentUser(session), currentBookId);
 	}
 
+	@GetMapping("/popular")
+	public List<BookSearchResult> popularBooks() {
+		return collectionService.popularBooks();
+	}
+
 	@PostMapping
 	public CollectionBookResponse add(@Valid @RequestBody AddBookRequest request, HttpSession session) {
 		return collectionService.add(currentUser(session), request.gutenbergId());
@@ -62,6 +67,11 @@ public class CollectionController {
 	public CollectionBookResponse progress(@PathVariable Long id, @Valid @RequestBody ProgressRequest request,
 			HttpSession session) {
 		return collectionService.updateProgress(currentUser(session), id, request.currentWordIndex());
+	}
+
+	@PatchMapping("/{id}/favorite")
+	public CollectionBookResponse favorite(@PathVariable Long id, HttpSession session) {
+		return collectionService.favorite(currentUser(session), id);
 	}
 
 	private UserAccount currentUser(HttpSession session) {

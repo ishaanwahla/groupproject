@@ -17,14 +17,15 @@
 }
 
 /*see more text*/
-.section-heading span {
+.section-heading a {
     color: #24527a;
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 600;
+    text-decoration: none;
 }
 
-.section-heading span:hover {
+.section-heading a:hover {
     text-decoration: underline;
 }
 
