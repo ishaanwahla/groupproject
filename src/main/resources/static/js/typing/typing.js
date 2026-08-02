@@ -1,9 +1,9 @@
-import { appState as app, inputState as input, bufferState, keyboardState } from './state.js';
+import { appState as app, inputState as input, bufferState } from './state.js';
 import { cycleChunk, populateBuffer, loadSelectedBook, renderChunks } from './buffer.js';
 import { statsConstants as stat, uiConstants as ui, bufferConstants as buf } from './constants.js';
 import { showSessionOverlay, beginSessionSelect } from './session.js';
 import { updateBookProgress, updateStats } from './progress.js';
-import { createVirtualKeyboard } from './keyboard.js';
+import { createVirtualKeyboard, setupKeys, populateCharLookup, KEYS, CHAR_TO_CODE } from './keyboard.js';
 
 
 // Check if stat tracking needs to be enabled
@@ -143,7 +143,7 @@ function handleCharacterInput(event, span) {
 		input.currentSpanPosition++;
 		updateBookProgress(app.currentTypedWordIndex);
 	} else {
-		const keyElement = keyboardState.keyRegistry.get(event.code);
+		const keyElement = KEYS.get(event.code).dom.keyElement;
 		if (keyElement) {
 			keyElement.classList.add("pressed", "typo");
 		}
@@ -155,7 +155,9 @@ function handleCharacterInput(event, span) {
 
 // Setup function that runs once after the DOM finishes initializing
 async function setup() {
+	setupKeys();
 	createVirtualKeyboard();
+	populateCharLookup();
 	showSessionOverlay();
 	const loaded = await loadSelectedBook();
 	if (loaded === null) {
@@ -182,7 +184,7 @@ async function setup() {
 
 window.addEventListener("keydown", (e) => {
 	// play the keypress animation on the virtual keyboard
-	const keyElement = keyboardState.keyRegistry.get(e.code);
+	const keyElement = KEYS.get(e.code).dom.keyElement;
 	if (keyElement) keyElement.classList.add("pressed");
 
 	// pauses the typing test
@@ -216,14 +218,13 @@ window.addEventListener("keydown", (e) => {
 
 // revert the virtual keyboard key back to its unpressed state
 window.addEventListener("keyup", (e) => {
-	const keyElement = keyboardState.keyRegistry.get(e.code);
+	const keyElement = KEYS.get(e.code).dom.keyElement;
 	if (keyElement) keyElement.classList.remove("pressed");
 });
 
-
 // if the window loses focus keyup will never fire, clear every pressed key manually
 window.addEventListener("blur", () => {
-	keyboardState.keyRegistry.forEach(key => key.classList.remove("pressed"));
+	KEYS.forEach(data => data.dom.keyElement.classList.remove("pressed"));
 });
 
 /* Wait until the page loads before attempting to access DOM elements */

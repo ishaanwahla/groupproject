@@ -2,7 +2,7 @@
 
 // Converts from raw text to lookup codes for KEYS
 // used for displaying the hint for the next key
-const CHAR_TO_CODE = new Map();
+export const CHAR_TO_CODE = new Map();
 
 // U is an arbitrary unit of width, used to scale each key's SVG
 const KEY_WIDTH_U = {
@@ -35,7 +35,7 @@ const ROW_LAYOUT = [
 ];
 
 
-const KEYS = new Map([
+export const KEYS = new Map([
 	// number row
 	["Escape", { image: "letters-numbers", symbols: [{ text: "esc", pos: "center" }] }],
 	["Digit1", { image: "letters-numbers", symbols: [{ text: "!", pos: "top" }, { text: "1", pos: "bottom" }] }],
