@@ -56,10 +56,10 @@ export const KEYS = new Map([
 	["Digit0", { image: "letters-numbers", symbols: [{ text: ")", pos: "top" }, { text: "0", pos: "bottom" }] }],
 	["Minus", { image: "letters-numbers", symbols: [{ text: "_", pos: "top" }, { text: "-", pos: "bottom" }] }],
 	["Equal", { image: "letters-numbers", symbols: [{ text: "+", pos: "top" }, { text: "=", pos: "bottom" }] }],
-	["Backspace", { image: "backspace", symbols: [{ icon: "fa-delete-left", style: "solid", pos: "center" }] }],
+	["Backspace", { image: "backspace", symbols: [{ icon: "fa-left-long", style: "solid", pos: "center" }] }],
 
 	// top letter row
-	["Tab", { image: "tab-pipe", symbols: [{ icon: "fa-arrow-right-to-bracket", style: "solid", pos: "center" }] }],
+	["Tab", { image: "tab-pipe", symbols: [{ icon: "fa-arrow-right-arrow-left", style: "solid", pos: "center" }] }],
 	["KeyQ", { image: "letters-numbers", symbols: [{ text: "Q", pos: "center" }] }],
 	["KeyW", { image: "letters-numbers", symbols: [{ text: "W", pos: "center" }] }],
 	["KeyE", { image: "letters-numbers", symbols: [{ text: "E", pos: "center" }] }],
@@ -87,10 +87,10 @@ export const KEYS = new Map([
 	["KeyL", { image: "letters-numbers", symbols: [{ text: "L", pos: "center" }] }],
 	["Semicolon", { image: "letters-numbers", symbols: [{ text: ":", pos: "top" }, { text: ";", pos: "bottom" }] }],
 	["Quote", { image: "letters-numbers", symbols: [{ text: "\"", pos: "top" }, { text: "'", pos: "bottom" }] }],
-	["Enter", { image: "enter-leftshift", symbols: [{ icon: "fa-turn-down", style: "solid", pos: "center" }] }],
+	["Enter", { image: "enter-leftshift", symbols: [{ text: "enter", pos: "center" }] }],
 
 	// bottom letter row
-	["ShiftLeft", { image: "enter-leftshift", symbols: [{ icon: "fa-angle-double-up", style: "solid", pos: "center" }] }],
+	["ShiftLeft", { image: "enter-leftshift", symbols: [{ icon: "fa-up-long", style: "solid", pos: "center" }] }],
 	["KeyZ", { image: "letters-numbers", symbols: [{ text: "Z", pos: "center" }] }],
 	["KeyX", { image: "letters-numbers", symbols: [{ text: "X", pos: "center" }] }],
 	["KeyC", { image: "letters-numbers", symbols: [{ text: "C", pos: "center" }] }],
@@ -101,7 +101,7 @@ export const KEYS = new Map([
 	["Comma", { image: "letters-numbers", symbols: [{ text: "<", pos: "top" }, { text: ",", pos: "bottom" }] }],
 	["Period", { image: "letters-numbers", symbols: [{ text: ">", pos: "top" }, { text: ".", pos: "bottom" }] }],
 	["Slash", { image: "letters-numbers", symbols: [{ text: "?", pos: "top" }, { text: "/", pos: "bottom" }] }],
-	["ShiftRight", { image: "rightshift", symbols: [{ icon: "fa-angle-double-up", style: "solid", pos: "center" }] }],
+	["ShiftRight", { image: "rightshift", symbols: [{ icon: "fa-up-long", style: "solid", pos: "center" }] }],
 
 	// spacebar row
 	["ControlLeft", { image: "ctrl-alt-super", symbols: [{ text: "ctrl", pos: "center" }] }],
