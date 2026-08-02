@@ -139,3 +139,8 @@
     color: #64748b;
     border-bottom: none;
 }
+
+.admin-books-list li.admin-books-favorite {
+    color: #b45309;
+    font-weight: 600;
+}

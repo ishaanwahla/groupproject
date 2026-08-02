@@ -1,6 +1,7 @@
 package cmpt276.groupproject.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -99,6 +100,33 @@ class AdminControllerTest {
 	}
 
 	@Test
+	void adminUsersIncludesFavoriteBookTitle() throws Exception {
+		user("Admin", "admin@example.com", UserRole.ADMIN);
+		UserAccount ada = user("Ada", "ada@example.com", UserRole.USER);
+		addBookToCollection(ada, "Alice in Wonderland", false);
+		addBookToCollection(ada, "The Time Machine", true);
+		MockCookie sessionCookie = login("admin@example.com");
+
+		mockMvc.perform(get("/api/admin/users").cookie(sessionCookie))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].email").value("ada@example.com"))
+			.andExpect(jsonPath("$[0].favoriteBookTitle").value("The Time Machine"));
+	}
+
+	@Test
+	void adminUsersReturnsNullFavoriteBookTitleWhenNoneFavorited() throws Exception {
+		user("Admin", "admin@example.com", UserRole.ADMIN);
+		UserAccount ada = user("Ada", "ada@example.com", UserRole.USER);
+		addBookToCollection(ada, "Alice in Wonderland");
+		MockCookie sessionCookie = login("admin@example.com");
+
+		mockMvc.perform(get("/api/admin/users").cookie(sessionCookie))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].email").value("ada@example.com"))
+			.andExpect(jsonPath("$[0].favoriteBookTitle").value(nullValue()));
+	}
+
+	@Test
 	void adminUsersIncludesMemberSinceAndLastActive() throws Exception {
 		user("Admin", "admin@example.com", UserRole.ADMIN);
 		user("Ada", "ada@example.com", UserRole.USER);
@@ -179,6 +207,10 @@ class AdminControllerTest {
 	}
 
 	private void addBookToCollection(UserAccount user, String title) {
+		addBookToCollection(user, title, false);
+	}
+
+	private void addBookToCollection(UserAccount user, String title, boolean favorite) {
 		Book book = new Book();
 		book.setGutenbergId(bookRepository.findAll().size() + 1);
 		book.setTitle(title);
@@ -191,6 +223,7 @@ class AdminControllerTest {
 		UserBook userBook = new UserBook();
 		userBook.setUser(user);
 		userBook.setBook(book);
+		userBook.setFavorite(favorite);
 		userBookRepository.save(userBook);
 	}
 
