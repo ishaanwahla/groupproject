@@ -256,3 +256,12 @@ export function updateKeyHint() {
 	glyph.classList.add("hint");
 	hintedGlyph = glyph;
 }
+
+// Reset the error count on a new session
+export function resetKeyErrors() {
+	for (const data of KEYS.values()) {
+		data.errors.total = 0;
+		data.errors.mistakes = 0;
+		data.dom.keyElement.style.setProperty("--tint-color", "transparent");
+	}
+}

@@ -3,7 +3,7 @@ import { sessionConstants as session, statsConstants as stat } from './constants
 import { populateBuffer } from './buffer.js';
 import { scrollToCursor, togglePause } from './typing.js';
 import { saveReadingProgress, saveUserStats } from './progress.js';
-import { updateKeyHint } from './keyboard.js';
+import { updateKeyHint, resetKeyErrors } from './keyboard.js';
 
 // Sets up event listeners for the session start UI elements
 export function beginSessionSelect() {
@@ -148,6 +148,8 @@ export function startSession(durationSeconds, endless) {
 	app.sessionCorrectKeystrokes = 0;
 	app.sessionWordsTyped = 0;
 	app.mistakeCounts = {};
+
+	resetKeyErrors();
 
 	app.isEndlessMode = endless;
 	app.remainingSeconds = endless ? 0 : durationSeconds;
