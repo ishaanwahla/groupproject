@@ -5,8 +5,6 @@ import { showSessionOverlay, beginSessionSelect, setupEndSessionControls } from 
 import { loadUserStats, updateBookProgress, updateStats } from './progress.js';
 import { createVirtualKeyboard, setupKeys, populateCharLookup, updateKeyHint, KEYS, CHAR_TO_CODE } from './keyboard.js';
 
-
-
 // Check if stat tracking needs to be enabled
 function ensureStatTracking() {
 	if (!app.trackingStats) {
@@ -206,7 +204,7 @@ function recordKeyAttempt(expectedChar, isCorrect) {
 	data.errors.total++;
 	if (!isCorrect) data.errors.mistakes++;
 
-	const rate = data.errors.mistakes / data.errors.total;
+	const rate = data.errors.mistakes / Math.max(data.errors.total, ui.RAMP_SAMPLE);
 	data.dom.keyElement.style.setProperty("--tint-color", getErrorTintColor(rate));
 }
 

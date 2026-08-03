@@ -38,6 +38,7 @@ export const uiConstants = {
 	MISTAKE_STEP: 64,
 	LINE_HEIGHT: 40,
 	PAUSED_OPACITY: 0.3,
+	RAMP_SAMPLE: 100,
 
 	ERROR_COLOR_STOPS: [
 		{ rate: 0.00, rgb: null },
