@@ -2,7 +2,7 @@
 
 import { appState as app } from './state.js';
 import { inputState as input } from './state.js';
-
+import { uiConstants as ui } from './constants.js';
 // Converts from raw text to lookup codes for KEYS
 // used for displaying the hint for the next key
 export const CHAR_TO_CODE = new Map();
@@ -120,7 +120,12 @@ export const KEYS = new Map([
 // to save on space only the fields that differ are declared above
 export function setupKeys() {
 	for (const data of KEYS.values()) {
-		data.errors = { total: 0, mistakes: 0 };
+		data.errors = {
+			total: 0,
+			mistakes: 0,
+			effectiveTotal: ui.BASELINE,
+			correctCount: 0,
+		};
 		data.dom = { keyElement: null, glyphElements: {} };
 	}
 }
@@ -262,6 +267,8 @@ export function resetKeyErrors() {
 	for (const data of KEYS.values()) {
 		data.errors.total = 0;
 		data.errors.mistakes = 0;
+		data.errors.effectiveTotal = ui.BASELINE;
+		data.errors.correctCount = 0;
 		data.dom.keyElement.style.setProperty("--tint-color", "transparent");
 	}
 }

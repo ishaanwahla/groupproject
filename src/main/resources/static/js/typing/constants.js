@@ -40,6 +40,11 @@ export const uiConstants = {
 	PAUSED_OPACITY: 0.3,
 	RAMP_SAMPLE: 100,
 
+	// key error display constants
+	BASELINE: 33, // starting weight for brand new keys
+	BONUS: 7, // extra weight to allow better recovery early on
+	RECOVERY_WINDOW: 15, // presses at which to stop giving the bonus
+
 	ERROR_COLOR_STOPS: [
 		{ rate: 0.00, rgb: null },
 		{ rate: 0.01, rgb: [250, 204, 21] },    // yellow

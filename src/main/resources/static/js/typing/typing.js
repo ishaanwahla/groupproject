@@ -202,9 +202,16 @@ function recordKeyAttempt(expectedChar, isCorrect) {
 	if (!data) return;
 
 	data.errors.total++;
-	if (!isCorrect) data.errors.mistakes++;
+	if (isCorrect) {
+		data.errors.correctCount++;
+		const taper = Math.max(0, 1 - data.errors.correctCount / ui.RECOVERY_WINDOW);
+		data.errors.effectiveTotal += 1 + ui.BONUS * taper;
+	} else {
+		data.errors.mistakes++;
+		data.errors.effectiveTotal += 1;
+	}
 
-	const rate = data.errors.mistakes / Math.max(data.errors.total, ui.RAMP_SAMPLE);
+	const rate = data.errors.mistakes / data.errors.effectiveTotal;
 	data.dom.keyElement.style.setProperty("--tint-color", getErrorTintColor(rate));
 }
 
